@@ -4,11 +4,13 @@
   "description": "chess board",
   "main": "src/index.js",
   "scripts": {
-    "clean": "rm dist/app.js",
+    "clean": "rm public/app.js",
     "dev": "webpack --mode development",
+    "serve": "PORT=8000 serve public",
     "start": "webpack serve --config ./webpack.config.js --mode development",
     "build-dev": "export NODE_ENV=development && webpack",
-    "build": "export NODE_ENV=production && webpack --mode production",
+    "build-prod": "export NODE_ENV=production && webpack --mode production",
+    "start-prod": "npm run build-prod && npm run serve",
     "lint": "eslint src --ext .js -c .eslintrc",
     "prettier": "prettier src/**/*.js",
     "lint:fix": "eslint src --ext .js -c .eslintrc --fix",
@@ -53,6 +55,7 @@
   "dependencies": {
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "serve": "^11.3.2"
   }
 }

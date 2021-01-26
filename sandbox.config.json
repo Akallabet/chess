@@ -3,5 +3,7 @@
   "infiniteLoopProtection": true,
   "container": {
     "node": "14"
-  }
+  },
+  "startScript": "start",
+  "port": "800"
 }

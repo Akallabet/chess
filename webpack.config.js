@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: '[hash].app.js',
+    filename: '[fullhash].app.js',
   },
   plugins: [
     new CleanWebpackPlugin(),

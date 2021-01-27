@@ -1,6 +1,11 @@
-export const Cell = ({ isWhite }) => {
+export const Cell = ({ isWhite, children }) => {
   const color = isWhite ? 'bg-whiteCell' : 'bg-blackCell'
   return (
-    <div data-testid={`cell-${isWhite ? 'white' : 'black'}`} className={`w-14 h-14 ${color}`} />
+    <div
+      data-testid={`cell-${isWhite ? 'white' : 'black'}`}
+      className={`relative  w-14 h-14 ${color}`}
+    >
+      {children}
+    </div>
   )
 }

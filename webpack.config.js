@@ -29,6 +29,11 @@ module.exports = {
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
+      {
+        test: /\.svg$/i,
+        exclude: /node_modules/,
+        use: ['file-loader'],
+      },
     ],
   },
   devServer: {

@@ -1,7 +1,7 @@
 import { COLORS, PIECES } from './constants'
 
 export const getAvailableRows = (board) => {
-  const sumIfPiece = (total, cell) => (total + isNaN(cell) ? 1 : 0)
+  const sumIfPiece = (total, cell) => total + (isNaN(cell) ? 1 : 0)
   const isRowNotFull = ({ row }) => row.reduce(sumIfPiece, 0) < 8
   const mapRowWithIndex = (row, rowIndex) => ({ rowIndex, row })
 

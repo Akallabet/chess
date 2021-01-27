@@ -50,5 +50,8 @@ export const engine = (
     return getInfo()
   }
 
-  return { getInfo, createRandomPiece }
+  return {
+    getInfo,
+    createRandomPiece,
+  }
 }

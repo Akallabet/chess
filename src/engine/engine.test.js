@@ -31,8 +31,8 @@ test('it should return a board with two black pawn in second row', () => {
 
 test('it should create a white pawn in a random place', () => {
   const initialFEN = '8/2p1p3/8/8/8/8/8/8 w KQkq - 0 1'
-  const { createRandomPawn } = engine({ FEN: initialFEN })
-  const { board, FEN } = createRandomPawn()
+  const { createRandomPiece } = engine({ FEN: initialFEN })
+  const { board, FEN } = createRandomPiece('p')
   expect(board).not.toEqual([
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 'p', 0, 'p', 0, 0, 0],

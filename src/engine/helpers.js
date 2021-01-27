@@ -1,3 +1,5 @@
+import { COLORS, PIECES } from './constants'
+
 export const getAvailableRows = (board) => {
   const sumIfPiece = (total, cell) => (total + isNaN(cell) ? 1 : 0)
   const isRowNotFull = ({ row }) => row.reduce(sumIfPiece, 0) < 8
@@ -39,3 +41,6 @@ export const addPieceToBoard = ({ board, piece, rowIndex, cellIndex }) => [
   [...board[rowIndex].slice(0, cellIndex), piece, ...board[rowIndex].slice(cellIndex + 1)],
   ...board.slice(rowIndex + 1),
 ]
+
+export const isValidPiece = (piece) =>
+  PIECES[COLORS[0]].indexOf(piece) !== -1 || PIECES[COLORS[1]].indexOf(piece) !== -1

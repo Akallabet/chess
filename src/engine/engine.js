@@ -6,6 +6,7 @@ import {
   getRandomRow,
   getAvailableRows,
   buildFENPiecePlacementFromBoard,
+  isValidPiece,
 } from './helpers'
 
 import { COLORS, PIECES } from './constants'
@@ -15,7 +16,7 @@ export const engine = (
     FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
   }
 ) => {
-  let { FEN } = args
+  const { FEN } = args
   let [
     piecePlacement,
     activeColor,
@@ -24,6 +25,7 @@ export const engine = (
     halfmoveClock,
     fullmoveNumber,
   ] = FEN.split(' ')
+
   let board = buildBoardFromFEN(piecePlacement)
 
   const updateBoard = (newBoard) => (board = newBoard)
@@ -37,15 +39,16 @@ export const engine = (
     }
   }
 
-  const createRandomPawn = (color = COLORS[0]) => {
-    const piece = PIECES[color][0]
-    const { rowIndex, cellIndex } = getRandomCell(
-      getFreeCells(getRandomRow(getAvailableRows(board)))
-    )
-    updateBoard(addPieceToBoard({ piece, board, rowIndex, cellIndex }))
-    updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
+  const createRandomPiece = (piece) => {
+    if (isValidPiece(piece)) {
+      const { rowIndex, cellIndex } = getRandomCell(
+        getFreeCells(getRandomRow(getAvailableRows(board)))
+      )
+      updateBoard(addPieceToBoard({ piece, board, rowIndex, cellIndex }))
+      updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
+    }
     return getInfo()
   }
 
-  return { getInfo, createRandomPawn }
+  return { getInfo, createRandomPiece }
 }

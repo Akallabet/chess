@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { engine } from './engine'
 
 export const useEngine = () => {
-  const { getInfo, createRandomPiece, getLegalMoves } = useMemo(
+  const { getInfo, createRandomPiece, selectPiece, deselectPiece } = useMemo(
     () => engine({ FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' }),
     []
   )
@@ -13,8 +13,11 @@ export const useEngine = () => {
     createRandomPiece: (args) => {
       setInfo(createRandomPiece(args))
     },
-    getLegalMoves: (args) => {
-      setInfo(getLegalMoves(args))
+    selectPiece: (args) => {
+      setInfo(selectPiece(args))
+    },
+    deselectPiece: (args) => {
+      setInfo(deselectPiece(args))
     },
   }
 }

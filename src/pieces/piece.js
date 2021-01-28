@@ -8,13 +8,13 @@ const pieceComponents = {
 }
 
 export const Piece = withEngine(
-  ({ piece, color, coordinates: { number, letter, y, x }, getLegalMoves }) => {
+  ({ piece, color, coordinates: { number, letter, y, x }, selectPiece }) => {
     const PieceComponent = pieceComponents[piece]
     return (
       <button
         className="w-full h-full"
         aria-label={`${piece} ${color} ${letter}${number}`}
-        onClick={() => getLegalMoves({ y, x })}
+        onClick={() => selectPiece({ y, x })}
       >
         <PieceComponent color={color} />
       </button>

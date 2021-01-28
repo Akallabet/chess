@@ -10,6 +10,7 @@ import {
   isValidPiece,
   highlithMovesToBoard,
   cleanBoard,
+  highlithPieceCell,
 } from './helpers'
 
 export const engine = (
@@ -50,16 +51,31 @@ export const engine = (
     return getInfo()
   }
 
-  const getLegalMoves = ({ y, x }) => {
+  const deselectPiece = ({ y, x }) => {
+    updateBoard(cleanBoard(board))
+    return getInfo()
+  }
+
+  const highlightMoves = ({ y, x }) => {
     const { piece, color } = board[y][x]
     const { moves } = PIECES[piece]
-    updateBoard(highlithMovesToBoard(cleanBoard(board))(moves({ board, color, y, x })))
+    updateBoard(
+      highlithMovesToBoard(highlithPieceCell(cleanBoard(board), { y, x }))(
+        moves({ board, color, y, x })
+      )
+    )
     return getInfo()
+  }
+
+  const selectPiece = ({ y, x }) => {
+    const { highlight } = board[y][x]
+    if (highlight) return deselectPiece({ y, x })
+    return highlightMoves({ y, x })
   }
 
   return {
     getInfo,
     createRandomPiece,
-    getLegalMoves,
+    selectPiece,
   }
 }

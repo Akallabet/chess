@@ -3,6 +3,64 @@ import { engine } from './engine'
 const emptyRow = [...Array(8)].map(() => ({ piece: false }))
 const emptyBoard = [...Array(8)].map(() => emptyRow)
 
+const highlightedBoard = [
+  [...emptyRow],
+  [
+    { piece: false },
+    { piece: false },
+    { piece: 'p', color: 'b', highlight: true },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+  ],
+  [
+    { piece: false },
+    { piece: false },
+    { piece: false, highlight: true },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+  ],
+  [
+    { piece: false },
+    { piece: false },
+    { piece: false, highlight: true },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+  ],
+  ...emptyBoard.slice(4, 8),
+]
+
+const boardWithBlackPawn = [
+  [
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+  ],
+  [
+    { piece: false },
+    { piece: false },
+    { piece: 'p', color: 'b' },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+    { piece: false },
+  ],
+  ...emptyBoard.slice(2, 8),
+]
 test('it should return an empty board', () => {
   const { getInfo } = engine()
   expect(getInfo()).toEqual({
@@ -16,29 +74,7 @@ test('it should return a board with a black pawn in second row, third column', (
   const { getInfo } = engine({ FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' })
   expect(getInfo()).toEqual({
     activeColor: 'w',
-    board: [
-      [
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-      ],
-      [
-        { piece: false },
-        { piece: false },
-        { piece: 'p', color: 'b' },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-        { piece: false },
-      ],
-      ...emptyBoard.slice(2, 8),
-    ],
+    board: boardWithBlackPawn,
     FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1',
   })
 })
@@ -110,42 +146,18 @@ test('it should create a white pawn in a random place', () => {
   expect(rest[4]).toEqual(initialFEN.split(' ')[5])
 })
 
-test('it should highlight the legal moves of a black pawn', () => {
+test('it should highlight the legal moves of a piece', () => {
   const initialFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
-  const { getLegalMoves } = engine({ FEN: initialFEN })
-  const { board } = getLegalMoves({ y: 1, x: 2 })
-  expect(board).toEqual([
-    [...emptyRow],
-    [
-      { piece: false },
-      { piece: false },
-      { piece: 'p', color: 'b' },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-    ],
-    [
-      { piece: false },
-      { piece: false },
-      { piece: false, highlight: true },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-    ],
-    [
-      { piece: false },
-      { piece: false },
-      { piece: false, highlight: true },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-    ],
-    ...emptyBoard.slice(4, 8),
-  ])
+  const { selectPiece } = engine({ FEN: initialFEN })
+  const { board } = selectPiece({ y: 1, x: 2 })
+  expect(board).toEqual(highlightedBoard)
+})
+
+test('it should deselect the legal moves of a piece', () => {
+  const initialFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
+  const { selectPiece } = engine({ FEN: initialFEN })
+  const { board } = selectPiece({ y: 1, x: 2 })
+  expect(board).toEqual(highlightedBoard)
+  const { board: deselectBoard } = selectPiece({ y: 1, x: 2 })
+  expect(deselectBoard).toEqual(boardWithBlackPawn)
 })

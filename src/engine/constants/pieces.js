@@ -8,7 +8,7 @@ export const pawn = {
       if (board[y - 1][x] && !board[y - 1][x].piece) {
         moves.push({ y: y - 1, x })
       }
-      if (y === 7 && board[y - 2][x] && !board[y - 2][x].piece) {
+      if (y === 6 && board[y - 2][x] && !board[y - 2][x].piece) {
         moves.push({ y: y - 2, x })
       }
       if (

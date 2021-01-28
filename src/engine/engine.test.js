@@ -110,12 +110,12 @@ test('it should create a white pawn in a random place', () => {
   expect(rest[4]).toEqual(initialFEN.split(' ')[5])
 })
 
-test.skip('it should highlight the legal moves of a pawn', () => {
+test('it should highlight the legal moves of a black pawn', () => {
   const initialFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
   const { getLegalMoves } = engine({ FEN: initialFEN })
   const { board } = getLegalMoves({ y: 1, x: 2 })
   expect(board).toEqual([
-    ...emptyRow,
+    [...emptyRow],
     [
       { piece: false },
       { piece: false },

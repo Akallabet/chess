@@ -38,5 +38,5 @@ test('Should add a random white pawn', () => {
   const { getByAltText, getByTestId, getByRole } = render(<App />)
   const board = getByTestId('board')
   fireEvent.click(getByRole('button', { name: /Add white pawn/i }))
-  expect(within(board).getByAltText('pawn-white')).toBeDefined()
+  expect(within(board).getByRole('button', { name: /p w/i })).toBeDefined()
 })

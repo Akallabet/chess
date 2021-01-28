@@ -1,7 +1,7 @@
-import { COLORS, PIECES, FENPieces } from './constants'
+import { PIECES, FENPieces } from './constants'
 
 export const getAvailableRows = (board, piece) => {
-  const isPawn = piece === PIECES[0]
+  const isPawn = piece === PIECES[piece].name
   const isLegal = ({ rowIndex }) => (isPawn && rowIndex > 0 && rowIndex < 7) || !isPawn
 
   const sumIfPiece = (total, { piece }) => total + (piece ? 1 : 0)
@@ -57,4 +57,20 @@ export const addPieceToBoard = ({ board, piece, color, rowIndex, cellIndex }) =>
   ...board.slice(rowIndex + 1),
 ]
 
-export const isValidPiece = (piece) => PIECES.indexOf(piece) !== -1
+export const cleanBoard = (board) =>
+  board.map((row) =>
+    row.map(({ piece, color }) => {
+      const props = {}
+      if (color) props.color = color
+      return { piece, ...props }
+    })
+  )
+
+export const highlithMovesToBoard = (board) => (moves) => {
+  moves.forEach(({ y, x }) => {
+    board[y][x].highlight = true
+  })
+  return board
+}
+
+export const isValidPiece = (piece) => !!PIECES[piece]

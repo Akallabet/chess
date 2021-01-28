@@ -1,30 +1,16 @@
 import './styles.css'
 import { Board } from './board'
-import { useMemo, useState } from 'react'
-import { engine } from './engine'
+import { useEngine } from './use-engine'
 
-const useEngine = () => {
-  const { getInfo, createRandomPiece } = useMemo(
-    () => engine({ FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' }),
-    []
-  )
-  const [info, setInfo] = useState(getInfo())
-
-  return {
-    ...info,
-    createRandomPiece: (args) => {
-      setInfo(createRandomPiece(args))
-    },
-  }
-}
+import EngineContext from './engine-context'
 
 const App = () => {
-  const { board, createRandomPiece } = useEngine()
+  const { board, createRandomPiece, getLegalMoves } = useEngine()
   return (
-    <>
+    <EngineContext.Provider value={{ getLegalMoves }}>
       <Board board={board} />
       <button onClick={() => createRandomPiece({ piece: 'p', color: 'w' })}>Add white pawn</button>
-    </>
+    </EngineContext.Provider>
   )
 }
 

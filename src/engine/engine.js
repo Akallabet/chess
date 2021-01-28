@@ -1,3 +1,4 @@
+import { PIECES } from './constants'
 import {
   addPieceToBoard,
   buildBoardFromFEN,
@@ -7,6 +8,8 @@ import {
   getAvailableRows,
   buildFENPiecePlacementFromBoard,
   isValidPiece,
+  highlithMovesToBoard,
+  cleanBoard,
 } from './helpers'
 
 export const engine = (
@@ -48,7 +51,9 @@ export const engine = (
   }
 
   const getLegalMoves = ({ y, x }) => {
-    const { piece } = board[y][x]
+    const { piece, color } = board[y][x]
+    const { moves } = PIECES[piece]
+    updateBoard(highlithMovesToBoard(cleanBoard(board))(moves({ board, color, y, x })))
     return getInfo()
   }
 

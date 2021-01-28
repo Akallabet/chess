@@ -1,1 +1,1 @@
-export { Pawn } from './pawn'
+export { Piece } from './piece'

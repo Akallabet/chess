@@ -75,7 +75,7 @@ export const engine = (
   const moveActivePiece = ({ y, x }) => {
     updateBoard(
       addPieceToBoard({
-        board: removePieceFromBoard({ board, ...activePiece }),
+        board: removePieceFromBoard({ board: cleanBoard(board), ...activePiece }),
         ...activePiece,
         x,
         y,

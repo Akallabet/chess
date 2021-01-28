@@ -39,13 +39,13 @@ test('Should display a black pawn', () => {
 })
 
 test('Should add a random white pawn', () => {
-  const { getByAltText, getByTestId, getByRole } = render(<App />)
+  const { getByRole } = render(<App />)
   fireEvent.click(getByRole('button', { name: /Add white pawn/i }))
   expect(getByRole('button', { name: /p w/i })).toBeDefined()
 })
 
 test('Should move a pown on the board', () => {
-  const { getByAltText, getByTestId, getByRole } = render(<App />)
+  const { getByTestId, getByRole } = render(<App />)
   fireEvent.click(getByRole('button', { name: /p b c2/i }))
   fireEvent.click(getByTestId('c3'))
   expect(getByRole('button', { name: /p b c3/i })).toBeDefined()

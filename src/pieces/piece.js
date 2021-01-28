@@ -8,13 +8,25 @@ const pieceComponents = {
 }
 
 export const Piece = withEngine(
-  ({ piece, color, coordinates: { number, letter, y, x }, selectPiece }) => {
+  ({
+    piece,
+    color,
+    coordinates: { number, letter, y, x },
+    activePiece,
+    selectPiece,
+    deselectPiece,
+  }) => {
     const PieceComponent = pieceComponents[piece]
+    const handleClick = !activePiece
+      ? selectPiece
+      : activePiece && activePiece.y === y && activePiece.x === x
+      ? deselectPiece
+      : () => {}
     return (
       <button
         className="w-full h-full"
         aria-label={`${piece} ${color} ${letter}${number}`}
-        onClick={() => selectPiece({ y, x })}
+        onClick={() => handleClick({ y, x })}
       >
         <PieceComponent color={color} />
       </button>

@@ -47,14 +47,16 @@ export const buildFENPiecePlacementFromBoard = (board) => {
   return board.reduce((placement, row) => `${placement}/${buildRowPlacement(row)}`, '')
 }
 
-export const addPieceToBoard = ({ board, piece, color, rowIndex, cellIndex }) => [
-  ...board.slice(0, rowIndex),
-  [
-    ...board[rowIndex].slice(0, cellIndex),
-    { piece, color },
-    ...board[rowIndex].slice(cellIndex + 1),
-  ],
-  ...board.slice(rowIndex + 1),
+export const addPieceToBoard = ({ board, piece, color, y, x }) => [
+  ...board.slice(0, y),
+  [...board[y].slice(0, x), { piece, color }, ...board[y].slice(x + 1)],
+  ...board.slice(y + 1),
+]
+
+export const removePieceFromBoard = ({ board, y, x }) => [
+  ...board.slice(0, y),
+  [...board[y].slice(0, x), { piece: false }, ...board[y].slice(x + 1)],
+  ...board.slice(y + 1),
 ]
 
 export const cleanBoard = (board) =>

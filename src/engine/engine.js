@@ -11,6 +11,7 @@ import {
   highlithMovesToBoard,
   cleanBoard,
   highlithPieceCell,
+  removePieceFromBoard,
 } from './helpers'
 
 export const engine = (
@@ -27,24 +28,26 @@ export const engine = (
     halfmoveClock,
     fullmoveNumber,
   ] = FEN.split(' ')
-
   let board = buildBoardFromFEN(piecePlacement)
+  let activePiece = false
 
   const updateBoard = (newBoard) => (board = newBoard)
   const updatePiecePlacement = (newPiecePlacement) => (piecePlacement = newPiecePlacement)
+  const updateActivePiece = (newActivePiece) => (activePiece = newActivePiece)
 
   const getInfo = () => ({
     activeColor,
     board,
     FEN: `${piecePlacement} ${activeColor} ${castlingAvailability} ${enPassantTarget} ${halfmoveClock} ${fullmoveNumber}`,
+    activePiece,
   })
 
   const createRandomPiece = ({ piece, color }) => {
     if (isValidPiece(piece)) {
-      const { rowIndex, cellIndex } = getRandomCell(
+      const { rowIndex: y, cellIndex: x } = getRandomCell(
         getFreeCells(getRandomRow(getAvailableRows(board, piece)))
       )
-      const newBoard = addPieceToBoard({ piece, color, board, rowIndex, cellIndex })
+      const newBoard = addPieceToBoard({ piece, color, board, y, x })
       updateBoard(newBoard)
       updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
     }
@@ -53,10 +56,11 @@ export const engine = (
 
   const deselectPiece = ({ y, x }) => {
     updateBoard(cleanBoard(board))
+    updateActivePiece(false)
     return getInfo()
   }
 
-  const highlightMoves = ({ y, x }) => {
+  const selectPiece = ({ y, x }) => {
     const { piece, color } = board[y][x]
     const { moves } = PIECES[piece]
     updateBoard(
@@ -64,18 +68,28 @@ export const engine = (
         moves({ board, color, y, x })
       )
     )
+    updateActivePiece({ y, x, piece, color })
     return getInfo()
   }
 
-  const selectPiece = ({ y, x }) => {
-    const { highlight } = board[y][x]
-    if (highlight) return deselectPiece({ y, x })
-    return highlightMoves({ y, x })
+  const moveActivePiece = ({ y, x }) => {
+    updateBoard(
+      addPieceToBoard({
+        board: removePieceFromBoard({ board, ...activePiece }),
+        ...activePiece,
+        x,
+        y,
+      })
+    )
+    updateActivePiece(false)
+    return getInfo()
   }
 
   return {
     getInfo,
     createRandomPiece,
     selectPiece,
+    deselectPiece,
+    moveActivePiece,
   }
 }

@@ -67,6 +67,7 @@ test('it should return an empty board', () => {
     activeColor: 'w',
     board: emptyBoard,
     FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
+    activePiece: false,
   })
 })
 
@@ -76,6 +77,7 @@ test('it should return a board with a black pawn in second row, third column', (
     activeColor: 'w',
     board: boardWithBlackPawn,
     FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1',
+    activePiece: false,
   })
 })
 
@@ -107,6 +109,7 @@ test('it should return a board with two black pawn in second row', () => {
       ...emptyBoard.slice(2, 8),
     ],
     FEN: '8/2p1p3/8/8/8/8/8/8 w KQkq - 0 1',
+    activePiece: false,
   })
 })
 
@@ -149,15 +152,26 @@ test('it should create a white pawn in a random place', () => {
 test('it should highlight the legal moves of a piece', () => {
   const initialFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
   const { selectPiece } = engine({ FEN: initialFEN })
-  const { board } = selectPiece({ y: 1, x: 2 })
+  const { board, activePiece } = selectPiece({ y: 1, x: 2 })
   expect(board).toEqual(highlightedBoard)
+  expect(activePiece).toEqual({ y: 1, x: 2, piece: 'p', color: 'b' })
 })
 
 test('it should deselect the legal moves of a piece', () => {
   const initialFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
-  const { selectPiece } = engine({ FEN: initialFEN })
-  const { board } = selectPiece({ y: 1, x: 2 })
+  const { selectPiece, deselectPiece } = engine({ FEN: initialFEN })
+  const { board, activePiece } = selectPiece({ y: 1, x: 2 })
   expect(board).toEqual(highlightedBoard)
-  const { board: deselectBoard } = selectPiece({ y: 1, x: 2 })
-  expect(deselectBoard).toEqual(boardWithBlackPawn)
+  expect(activePiece).toEqual({ y: 1, x: 2, piece: 'p', color: 'b' })
+  const info = deselectPiece({ y: 1, x: 2 })
+  expect(info.board).toEqual(boardWithBlackPawn)
+  expect(info.activePiece).toEqual(false)
 })
+
+// test('it should capture a pawn', () => {
+//   const initialFEN = '8/2p5/1P6/8/8/8/8/8 w KQkq - 0 1'
+//   const { selectPiece, movePiece } = engine({ FEN: initialFEN })
+//   selectPiece({ y: 1, x: 2 })
+//   const { FEN } = moveActivePiece({ y: 2, x: 1 })
+//   expect(FEN).toEqual('8/8/1p6/8/8/8/8/8 w KQkq - 0 1')
+// })

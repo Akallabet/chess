@@ -1,15 +1,19 @@
 import { render, within, fireEvent } from '@testing-library/react'
-
 import App from './app'
+
 test('Should display a chess board', () => {
-  const { getAllByTestId, getByTestId, getByText } = render(<App />)
+  const { getAllByTestId, getByTestId } = render(<App />)
 
   const board = getByTestId('board')
 
   expect(board).toBeDefined()
-  expect(getAllByTestId('row').length).toEqual(8)
-  expect(getAllByTestId('cell-white').length).toEqual(32)
-  expect(getAllByTestId('cell-black').length).toEqual(32)
+  ;[...Array(8)]
+    .map((_, i) => i + 1)
+    .forEach((number) =>
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].forEach((letter) => {
+        expect(getByTestId(`${letter}${number}`)).toBeDefined()
+      })
+    )
   expect(within(board).getByText('1')).toBeDefined()
   expect(within(board).getByText('2')).toBeDefined()
   expect(within(board).getByText('3')).toBeDefined()
@@ -29,14 +33,20 @@ test('Should display a chess board', () => {
 })
 
 test('Should display a black pawn', () => {
-  const { getByAltText, getByTestId } = render(<App />)
+  const { getByRole, getByTestId } = render(<App />)
   const board = getByTestId('board')
-  expect(within(board).getByAltText('pawn-black')).toBeDefined()
+  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
 })
 
 test('Should add a random white pawn', () => {
   const { getByAltText, getByTestId, getByRole } = render(<App />)
-  const board = getByTestId('board')
   fireEvent.click(getByRole('button', { name: /Add white pawn/i }))
-  expect(within(board).getByRole('button', { name: /p w/i })).toBeDefined()
+  expect(getByRole('button', { name: /p w/i })).toBeDefined()
+})
+
+test('Should move a pown on the board', () => {
+  const { getByAltText, getByTestId, getByRole } = render(<App />)
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c3'))
+  expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
 })

@@ -12,8 +12,8 @@ const useEngine = () => {
 
   return {
     ...info,
-    createRandomPiece: (piece) => {
-      setInfo(createRandomPiece(piece))
+    createRandomPiece: (args) => {
+      setInfo(createRandomPiece(args))
     },
   }
 }
@@ -23,7 +23,7 @@ const App = () => {
   return (
     <>
       <Board board={board} />
-      <button onClick={() => createRandomPiece('P')}>Add white pawn</button>
+      <button onClick={() => createRandomPiece({ piece: 'p', color: 'w' })}>Add white pawn</button>
     </>
   )
 }

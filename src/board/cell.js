@@ -1,14 +1,14 @@
 import { Pawn } from '../pieces/pawn'
 
-export const Cell = ({ isWhite, cell, children }) => {
-  const color = isWhite ? 'bg-whiteCell' : 'bg-blackCell'
+export const Cell = ({ isWhite, cell: { piece, color }, children }) => {
+  // if (color) console.log(color)
   return (
     <div
       data-testid={`cell-${isWhite ? 'white' : 'black'}`}
-      className={`relative  w-14 h-14 ${color}`}
+      className={`relative  w-14 h-14 ${isWhite ? 'bg-whiteCell' : 'bg-blackCell'}`}
     >
       {children}
-      {cell ? <Pawn color={cell} /> : null}
+      {piece ? <Pawn color={color} /> : null}
     </div>
   )
 }

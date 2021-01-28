@@ -9,8 +9,6 @@ import {
   isValidPiece,
 } from './helpers'
 
-import { COLORS, PIECES } from './constants'
-
 export const engine = (
   args = {
     FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
@@ -31,27 +29,32 @@ export const engine = (
   const updateBoard = (newBoard) => (board = newBoard)
   const updatePiecePlacement = (newPiecePlacement) => (piecePlacement = newPiecePlacement)
 
-  const getInfo = () => {
-    return {
-      activeColor,
-      board,
-      FEN: `${piecePlacement} ${activeColor} ${castlingAvailability} ${enPassantTarget} ${halfmoveClock} ${fullmoveNumber}`,
-    }
-  }
+  const getInfo = () => ({
+    activeColor,
+    board,
+    FEN: `${piecePlacement} ${activeColor} ${castlingAvailability} ${enPassantTarget} ${halfmoveClock} ${fullmoveNumber}`,
+  })
 
-  const createRandomPiece = (piece) => {
+  const createRandomPiece = ({ piece, color }) => {
     if (isValidPiece(piece)) {
       const { rowIndex, cellIndex } = getRandomCell(
-        getFreeCells(getRandomRow(getAvailableRows(board)))
+        getFreeCells(getRandomRow(getAvailableRows(board, piece)))
       )
-      updateBoard(addPieceToBoard({ piece, board, rowIndex, cellIndex }))
+      const newBoard = addPieceToBoard({ piece, color, board, rowIndex, cellIndex })
+      updateBoard(newBoard)
       updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
     }
+    return getInfo()
+  }
+
+  const getLegalMoves = ({ y, x }) => {
+    const { piece } = board[y][x]
     return getInfo()
   }
 
   return {
     getInfo,
     createRandomPiece,
+    getLegalMoves,
   }
 }

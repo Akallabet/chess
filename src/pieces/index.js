@@ -1,1 +1,0 @@
-export { Piece } from './piece'

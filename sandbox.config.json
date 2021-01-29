@@ -1,9 +1,0 @@
-{
-  "template": "node",
-  "infiniteLoopProtection": true,
-  "container": {
-    "node": "14",
-    "startScript": "start-prod",
-    "port": "8000"
-  }
-}

@@ -1,5 +1,14 @@
 {
-  "plugins": ["@babel/plugin-proposal-class-properties"],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "helpers": true,
+        "regenerator": true
+      }
+    ]
+  ],
   "presets": [
     "@babel/preset-env",
     [

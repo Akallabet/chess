@@ -14,32 +14,23 @@ import {
   removePieceFromBoard,
 } from './helpers'
 
-export const engine = (
-  args = {
-    FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
-  }
-) => {
-  const { FEN } = args
-  let [
-    piecePlacement,
-    activeColor,
-    castlingAvailability,
-    enPassantTarget,
-    halfmoveClock,
-    fullmoveNumber,
-  ] = FEN.split(' ')
-  let board = buildBoardFromFEN(piecePlacement)
+export const engine = ({ FEN: initialFEN }) => {
+  let FEN = initialFEN
+  let board = buildBoardFromFEN(initialFEN)
   let activePiece = false
   const capturedPieces = []
 
+  const updateFEN = (newFEN) => (FEN = newFEN)
   const updateBoard = (newBoard) => (board = newBoard)
-  const updatePiecePlacement = (newPiecePlacement) => (piecePlacement = newPiecePlacement)
+  const updatePiecePlacement = (piecePlacement) => {
+    const [_, ...FENParts] = FEN.split(' ')
+    updateFEN(`${piecePlacement} ${FENParts.join(' ')}`)
+  }
   const updateActivePiece = (newActivePiece) => (activePiece = newActivePiece)
 
   const getInfo = () => ({
-    activeColor,
+    FEN,
     board,
-    FEN: `${piecePlacement} ${activeColor} ${castlingAvailability} ${enPassantTarget} ${halfmoveClock} ${fullmoveNumber}`,
     activePiece,
     capturedPieces,
   })
@@ -53,13 +44,11 @@ export const engine = (
       updateBoard(newBoard)
       updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
     }
-    return getInfo()
   }
 
   const deselectPiece = ({ y, x }) => {
     updateBoard(cleanBoard(board))
     updateActivePiece(false)
-    return getInfo()
   }
 
   const selectPiece = ({ y, x }) => {
@@ -71,7 +60,6 @@ export const engine = (
       )
     )
     updateActivePiece({ y, x, piece, color })
-    return getInfo()
   }
 
   const moveActivePiece = ({ y, x }) => {
@@ -87,14 +75,26 @@ export const engine = (
     if (cell.piece) capturedPieces.push(cell)
     updateActivePiece(false)
     updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
+  }
+
+  const reset = ({ FEN: newFEN }) => {
+    updateFEN(newFEN)
+    updateBoard(buildBoardFromFEN(newFEN))
+    updateActivePiece(false)
+  }
+
+  const addInfo = (f) => (args) => {
+    f(args)
     return getInfo()
   }
 
   return {
     getInfo,
-    createRandomPiece,
-    selectPiece,
-    deselectPiece,
-    moveActivePiece,
+    ...getInfo(),
+    createRandomPiece: addInfo(createRandomPiece),
+    selectPiece: addInfo(selectPiece),
+    deselectPiece: addInfo(deselectPiece),
+    moveActivePiece: addInfo(moveActivePiece),
+    reset: addInfo(reset),
   }
 }

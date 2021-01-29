@@ -1,11 +1,15 @@
 import { useMemo, useState } from 'react'
 import { engine } from '../engine'
 
-export const useEngine = ({ onMove, initialData }) => {
-  const { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece } = useMemo(
-    () => engine(initialData || { FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' }),
-    [initialData]
-  )
+export const useEngine = ({ onMove, initialData, defaultInitialData }) => {
+  const {
+    getInfo,
+    createRandomPiece,
+    selectPiece,
+    deselectPiece,
+    moveActivePiece,
+    reset,
+  } = useMemo(() => engine(initialData || defaultInitialData), [initialData])
   const [info, setInfo] = useState(getInfo())
 
   return {
@@ -22,6 +26,9 @@ export const useEngine = ({ onMove, initialData }) => {
     moveActivePiece: (args) => {
       setInfo(moveActivePiece(args))
       onMove()
+    },
+    reset: () => {
+      setInfo(reset(defaultInitialData))
     },
   }
 }

@@ -1,8 +1,21 @@
+const colors = require('tailwindcss/colors')
+
 module.exports = {
   purge: ['./src/**/*.js'],
   darkMode: false, // or 'media' or 'class'
   theme: {
     colors: {
+      blue: colors.blue,
+      primary: {
+        light: colors.green[500],
+        DEFAULT: colors.green[500],
+        dark: colors.green[600],
+      },
+      secondary: {
+        light: colors.white,
+        DEFAULT: colors.white,
+        dark: colors.white,
+      },
       blackCell: {
         light: '#b58863',
         DEFAULT: '#b58863',

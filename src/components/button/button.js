@@ -1,8 +1,22 @@
 import clsx from 'clsx'
 import { bool, func, node } from 'prop-types'
 
-export const Button = ({ onClick, children, fullWidth, fullHeight, ...buttonProps }) => {
-  const classes = clsx({ 'w-full': fullWidth, 'h-full': fullHeight })
+export const Button = ({
+  onClick,
+  children,
+  fullWidth,
+  fullHeight,
+  backGround,
+  padding,
+  ...buttonProps
+}) => {
+  const classes = clsx('text-secondary', 'rounded-md', {
+    'p-1.5': padding,
+    'bg-primary': backGround,
+    'hover:bg-primary-dark': backGround,
+    'w-full': fullWidth,
+    'h-full': fullHeight,
+  })
   return (
     <button className={`${classes}`} onClick={onClick} {...buttonProps}>
       {children}
@@ -15,10 +29,14 @@ Button.propTypes = {
   children: node.isRequired,
   fullWidth: bool,
   fullHeight: bool,
+  backGround: bool,
+  padding: bool,
 }
 
 Button.defaultProps = {
   onClick: () => {},
   fullWidth: false,
   fullHeight: false,
+  backGround: true,
+  padding: true,
 }

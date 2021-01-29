@@ -26,6 +26,8 @@ export const Piece = withEngine(
       <Button
         fullWidth
         fullHeight
+        backGround={false}
+        padding={false}
         aria-label={`${piece} ${color} ${letter}${number}`}
         onClick={() => handleClick({ y, x })}
       >

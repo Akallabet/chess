@@ -57,3 +57,13 @@ test('Should play a sound when moving a piece', () => {
   fireEvent.click(getByTestId('c3'))
   expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1)
 })
+
+test('Should reset the board', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(<App />)
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c3'))
+  expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+  fireEvent.click(getByRole('button', { name: /reset/i }))
+  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+})

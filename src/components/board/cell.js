@@ -1,21 +1,20 @@
+import clsx from 'clsx'
 import { Piece } from '../pieces'
 import { withEngine } from '../../engine'
 
 export const Cell = withEngine(
   ({ isWhite, cell: { piece, color, highlight }, coordinates, children, moveActivePiece }) => {
     const handleClick = highlight ? moveActivePiece : () => {}
+    const classes = clsx('relative', 'w-14', 'h-14', {
+      'bg-whiteCellHighlight': isWhite && highlight,
+      'bg-whiteCell': isWhite && !highlight,
+      'bg-blackCellHighlight': !isWhite && highlight,
+      'bg-blackCell': !isWhite && !highlight,
+    })
     return (
       <div
         data-testid={`${coordinates.letter}${coordinates.number}`}
-        className={`relative  w-14 h-14 ${
-          isWhite
-            ? highlight
-              ? 'bg-whiteCellHighlight'
-              : 'bg-whiteCell'
-            : highlight
-            ? 'bg-blackCellHighlight'
-            : 'bg-blackCell'
-        }`}
+        className={classes}
         onClick={() => handleClick(coordinates)}
       >
         {children}

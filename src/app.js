@@ -9,6 +9,7 @@ import { useStorage, useLoadData } from './storage'
 const App = () => {
   const { playMove } = useSounds({ hasSound: true })
   const initialData = useLoadData()
+
   const {
     FEN,
     board,
@@ -17,13 +18,26 @@ const App = () => {
     selectPiece,
     deselectPiece,
     moveActivePiece,
-  } = useEngine({ onMove: playMove, initialData })
+    reset,
+  } = useEngine({
+    onMove: playMove,
+    initialData,
+    defaultInitialData: { FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' },
+  })
+
   useStorage({ FEN, board, activePiece })
   return (
     <div className="max-w-xl mx-auto">
       <I18nProvider language="en-GB">
         <EngineProvider
-          value={{ selectPiece, deselectPiece, activePiece, moveActivePiece, createRandomPiece }}
+          value={{
+            selectPiece,
+            deselectPiece,
+            activePiece,
+            moveActivePiece,
+            createRandomPiece,
+            reset,
+          }}
         >
           <Board board={board} />
           <Controls />

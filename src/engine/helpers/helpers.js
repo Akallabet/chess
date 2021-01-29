@@ -20,7 +20,8 @@ export const getFreeCells = ({ rowIndex, row }) => {
   return row.map(mapCellWithIndex).filter(isCellEmpty)
 }
 
-export const buildBoardFromFEN = (piecePlacement) => {
+export const buildBoardFromFEN = (FEN) => {
+  const [piecePlacement] = FEN.split(' ')
   const addEmptyCells = (num) =>
     [...Array(Number(num))].map(() => ({
       piece: false,

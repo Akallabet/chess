@@ -1,5 +1,6 @@
 {
   "controls": {
-    "randomWhitePawn": "Add white pawn"
+    "randomWhitePawn": "Add white pawn",
+    "reset": "reset"
   }
 }

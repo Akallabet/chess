@@ -1,12 +1,12 @@
-import { withEngine } from '../../engine'
-import { Button } from '../button'
+import { withEngine } from '../../../engine'
 import { RandomWhitePawn } from './random-white-pawn'
+import { Reset } from './reset'
 
 export const Controls = withEngine(({ createRandomPiece, reset }) => {
   return (
     <>
       <RandomWhitePawn onClick={createRandomPiece} />
-      <Button onClick={reset}>reset</Button>
+      <Reset onClick={reset} />
     </>
   )
 })

@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { Piece } from '../pieces'
-import { withEngine } from '../../engine'
+import { withEngine } from '../../../engine'
 
 export const Cell = withEngine(
   ({ isWhite, cell: { piece, color, highlight }, coordinates, children, moveActivePiece }) => {

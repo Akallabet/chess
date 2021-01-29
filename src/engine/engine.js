@@ -30,6 +30,7 @@ export const engine = (
   ] = FEN.split(' ')
   let board = buildBoardFromFEN(piecePlacement)
   let activePiece = false
+  const capturedPieces = []
 
   const updateBoard = (newBoard) => (board = newBoard)
   const updatePiecePlacement = (newPiecePlacement) => (piecePlacement = newPiecePlacement)
@@ -40,6 +41,7 @@ export const engine = (
     board,
     FEN: `${piecePlacement} ${activeColor} ${castlingAvailability} ${enPassantTarget} ${halfmoveClock} ${fullmoveNumber}`,
     activePiece,
+    capturedPieces,
   })
 
   const createRandomPiece = ({ piece, color }) => {
@@ -73,6 +75,7 @@ export const engine = (
   }
 
   const moveActivePiece = ({ y, x }) => {
+    const cell = { ...board[y][x] }
     updateBoard(
       addPieceToBoard({
         board: removePieceFromBoard({ board: cleanBoard(board), ...activePiece }),
@@ -81,6 +84,7 @@ export const engine = (
         y,
       })
     )
+    if (cell.piece) capturedPieces.push(cell)
     updateActivePiece(false)
     return getInfo()
   }

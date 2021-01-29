@@ -68,6 +68,7 @@ test('it should return an empty board', () => {
     board: emptyBoard,
     FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
     activePiece: false,
+    capturedPieces: [],
   })
 })
 
@@ -78,6 +79,7 @@ test('it should return a board with a black pawn in second row, third column', (
     board: boardWithBlackPawn,
     FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1',
     activePiece: false,
+    capturedPieces: [],
   })
 })
 
@@ -110,6 +112,7 @@ test('it should return a board with two black pawn in second row', () => {
     ],
     FEN: '8/2p1p3/8/8/8/8/8/8 w KQkq - 0 1',
     activePiece: false,
+    capturedPieces: [],
   })
 })
 

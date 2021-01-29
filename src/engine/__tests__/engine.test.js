@@ -171,10 +171,10 @@ test('it should deselect the legal moves of a piece', () => {
   expect(info.activePiece).toEqual(false)
 })
 
-// test('it should capture a pawn', () => {
-//   const initialFEN = '8/2p5/1P6/8/8/8/8/8 w KQkq - 0 1'
-//   const { selectPiece, movePiece } = engine({ FEN: initialFEN })
-//   selectPiece({ y: 1, x: 2 })
-//   const { FEN } = moveActivePiece({ y: 2, x: 1 })
-//   expect(FEN).toEqual('8/8/1p6/8/8/8/8/8 w KQkq - 0 1')
-// })
+test('it should move a pawn', () => {
+  const initialFEN = '8/8/8/8/8/8/3P4/8 w KQkq - 0 1'
+  const { selectPiece, moveActivePiece } = engine({ FEN: initialFEN })
+  selectPiece({ y: 6, x: 3 })
+  const { FEN } = moveActivePiece({ y: 5, x: 3 })
+  expect(FEN).toEqual('8/8/8/8/8/3P4/8/8 w KQkq - 0 1')
+})

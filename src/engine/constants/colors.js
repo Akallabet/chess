@@ -1,1 +1,1 @@
-export const COLORS = ['w', 'b']
+export const COLORS = { w: 'w', b: 'b' }

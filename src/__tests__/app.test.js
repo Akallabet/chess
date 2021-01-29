@@ -50,3 +50,10 @@ test('Should move a pown on the board', () => {
   fireEvent.click(getByTestId('c3'))
   expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
 })
+
+test('Should play a sound when moving a piece', () => {
+  const { getByTestId, getByRole } = render(<App />)
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c3'))
+  expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1)
+})

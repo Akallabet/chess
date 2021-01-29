@@ -86,6 +86,7 @@ export const engine = (
     )
     if (cell.piece) capturedPieces.push(cell)
     updateActivePiece(false)
+    updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
     return getInfo()
   }
 

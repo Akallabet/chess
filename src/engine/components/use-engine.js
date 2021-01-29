@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { engine } from '../engine'
 
-export const useEngine = ({ onMove }) => {
+export const useEngine = ({ onMove, initialData }) => {
   const { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece } = useMemo(
-    () => engine({ FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' }),
+    () => engine(initialData || { FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' }),
     []
   )
   const [info, setInfo] = useState(getInfo())

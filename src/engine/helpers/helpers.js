@@ -21,16 +21,12 @@ export const getFreeCells = ({ rowIndex, row }) => {
 }
 
 export const buildBoardFromFEN = (piecePlacement) => {
-  const convertFromFEN = (piece) => {
-    const color = FENPieces['w'].indexOf(piece) !== -1 ? 'w' : 'b'
-    return { piece, color }
-  }
   const addEmptyCells = (num) =>
     [...Array(Number(num))].map(() => ({
       piece: false,
     }))
   const buildCell = (row, cell) =>
-    isNaN(cell) ? [...row, convertFromFEN(cell)] : [...row, ...addEmptyCells(cell)]
+    isNaN(cell) ? [...row, FENPieces[cell]] : [...row, ...addEmptyCells(cell)]
   const buildRow = (rowPlacement) => rowPlacement.split('').reduce(buildCell, [])
 
   return piecePlacement.split('/').map(buildRow)
@@ -38,13 +34,15 @@ export const buildBoardFromFEN = (piecePlacement) => {
 
 export const buildFENPiecePlacementFromBoard = (board) => {
   const buildRowPlacement = (row) =>
-    row.reduce((str, { piece }) => {
-      if (piece) return `${str}${piece}`
-      const lastInfo = str[str.length - 1]
-      if (isNaN(lastInfo)) return `${str}1`
-      return `${str}${lastInfo + 1}`
+    row.reduce((str, { piece, color }) => {
+      if (piece) return `${str}${PIECES[piece].FEN[color]}`
+      if (isNaN(str[str.length - 1])) return `${str}1`
+      return `${str.slice(0, str.length - 1)}${Number(str[str.length - 1]) + 1}`
     }, '')
-  return board.reduce((placement, row) => `${placement}/${buildRowPlacement(row)}`, '')
+  return board.reduce((placement, row) => {
+    const separator = placement ? '/' : ''
+    return `${placement}${separator}${buildRowPlacement(row)}`
+  }, '')
 }
 
 export const addPieceToBoard = ({ board, piece, color, y, x }) => [

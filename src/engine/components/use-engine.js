@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { engine } from './engine'
+import { engine } from '../engine'
 
 export const useEngine = () => {
   const { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece } = useMemo(

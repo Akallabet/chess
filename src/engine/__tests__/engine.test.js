@@ -1,4 +1,4 @@
-import { engine } from './engine'
+import { engine } from '../engine'
 
 const emptyRow = [...Array(8)].map(() => ({ piece: false }))
 const emptyBoard = [...Array(8)].map(() => emptyRow)

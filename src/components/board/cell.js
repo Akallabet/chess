@@ -1,5 +1,5 @@
-import { Piece } from '../pieces/'
-import withEngine from '../with-engine'
+import { Piece } from '../../pieces'
+import { withEngine } from '../../engine'
 
 export const Cell = withEngine(
   ({ isWhite, cell: { piece, color, highlight }, coordinates, children, moveActivePiece }) => {

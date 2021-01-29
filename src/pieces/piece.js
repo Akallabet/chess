@@ -1,5 +1,4 @@
-import { PIECES } from '../engine'
-import withEngine from '../with-engine'
+import { PIECES, withEngine } from '../engine'
 
 import { Pawn } from './pawn'
 

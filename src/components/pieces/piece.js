@@ -1,4 +1,5 @@
-import { PIECES, withEngine } from '../engine'
+import { PIECES, withEngine } from '../../engine'
+import { Button } from '../button'
 
 import { Pawn } from './pawn'
 
@@ -22,13 +23,14 @@ export const Piece = withEngine(
       ? deselectPiece
       : () => {}
     return (
-      <button
-        className="w-full h-full"
+      <Button
+        fullWidth
+        fullHeight
         aria-label={`${piece} ${color} ${letter}${number}`}
         onClick={() => handleClick({ y, x })}
       >
         <PieceComponent color={color} />
-      </button>
+      </Button>
     )
   }
 )

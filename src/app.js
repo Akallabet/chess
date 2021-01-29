@@ -20,14 +20,16 @@ const App = () => {
   } = useEngine({ onMove: playMove, initialData })
   useStorage({ FEN, board, activePiece })
   return (
-    <I18nProvider language="en-GB">
-      <EngineProvider
-        value={{ selectPiece, deselectPiece, activePiece, moveActivePiece, createRandomPiece }}
-      >
-        <Board board={board} />
-        <Controls />
-      </EngineProvider>
-    </I18nProvider>
+    <div className="max-w-xl mx-auto">
+      <I18nProvider language="en-GB">
+        <EngineProvider
+          value={{ selectPiece, deselectPiece, activePiece, moveActivePiece, createRandomPiece }}
+        >
+          <Board board={board} />
+          <Controls />
+        </EngineProvider>
+      </I18nProvider>
+    </div>
   )
 }
 

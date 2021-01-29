@@ -4,7 +4,7 @@ import { engine } from '../engine'
 export const useEngine = ({ onMove, initialData }) => {
   const { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece } = useMemo(
     () => engine(initialData || { FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' }),
-    []
+    [initialData]
   )
   const [info, setInfo] = useState(getInfo())
 

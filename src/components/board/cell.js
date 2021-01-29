@@ -1,4 +1,4 @@
-import { Piece } from '../../pieces'
+import { Piece } from '../pieces'
 import { withEngine } from '../../engine'
 
 export const Cell = withEngine(

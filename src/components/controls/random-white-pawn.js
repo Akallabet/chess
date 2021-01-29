@@ -1,7 +1,8 @@
 import { withI18n } from '../../i18n'
+import { Button } from '../button'
 
 export const RandomWhitePawn = withI18n(({ onClick, content }) => (
-  <button onClick={() => onClick({ piece: 'p', color: 'w' })}>
+  <Button onClick={() => onClick({ piece: 'p', color: 'w' })}>
     {content.controls.randomWhitePawn}
-  </button>
+  </Button>
 ))

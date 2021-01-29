@@ -1,5 +1,5 @@
 import { render, within, fireEvent } from '@testing-library/react'
-import App from './app'
+import App from '../app'
 
 test('Should display a chess board', () => {
   const { getAllByTestId, getByTestId } = render(<App />)

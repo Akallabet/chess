@@ -14,6 +14,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Chess Board',
       template: 'src/index.html',
+      favicon: 'src/favicon.ico',
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],
@@ -30,9 +31,13 @@ module.exports = {
         use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
-        test: /\.svg$/i,
-        exclude: /node_modules/,
-        use: ['file-loader'],
+        test: /\.(mp3|svg)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: 'assets/sounds/[name].[ext]',
+          },
+        },
       },
     ],
   },

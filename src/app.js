@@ -3,8 +3,10 @@ import { Board } from './components/board'
 import { useEngine, EngineProvider } from './engine'
 import { I18nProvider } from './i18n'
 import { Controls } from './components/controls'
+import { useSounds } from './sounds/use-sounds'
 
 const App = () => {
+  const { playMove } = useSounds({ hasSound: true })
   const {
     board,
     activePiece,
@@ -12,7 +14,7 @@ const App = () => {
     selectPiece,
     deselectPiece,
     moveActivePiece,
-  } = useEngine()
+  } = useEngine({ onMove: playMove })
   return (
     <I18nProvider language="en-GB">
       <EngineProvider

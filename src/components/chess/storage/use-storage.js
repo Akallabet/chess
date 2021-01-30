@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
-export const useStorage = ({ FEN, board, activePiece }) => {
+export const useStorage = (data) => {
   useEffect(() => {
-    localStorage.setItem('chess', JSON.stringify({ FEN, board, activePiece }))
-  }, [FEN, board, activePiece])
+    localStorage.setItem('chess', JSON.stringify(data))
+  }, [data])
 }

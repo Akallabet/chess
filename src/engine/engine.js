@@ -14,11 +14,16 @@ import {
   removePieceFromBoard,
 } from './helpers'
 
-export const engine = ({ FEN: initialFEN }) => {
+export const engine = ({
+  FEN: initialFEN,
+  board: initialBoard,
+  activePiece: initialActivePiece,
+  capturedPieces: initialCapturedPieces,
+}) => {
   let FEN = initialFEN
-  let board = buildBoardFromFEN(initialFEN)
-  let activePiece = false
-  const capturedPieces = []
+  let board = initialBoard || buildBoardFromFEN(initialFEN)
+  let activePiece = initialActivePiece || false
+  const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (newFEN) => (FEN = newFEN)
   const updateBoard = (newBoard) => (board = newBoard)
@@ -90,7 +95,6 @@ export const engine = ({ FEN: initialFEN }) => {
 
   return {
     getInfo,
-    ...getInfo(),
     createRandomPiece: addInfo(createRandomPiece),
     selectPiece: addInfo(selectPiece),
     deselectPiece: addInfo(deselectPiece),

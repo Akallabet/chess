@@ -1,34 +1,40 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useHistory } from '../../components/chess/history'
+import { useLoadData, useStorage } from '../../components/chess/storage'
 import { engine } from '../engine'
 
-export const useEngine = ({ onMove, initialData, defaultInitialData }) => {
-  const {
-    getInfo,
-    createRandomPiece,
-    selectPiece,
-    deselectPiece,
-    moveActivePiece,
-    reset,
-  } = useMemo(() => engine(initialData || defaultInitialData), [initialData])
-  const [info, setInfo] = useState(getInfo())
+export const useEngine = ({ onMove, defaultInitialData }) => {
+  const history = useLoadData()
+
+  const data = history ? history.current : defaultInitialData
+  const { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece } = useMemo(
+    () => engine(data),
+    [data]
+  )
+
+  const { stack, current, head, undo, reset, add, redo } = useHistory(history, getInfo())
+
+  useStorage({ stack, current, head })
+  const { board, activePiece } = current
 
   return {
-    ...info,
+    board,
+    activePiece,
     createRandomPiece: (args) => {
-      setInfo(createRandomPiece(args))
+      add(createRandomPiece(args))
     },
     selectPiece: (args) => {
-      setInfo(selectPiece(args))
+      add(selectPiece(args))
     },
     deselectPiece: (args) => {
-      setInfo(deselectPiece(args))
+      add(deselectPiece(args))
     },
     moveActivePiece: (args) => {
-      setInfo(moveActivePiece(args))
+      add(moveActivePiece(args))
       onMove()
     },
-    reset: () => {
-      setInfo(reset(defaultInitialData))
-    },
+    reset,
+    undo,
+    redo,
   }
 }

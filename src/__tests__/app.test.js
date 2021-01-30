@@ -67,3 +67,67 @@ test('Should reset the board', async () => {
   fireEvent.click(getByRole('button', { name: /reset/i }))
   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
 })
+
+test('Should undo a move', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(<App />)
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c4'))
+  expect(getByRole('button', { name: /p b c4/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+
+  fireEvent.click(getByRole('button', { name: /</i }))
+  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
+})
+
+test('Should not redo if at the history stack head', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(<App />)
+
+  fireEvent.click(getByRole('button', { name: />/i }))
+  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+})
+
+test('Should redo several moves', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(<App />)
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c4'))
+  fireEvent.click(getByRole('button', { name: /p b c4/i }))
+  fireEvent.click(getByTestId('c5'))
+  fireEvent.click(getByRole('button', { name: /p b c5/i }))
+  fireEvent.click(getByTestId('c6'))
+
+  expect(getByRole('button', { name: /p b c6/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+
+  fireEvent.click(getByRole('button', { name: /</i }))
+  fireEvent.click(getByRole('button', { name: /</i }))
+  fireEvent.click(getByRole('button', { name: /</i }))
+  fireEvent.click(getByRole('button', { name: /</i }))
+  fireEvent.click(getByRole('button', { name: /</i }))
+  fireEvent.click(getByRole('button', { name: /</i }))
+
+  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c6/i })).toBeNull()
+
+  fireEvent.click(getByRole('button', { name: />/i }))
+  fireEvent.click(getByRole('button', { name: />/i }))
+  fireEvent.click(getByRole('button', { name: />/i }))
+  fireEvent.click(getByRole('button', { name: />/i }))
+  fireEvent.click(getByRole('button', { name: />/i }))
+  fireEvent.click(getByRole('button', { name: />/i }))
+
+  expect(getByRole('button', { name: /p b c6/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+})
+
+// test('Should write new history of actions after going back', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: /p b c2/i }))
+//   fireEvent.click(getByTestId('c4'))
+//   expect(getByRole('button', { name: /p b c4/i })).toBeDefined()
+//   expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+
+//   fireEvent.click(getByRole('button', { name: /</i }))
+//   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+//   expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
+// })

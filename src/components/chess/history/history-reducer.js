@@ -15,9 +15,9 @@ export default (state, action) => {
       }
     }
     case ADD: {
-      const { stack: currentStack } = state
+      const { stack: currentStack, head: currentHead } = state
       const { configuration } = action
-      const stack = [...currentStack, { ...configuration }]
+      const stack = [...currentStack.slice(0, currentHead + 1), { ...configuration }]
       const head = stack.length - 1
       return {
         stack,
@@ -27,30 +27,41 @@ export default (state, action) => {
     }
     case UNDO: {
       const { stack, head: currentHead } = state
+      const { onAction } = action
       const head = currentHead ? currentHead - 1 : 0
+      const current = stack[head]
+      onAction(current)
       return {
         stack,
         head,
-        current: stack[head],
+        current,
       }
     }
     case REDO: {
       const { stack, head: currentHead } = state
+      const { onAction } = action
       const head = currentHead < stack.length - 1 ? currentHead + 1 : currentHead
+      const current = stack[head]
+      onAction(current)
       return {
         stack,
         head,
-        current: stack[head],
+        current,
       }
     }
     case RESET: {
       const { stack: currentStack } = state
+      const { onAction } = action
       const stack = [{ ...currentStack[0] }]
       const head = 0
+      const current = stack[head]
+
+      onAction(current)
+
       return {
-        stack: [{ ...stack[0] }],
+        stack,
         head,
-        current: stack[head],
+        current,
       }
     }
     default:

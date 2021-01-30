@@ -2,7 +2,7 @@ import { useReducer } from 'react'
 import { createActions } from './action-creator'
 import historyReducer from './history-reducer'
 
-export const useHistory = (history, info) => {
+export const useHistory = (history, info, onAction) => {
   const [state, dispatch] = useReducer(
     historyReducer,
     history || {
@@ -11,12 +11,13 @@ export const useHistory = (history, info) => {
       head: 0,
     }
   )
-  const actions = createActions(dispatch)
-  const { stack, current } = state
+  const actions = createActions(dispatch, onAction)
+  const { stack, current, head } = state
 
   return {
     stack,
     current,
+    head,
     ...actions,
   }
 }

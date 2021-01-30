@@ -80,7 +80,7 @@ test('Should undo a move', async () => {
   expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
 })
 
-test('Should not redo if at the history stack head', async () => {
+test('Should not redo if at the end of the history stack', async () => {
   const { getByTestId, getByRole, queryByRole } = render(<App />)
 
   fireEvent.click(getByRole('button', { name: />/i }))
@@ -120,14 +120,14 @@ test('Should redo several moves', async () => {
   expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
 })
 
-// test('Should write new history of actions after going back', async () => {
-//   const { getByTestId, getByRole, queryByRole } = render(<App />)
-//   fireEvent.click(getByRole('button', { name: /p b c2/i }))
-//   fireEvent.click(getByTestId('c4'))
-//   expect(getByRole('button', { name: /p b c4/i })).toBeDefined()
-//   expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+test('Should write new history after going back', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(<App />)
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c4'))
+  fireEvent.click(getByRole('button', { name: /</i }))
+  fireEvent.click(getByTestId('c3'))
 
-//   fireEvent.click(getByRole('button', { name: /</i }))
-//   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
-//   expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
-// })
+  expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+  expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
+})

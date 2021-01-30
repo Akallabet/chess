@@ -5,11 +5,11 @@ import { withEngine } from '../../../engine'
 export const Cell = withEngine(
   ({ isWhite, cell: { piece, color, highlight }, coordinates, children, moveActivePiece }) => {
     const handleClick = highlight ? moveActivePiece : () => {}
-    const classes = clsx('relative', 'w-14', 'h-14', {
-      'bg-whiteCellHighlight': isWhite && highlight,
-      'bg-whiteCell': isWhite && !highlight,
-      'bg-blackCellHighlight': !isWhite && highlight,
-      'bg-blackCell': !isWhite && !highlight,
+    const classes = clsx('relative', 'h-full', 'w-1/8', {
+      'bg-primary-dark': isWhite && highlight,
+      'bg-primary': isWhite && !highlight,
+      'bg-secondary-dark': !isWhite && highlight,
+      'bg-secondary': !isWhite && !highlight,
     })
     return (
       <div

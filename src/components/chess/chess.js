@@ -25,7 +25,7 @@ export const Chess = () => {
 
   useStorage({ FEN, board, activePiece })
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="px-3 w-full sm:px-0 sm:max-w-xl sm:mx-auto">
       <EngineProvider
         value={{
           selectPiece,

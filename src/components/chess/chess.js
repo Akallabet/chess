@@ -4,6 +4,7 @@ import { Controls } from './controls'
 import { useSounds } from './sounds/use-sounds'
 import { useStorage, useLoadData } from './storage'
 import { Box } from '../box'
+import { useHistory } from './use-history'
 
 export const Chess = () => {
   const { playMove } = useSounds({ hasSound: true })
@@ -25,6 +26,8 @@ export const Chess = () => {
   })
 
   useStorage({ FEN, board, activePiece })
+  const history = useHistory({ FEN, board, activePiece })
+
   return (
     <div className="px-3 w-full sm:px-0 sm:max-w-xl sm:mx-auto">
       <EngineProvider

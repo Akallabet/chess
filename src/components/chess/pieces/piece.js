@@ -28,6 +28,7 @@ export const Piece = withGame(
         fullHeight
         backGround={false}
         padding={false}
+        borders={false}
         aria-label={`${piece} ${color} ${letter}${number}`}
         onClick={() => handleClick({ y, x })}
       >

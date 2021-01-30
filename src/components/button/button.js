@@ -8,9 +8,13 @@ export const Button = ({
   fullHeight,
   backGround,
   padding,
+  borders,
   ...buttonProps
 }) => {
-  const classes = clsx('text-secondary', 'rounded-md', 'border-secondary', 'border', {
+  const classes = clsx('text-secondary', {
+    'rounded-md': borders,
+    'border-secondary': borders,
+    border: borders,
     'p-1.5': padding,
     'bg-primary': backGround,
     'hover:bg-primary-dark': backGround,
@@ -31,6 +35,7 @@ Button.propTypes = {
   fullHeight: bool,
   backGround: bool,
   padding: bool,
+  borders: bool,
 }
 
 Button.defaultProps = {
@@ -39,4 +44,5 @@ Button.defaultProps = {
   fullHeight: false,
   backGround: true,
   padding: true,
+  borders: true,
 }

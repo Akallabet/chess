@@ -14,7 +14,7 @@ import {
   removePieceFromBoard,
 } from './helpers'
 
-export const engine = ({
+export const game = ({
   FEN: initialFEN,
   board: initialBoard,
   activePiece: initialActivePiece,
@@ -82,12 +82,6 @@ export const engine = ({
     updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
   }
 
-  const reset = ({ FEN: newFEN }) => {
-    updateFEN(newFEN)
-    updateBoard(buildBoardFromFEN(newFEN))
-    updateActivePiece(false)
-  }
-
   const addInfo = (f) => (args) => {
     f(args)
     return getInfo()
@@ -99,6 +93,5 @@ export const engine = ({
     selectPiece: addInfo(selectPiece),
     deselectPiece: addInfo(deselectPiece),
     moveActivePiece: addInfo(moveActivePiece),
-    reset: addInfo(reset),
   }
 }

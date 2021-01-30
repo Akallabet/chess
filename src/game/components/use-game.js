@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useHistory } from '../../components/chess/history'
 import { useLoadData, useStorage } from '../../components/chess/storage'
-import { engine } from '../engine'
+import { game } from '../game'
 
-export const useEngine = ({ onMove, defaultInitialData }) => {
+export const useGame = ({ onMove, defaultInitialData }) => {
   const history = useLoadData()
 
   const data = history ? history.current : defaultInitialData
@@ -11,9 +11,9 @@ export const useEngine = ({ onMove, defaultInitialData }) => {
   const [
     { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece },
     setEngine,
-  ] = useState(engine(data))
+  ] = useState(game(data))
 
-  const resetGame = (configuration) => setEngine(engine(configuration))
+  const resetGame = (configuration) => setEngine(game(configuration))
 
   const { stack, current, head, undo, reset, add, redo } = useHistory(history, getInfo(), resetGame)
 

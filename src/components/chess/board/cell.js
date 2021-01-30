@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { Piece } from '../pieces'
-import { withEngine } from '../../../engine'
+import { withGame } from '../../../game'
 
-export const Cell = withEngine(
+export const Cell = withGame(
   ({ isWhite, cell: { piece, color, highlight }, coordinates, children, moveActivePiece }) => {
     const handleClick = highlight ? moveActivePiece : () => {}
     const classes = clsx('relative', 'h-full', 'w-1/8', {

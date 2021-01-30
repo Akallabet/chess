@@ -1,5 +1,5 @@
 import { Board } from './board'
-import { useEngine, EngineProvider } from '../../engine'
+import { useGame, GameProvider } from '../../game'
 import { Controls } from './controls'
 import { useSounds } from './sounds/use-sounds'
 import { Box } from '../box'
@@ -23,14 +23,14 @@ export const Chess = () => {
     reset,
     undo,
     redo,
-  } = useEngine({
+  } = useGame({
     onMove: playMove,
     defaultInitialData,
   })
 
   return (
     <div className="px-3 w-full sm:px-0 sm:max-w-xl sm:mx-auto">
-      <EngineProvider
+      <GameProvider
         value={{
           selectPiece,
           deselectPiece,
@@ -46,7 +46,7 @@ export const Chess = () => {
           <Board board={board} />
         </Box>
         <Controls />
-      </EngineProvider>
+      </GameProvider>
     </div>
   )
 }

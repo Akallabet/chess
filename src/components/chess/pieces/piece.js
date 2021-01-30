@@ -1,4 +1,4 @@
-import { PIECES, withEngine } from '../../../engine'
+import { PIECES, withGame } from '../../../game'
 import { Button } from '../../button'
 
 import { Pawn } from './pawn'
@@ -7,7 +7,7 @@ const pieceComponents = {
   [PIECES.p.name]: Pawn,
 }
 
-export const Piece = withEngine(
+export const Piece = withGame(
   ({
     piece,
     color,

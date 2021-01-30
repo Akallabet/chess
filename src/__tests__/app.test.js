@@ -82,7 +82,6 @@ test('Should undo a move', async () => {
 
 test('Should not redo if at the end of the history stack', async () => {
   const { getByTestId, getByRole, queryByRole } = render(<App />)
-
   fireEvent.click(getByRole('button', { name: />/i }))
   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
 })

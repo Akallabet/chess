@@ -10,7 +10,7 @@ export const Button = ({
   padding,
   ...buttonProps
 }) => {
-  const classes = clsx('text-secondary', 'rounded-md', {
+  const classes = clsx('text-secondary', 'rounded-md', 'border-secondary', 'border', {
     'p-1.5': padding,
     'bg-primary': backGround,
     'hover:bg-primary-dark': backGround,

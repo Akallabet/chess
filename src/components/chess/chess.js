@@ -3,6 +3,7 @@ import { useEngine, EngineProvider } from '../../engine'
 import { Controls } from './controls'
 import { useSounds } from './sounds/use-sounds'
 import { useStorage, useLoadData } from './storage'
+import { Box } from '../box'
 
 export const Chess = () => {
   const { playMove } = useSounds({ hasSound: true })
@@ -36,7 +37,9 @@ export const Chess = () => {
           reset,
         }}
       >
-        <Board board={board} />
+        <Box pb={1}>
+          <Board board={board} />
+        </Box>
         <Controls />
       </EngineProvider>
     </div>

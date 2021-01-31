@@ -9,7 +9,7 @@ export const Chess = ({ FEN }) => {
   const { playMove } = useSounds({ hasSound: true })
 
   return (
-    <Box px={3} fullWidth sm={{ px: 0, maxWidth: 'xl', mx: 'auto', w: 452 }}>
+    <Box px={3} fullWidth sm={{ px: 0, mx: 'auto', w: 452 }}>
       <GameProvider onMove={playMove} FEN={FEN}>
         <Box pb={1}>
           <Board />

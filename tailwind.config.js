@@ -1,8 +1,8 @@
-const colors = require('tailwindcss/colors')
+/* eslint-disable no-undef */
 
 module.exports = {
   purge: ['./src/**/*.js'],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: false,
   theme: {
     colors: {
       primary: {
@@ -17,6 +17,9 @@ module.exports = {
       },
     },
     extend: {
+      maxWidth: {
+        452: '452px',
+      },
       width: {
         452: '452px',
         '1/8': '12.5%',

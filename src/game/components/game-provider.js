@@ -1,0 +1,48 @@
+import { func, node, string } from 'prop-types'
+import GameContext from './game-context'
+import { useGame } from './use-game'
+
+export const GameProvider = ({ FEN, onMove, children }) => {
+  const {
+    board,
+    activePiece,
+    createRandomPiece,
+    selectPiece,
+    deselectPiece,
+    moveActivePiece,
+    reset,
+    undo,
+    redo,
+  } = useGame({
+    onMove,
+    defaultInitialData: { FEN },
+  })
+
+  return (
+    <GameContext.Provider
+      value={{
+        board,
+        activePiece,
+        selectPiece,
+        deselectPiece,
+        moveActivePiece,
+        createRandomPiece,
+        reset,
+        undo,
+        redo,
+      }}
+    >
+      {children}
+    </GameContext.Provider>
+  )
+}
+
+GameProvider.propTypes = {
+  FEN: string.isRequired,
+  onMove: func,
+  children: node.isRequired,
+}
+
+GameProvider.defaultProps = {
+  onMove: () => {},
+}

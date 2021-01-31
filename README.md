@@ -1,17 +1,18 @@
 # CHESS
 
-# [Live version](https://akallabet.github.io/chess/)
+## [Live version](https://akallabet.github.io/chess/)
 
-# [Code Sandboc](https://codesandbox.io/s/wonderful-lewin-geftn)
+## [Code Sandbox](https://codesandbox.io/s/wonderful-lewin-geftn)
 
 ## Contents
 
-3. [ Project Objectives ](#project-objectives)
-4. [ Project Structure ](#project-structure)
-5. [ Installation ](#installation)
-6. [ Local Development ](#local-development)
+1. [ Features ](#features)
+2. [ Structure ](#structure)
+3. [ Styling ](#styling)
+4. [ Installation ](#installation)
+5. [ Local Development ](#local-development)
 
-## project-features
+## Features
 
 - Display a chessboard with a default FEN of: 8/2p5/8/8/8/8/8/8 w KQkq - 0 1
 - Display a button that adds a white pawn to a random legal position on the board
@@ -25,43 +26,50 @@ Additional Features
 - Add a redo ">" button
 - Add a reset button
 
-## project-structure
+## Structure
 
 ```
 src/game
 ```
 
-This is the js game logic which is indipendent from the UI, it exports a function that accepts an object with
+This is the js game logic which is indipendent from the UI, it exports a function that accepts an object with:
 
-- FEN: (only with pawns) - Required
-- board: <Array>
-- activePiece: <Object>
-- capturedPieces: <Array>
+- FEN: (only with pawns) - String - Required
+- board - Array
+- activePiece - Object
+- capturedPieces - Array
 
 It returns a set of functions that, upon invocation, return the resulting status:
 
-- FEN: new FEN configuration,
-- board: Array representation of a chessboard,
-- activePiece: current selected piece,
-- capturedPieces: Array of captured pieces,
+- FEN: new FEN configuration
+- board: Array representation of a chessboard
+- activePiece: current selected piece
+- capturedPieces: Array of captured pieces
 
 ```
 src/game/components
 ```
 
-This folder contains a wrapper in React for using the game logic
-
-```
-src/game/components/use-game.js
-```
-
-React hook that can be used in any react component
+This folder contains a wrapper in React for using the game logic, the entry point would be `GameProvider`. By wrapping any React component with this provider, it allows to use the HOC `withGame` which exposes all the game pieces such as `board`, `activePiece` and so on
 
 ```
 src/components
 ```
 
-This is the collection of React components
+This is where all the React components live
+
+```
+src/i18n
+```
+
+This is where all the copy in json lives (only `gb_EN`), in order to access it, wrap the outmost component with `I18nProvider` and then use the HOC `withI18n` to access the copy
+
+## Styling
+
+All the are created using [Tailwindcss](https://tailwindcss.com/), I created two reusable react components that translate props to tailwindcss classes as an example:
+
+- `Box`
+- `Button`
 
 ## Installation
 

@@ -1,5 +1,3 @@
-import GameContext from './game-context'
-export const GameProvider = GameContext.Provider
-
+export { GameProvider } from './game-provider'
 export { withGame } from './with-game'
 export { useGame } from './use-game'

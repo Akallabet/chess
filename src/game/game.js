@@ -56,7 +56,6 @@ export const game = ({
   }
 
   const selectPiece = ({ y, x }) => {
-    // console.log('select', y, x)
     const { piece, color } = board[y][x]
     const { moves } = PIECES[piece]
     updateBoard(

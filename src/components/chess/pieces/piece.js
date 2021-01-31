@@ -18,11 +18,15 @@ export const Piece = withGame(
     deselectPiece,
   }) => {
     const PieceComponent = pieceComponents[piece]
-    const handleClick = !activePiece
-      ? selectPiece
-      : activePiece && activePiece.y === y && activePiece.x === x
-      ? deselectPiece
-      : () => {}
+    const deselectAndStop = ({ x, y, e }) => {
+      e.stopPropagation()
+      deselectPiece({ y, x })
+    }
+    const handleClick = activePiece
+      ? activePiece.y === y && activePiece.x === x
+        ? deselectAndStop
+        : selectPiece
+      : selectPiece
     return (
       <Button
         fullWidth
@@ -31,7 +35,7 @@ export const Piece = withGame(
         padding={false}
         borders={false}
         aria-label={`${piece} ${color} ${letter}${number}`}
-        onClick={() => handleClick({ y, x })}
+        onClick={(e) => handleClick({ y, x, e })}
       >
         <PieceComponent color={color} />
       </Button>

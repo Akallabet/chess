@@ -129,3 +129,16 @@ test('Should write new history after going back', async () => {
   expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
   expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
 })
+
+test('Should deselect a piece and select another one by clicking over it', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="8/2p5/8/8/8/8/2P5/8 w KQkq - 0 1" />
+  )
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByRole('button', { name: /p w c7/i }))
+  fireEvent.click(getByTestId('c5'))
+
+  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+  expect(getByRole('button', { name: /p w c5/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p w c7/i })).toBeNull()
+})

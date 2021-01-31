@@ -2,13 +2,14 @@ import './styles.css'
 import { Chess } from './components/chess'
 import { I18nProvider } from './i18n'
 import { Footer, Header, Section } from './components/layout'
+import { string } from 'prop-types'
 
-const App = () => {
+const App = ({ FEN }) => {
   return (
     <I18nProvider language="en-GB">
       <Header />
       <Section>
-        <Chess />
+        <Chess FEN={FEN} />
       </Section>
       <Footer />
     </I18nProvider>
@@ -16,3 +17,11 @@ const App = () => {
 }
 
 export default App
+
+App.propTypes = {
+  FEN: string,
+}
+
+App.defaultProps = {
+  FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1',
+}

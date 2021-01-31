@@ -3,14 +3,9 @@ import { useGame, GameProvider } from '../../game'
 import { Controls } from './controls'
 import { useSounds } from './sounds/use-sounds'
 import { Box } from '../box'
+import { string } from 'prop-types'
 
-const defaultFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
-
-const defaultInitialData = {
-  FEN: defaultFEN,
-}
-
-export const Chess = () => {
+export const Chess = ({ FEN }) => {
   const { playMove } = useSounds({ hasSound: true })
 
   const {
@@ -25,7 +20,7 @@ export const Chess = () => {
     redo,
   } = useGame({
     onMove: playMove,
-    defaultInitialData,
+    defaultInitialData: { FEN },
   })
 
   return (
@@ -49,4 +44,8 @@ export const Chess = () => {
       </GameProvider>
     </div>
   )
+}
+
+Chess.propTypes = {
+  FEN: string.isRequired,
 }

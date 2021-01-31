@@ -40,7 +40,7 @@ export const game = ({
   })
 
   const createRandomPiece = ({ piece, color }) => {
-    if (isValidPiece(piece)) {
+    if (getAvailableRows(board, piece).length) {
       const { rowIndex: y, cellIndex: x } = getRandomCell(
         getFreeCells(getRandomRow(getAvailableRows(board, piece)))
       )

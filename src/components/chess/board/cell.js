@@ -19,7 +19,9 @@ export const Cell = withGame(
         onClick={() => handleClick(coordinates)}
       >
         {children}
-        {piece ? <Piece piece={piece} color={color} coordinates={coordinates} /> : null}
+        {piece ? (
+          <Piece piece={piece} color={color} coordinates={coordinates} highlight={highlight} />
+        ) : null}
       </div>
     )
   }

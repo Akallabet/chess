@@ -13,6 +13,7 @@ export const Piece = withGame(
     piece,
     color,
     coordinates: { number, letter, y, x },
+    highlight,
     activePiece,
     selectPiece,
     deselectPiece,
@@ -25,7 +26,9 @@ export const Piece = withGame(
     const handleClick = activePiece
       ? activePiece.y === y && activePiece.x === x
         ? deselectAndStop
-        : selectPiece
+        : !highlight
+        ? selectPiece
+        : () => {}
       : selectPiece
     return (
       <Button

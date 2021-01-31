@@ -142,3 +142,19 @@ test('Should deselect a piece and select another one by clicking over it', async
   expect(getByRole('button', { name: /p w c5/i })).toBeDefined()
   expect(queryByRole('button', { name: /p w c7/i })).toBeNull()
 })
+
+test('Should capture a pawn', async () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="8/2p5/8/8/8/8/1P6/8 w KQkq - 0 1" />
+  )
+  fireEvent.click(getByRole('button', { name: /p b c2/i }))
+  fireEvent.click(getByTestId('c4'))
+  fireEvent.click(getByRole('button', { name: /p w b7/i }))
+  fireEvent.click(getByTestId('b5'))
+
+  fireEvent.click(getByRole('button', { name: /p b c4/i }))
+  fireEvent.click(getByRole('button', { name: /p w b5/i }))
+
+  expect(getByRole('button', { name: /p b b5/i })).toBeDefined()
+  expect(queryByRole('button', { name: /p w b5/i })).toBeNull()
+})

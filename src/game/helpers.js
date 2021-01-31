@@ -1,4 +1,4 @@
-import { PIECES, FENPieces } from '../constants'
+import { PIECES, FENPieces } from './constants'
 
 export const getAvailableRows = (board, piece) => {
   const isPawn = piece === PIECES[piece].name

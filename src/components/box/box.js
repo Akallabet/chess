@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { bool, node, number, object } from 'prop-types'
 
-const convertPropsToClasses = (modifier) => ({
+const convertPropsToClasses = ({
   pb,
   px,
   mr,
@@ -12,28 +12,23 @@ const convertPropsToClasses = (modifier) => ({
   spacex,
   fullWidth,
   maxWidth,
+  className,
 }) => ({
-  [`${modifier}${modifier}pb-${pb}`]: pb,
-  [`${modifier}px-${px}`]: !isNaN(px),
-  [`${modifier}mr-${mr}`]: mr,
-  [`${modifier}mx-${mx}`]: mx,
-  [`${modifier}w-${w}`]: w,
-  [`${modifier}w-full`]: fullWidth,
-  [`${modifier}max-w-${maxWidth}`]: maxWidth,
-  [`${modifier}flex`]: flex,
-  [`${modifier}flex-row`]: flexRow,
-  [`${modifier}space-x-${spacex}`]: spacex,
+  [`pb-${pb}`]: pb,
+  [`px-${px}`]: !isNaN(px),
+  [`mr-${mr}`]: mr,
+  [`mx-${mx}`]: mx,
+  [`w-${w}`]: w,
+  [`w-full`]: fullWidth,
+  [`max-w-${maxWidth}`]: maxWidth,
+  [`flex`]: flex,
+  [`flex-row`]: flexRow,
+  [`space-x-${spacex}`]: spacex,
+  [`${className}`]: className,
 })
 
-export const Box = ({ children, sm, ...props }) => {
-  let propsToClasses = { ...convertPropsToClasses('')(props) }
-  if (sm) {
-    propsToClasses = {
-      ...propsToClasses,
-      ...convertPropsToClasses('sm:')(sm),
-    }
-  }
-  const classes = clsx(propsToClasses)
+export const Box = ({ children, ...props }) => {
+  const classes = clsx({ ...convertPropsToClasses(props) })
   return <div className={classes}>{children}</div>
 }
 

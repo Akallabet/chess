@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 const webpack = require('webpack')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -8,7 +10,7 @@ module.exports = {
   entry: path.resolve(__dirname, './src/index.js'),
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: 'app.js',
+    filename: 'app.[fullhash].js',
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -18,7 +20,9 @@ module.exports = {
       favicon: 'src/favicon.ico',
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'styles.[fullhash].css',
+    }),
   ],
   module: {
     rules: [

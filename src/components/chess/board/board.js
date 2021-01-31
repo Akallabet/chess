@@ -1,3 +1,4 @@
+import { array, arrayOf } from 'prop-types'
 import { Row } from './row'
 
 export const Board = ({ board }) => (
@@ -10,3 +11,7 @@ export const Board = ({ board }) => (
     ))}
   </div>
 )
+
+Board.propTypes = {
+  board: arrayOf(array).isRequired,
+}

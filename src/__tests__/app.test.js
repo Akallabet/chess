@@ -2,7 +2,7 @@ import { render, within, fireEvent } from '@testing-library/react'
 import App from '../app'
 
 test('Should display a chess board', () => {
-  const { getAllByTestId, getByTestId } = render(<App />)
+  const { getByTestId } = render(<App />)
 
   const board = getByTestId('board')
 
@@ -33,8 +33,7 @@ test('Should display a chess board', () => {
 })
 
 test('Should display a black pawn', () => {
-  const { getByRole, getByTestId } = render(<App />)
-  const board = getByTestId('board')
+  const { getByRole } = render(<App />)
   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
 })
 
@@ -81,7 +80,7 @@ test('Should undo a move', async () => {
 })
 
 test('Should not redo if at the end of the history stack', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(<App />)
+  const { getByRole } = render(<App />)
   fireEvent.click(getByRole('button', { name: />/i }))
   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
 })

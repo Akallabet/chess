@@ -28,8 +28,7 @@ export const game = ({
   const updateFEN = (newFEN) => (FEN = newFEN)
   const updateBoard = (newBoard) => (board = newBoard)
   const updatePiecePlacement = (piecePlacement) => {
-    const [_, ...FENParts] = FEN.split(' ')
-    updateFEN(`${piecePlacement} ${FENParts.join(' ')}`)
+    updateFEN(`${piecePlacement} ${FEN.split(' ').slice(1).join(' ')}`)
   }
   const updateActivePiece = (newActivePiece) => (activePiece = newActivePiece)
 
@@ -51,7 +50,7 @@ export const game = ({
     }
   }
 
-  const deselectPiece = ({ y, x }) => {
+  const deselectPiece = () => {
     updateBoard(cleanBoard(board))
     updateActivePiece(false)
   }

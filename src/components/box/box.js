@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { bool, node, number, string } from 'prop-types'
+import { bool, node, number } from 'prop-types'
 
 export const Box = ({ pb, mr, flex, flexRow, spacex, children }) => {
   const classes = clsx({

@@ -1,3 +1,4 @@
+import { bool, node } from 'prop-types'
 import { Notation } from './notation'
 
 export const Number = ({ children, isWhite }) => (
@@ -5,3 +6,8 @@ export const Number = ({ children, isWhite }) => (
     {children}
   </Notation>
 )
+
+Number.propTypes = {
+  children: node.isRequired,
+  isWhite: bool.isRequired,
+}

@@ -1,4 +1,4 @@
-import React from 'react'
+/* eslint-disable react/display-name */
 import GameContext from './game-context'
 
 export const withGame = (Component) => (props) => {

@@ -9,7 +9,6 @@
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:mdx/recommended",
     "eslint-config-prettier",
     "plugin:jest/recommended"
   ],

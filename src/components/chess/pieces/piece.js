@@ -1,3 +1,4 @@
+import { func, number, shape, string } from 'prop-types'
 import { PIECES, withGame } from '../../../game'
 import { Button } from '../../button'
 
@@ -37,3 +38,20 @@ export const Piece = withGame(
     )
   }
 )
+
+Piece.propTypes = {
+  piece: string.isRequired,
+  color: string.isRequired,
+  coordinates: shape({
+    y: number.isRequired,
+    x: number.isRequired,
+    number: number.isRequired,
+    letter: string.isRequired,
+  }).isRequired,
+  activePiece: shape({
+    y: string.isRequired,
+    x: string.isRequired,
+  }),
+  selectPiece: func,
+  deselectPiece: func,
+}

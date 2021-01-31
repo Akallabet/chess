@@ -1,5 +1,6 @@
+import { arrayOf, bool, number, object } from 'prop-types'
 import { Cell } from './cell'
-import { Letter, Notation, Number } from './notation'
+import { Letter, Number } from './notation'
 
 const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
@@ -21,3 +22,9 @@ export const Row = ({ row, isOdd, rowIndex }) => (
     })}
   </div>
 )
+
+Row.propTypes = {
+  row: arrayOf(object).isRequired,
+  isOdd: bool.isRequired,
+  rowIndex: number.isRequired,
+}

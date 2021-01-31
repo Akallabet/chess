@@ -2,39 +2,14 @@
 
 # [Live version](https://akallabet.github.io/chess/)
 
+# [Code Sandboc](https://codesandbox.io/s/wonderful-lewin-geftn)
+
 ## Contents
 
-1. [ Installation ](#installation)
-2. [ Local Development ](#local-development)
 3. [ Project Objectives ](#project-objectives)
 4. [ Project Structure ](#project-structure)
-
-## Installation
-
-Prerequisites:
-
-- Nodejs: this code has been run with Nodejs v14 with MacOS Catalina
-- Git
-
-Clone this repo either via https or ssh, then from a terminal cd into the repo folder and
-
-```
-npm i
-```
-
-## local-development
-
-Launch the local dev server with hot reload (http://localhost:8000)
-
-```
-npm start
-```
-
-Launch the unit tests suite
-
-```
-npm test
-```
+5. [ Installation ](#installation)
+6. [ Local Development ](#local-development)
 
 ## project-features
 
@@ -87,3 +62,30 @@ src/components
 ```
 
 This is the collection of React components
+
+## Installation
+
+Prerequisites:
+
+- Nodejs: this code has been run with Nodejs v14 with MacOS Catalina
+- Git
+
+Clone this repo either via https or ssh, then from a terminal cd into the repo folder and
+
+```
+npm i
+```
+
+## local-development
+
+Launch the local dev server with hot reload (http://localhost:8000)
+
+```
+npm start
+```
+
+Launch the unit tests suite
+
+```
+npm test
+```

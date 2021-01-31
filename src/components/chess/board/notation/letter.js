@@ -1,3 +1,4 @@
+import { bool, node } from 'prop-types'
 import { Notation } from './notation'
 
 export const Letter = ({ children, isWhite }) => (
@@ -5,3 +6,8 @@ export const Letter = ({ children, isWhite }) => (
     {children}
   </Notation>
 )
+
+Letter.propTypes = {
+  children: node.isRequired,
+  isWhite: bool.isRequired,
+}

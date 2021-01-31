@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { Piece } from '../pieces'
 import { withGame } from '../../../game'
+import { bool, func, node, number, oneOfType, shape, string } from 'prop-types'
 
 export const Cell = withGame(
   ({ isWhite, cell: { piece, color, highlight }, coordinates, children, moveActivePiece }) => {
@@ -23,3 +24,20 @@ export const Cell = withGame(
     )
   }
 )
+
+Cell.propTypes = {
+  isWhite: bool.isRequired,
+  cell: shape({
+    piece: oneOfType([string, bool]).isRequired,
+    color: string,
+    highlight: bool,
+  }).isRequired,
+  coordinates: shape({
+    y: number.isRequired,
+    x: number.isRequired,
+    number: number.isRequired,
+    letter: string.isRequired,
+  }).isRequired,
+  children: node.isRequired,
+  moveActivePiece: func,
+}

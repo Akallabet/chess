@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
@@ -17,6 +18,7 @@ module.exports = {
       favicon: 'src/favicon.ico',
     }),
     new webpack.HotModuleReplacementPlugin(),
+    new MiniCssExtractPlugin(),
   ],
   module: {
     rules: [
@@ -28,7 +30,11 @@ module.exports = {
       {
         test: /\.css$/i,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader', 'postcss-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          { loader: 'css-loader', options: { url: false } },
+          'postcss-loader',
+        ],
       },
       {
         test: /\.(mp3|svg)$/,
@@ -41,7 +47,7 @@ module.exports = {
       },
     ],
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
   devServer: {
     contentBase: path.join(__dirname, 'public'),
     compress: true,

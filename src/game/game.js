@@ -2,12 +2,7 @@ import { PIECES } from './constants'
 import {
   addPieceToBoard,
   buildBoardFromFEN,
-  getRandomCell,
-  getFreeCells,
-  getRandomRow,
-  getAvailableRows,
   buildFENPiecePlacementFromBoard,
-  isValidPiece,
   highlithMovesToBoard,
   cleanBoard,
   highlithPieceCell,
@@ -38,17 +33,6 @@ export const game = ({
     activePiece,
     capturedPieces,
   })
-
-  const createRandomPiece = ({ piece, color }) => {
-    if (getAvailableRows(board, piece).length) {
-      const { rowIndex: y, cellIndex: x } = getRandomCell(
-        getFreeCells(getRandomRow(getAvailableRows(board, piece)))
-      )
-      const newBoard = addPieceToBoard({ piece, color, board, y, x })
-      updateBoard(newBoard)
-      updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
-    }
-  }
 
   const deselectPiece = () => {
     updateBoard(cleanBoard(board))
@@ -88,7 +72,6 @@ export const game = ({
 
   return {
     getInfo,
-    createRandomPiece: addInfo(createRandomPiece),
     selectPiece: addInfo(selectPiece),
     deselectPiece: addInfo(deselectPiece),
     moveActivePiece: addInfo(moveActivePiece),

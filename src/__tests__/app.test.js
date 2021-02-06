@@ -37,12 +37,6 @@ test('Should display a black pawn', () => {
   expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
 })
 
-test('Should add a random white pawn', () => {
-  const { getByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /Add white pawn/i }))
-  expect(getByRole('button', { name: /p w/i })).toBeDefined()
-})
-
 test('Should move a pawn on the board', () => {
   const { getByTestId, getByRole } = render(<App />)
   fireEvent.click(getByRole('button', { name: /p b c2/i }))

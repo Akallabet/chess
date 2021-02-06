@@ -8,10 +8,7 @@ export const useGame = ({ onMove, defaultInitialData }) => {
 
   const data = history ? history.current : defaultInitialData
 
-  const [
-    { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece },
-    setEngine,
-  ] = useState(game(data))
+  const [{ getInfo, selectPiece, deselectPiece, moveActivePiece }, setEngine] = useState(game(data))
 
   const resetGame = (configuration) => setEngine(game(configuration))
 
@@ -24,9 +21,6 @@ export const useGame = ({ onMove, defaultInitialData }) => {
   return {
     board,
     activePiece,
-    createRandomPiece: (args) => {
-      add(createRandomPiece(args))
-    },
     selectPiece: (args) => {
       add(selectPiece(args))
     },

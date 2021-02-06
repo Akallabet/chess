@@ -1,25 +1,5 @@
 import { PIECES, FENPieces } from './constants'
 
-export const getAvailableRows = (board, piece) => {
-  const isPawn = piece === PIECES[piece].name
-  const isLegal = ({ rowIndex }) => (isPawn && rowIndex > 0 && rowIndex < 7) || !isPawn
-
-  const sumIfPiece = (total, { piece }) => total + (piece ? 1 : 0)
-  const isRowNotFull = ({ row }) => row.reduce(sumIfPiece, 0) < 8
-  const mapRowWithIndex = (row, rowIndex) => ({ rowIndex, row })
-
-  return board.map(mapRowWithIndex).filter(isLegal).filter(isRowNotFull)
-}
-
-export const getRandomRow = (rows) => rows[Math.floor(Math.random() * rows.length)]
-export const getRandomCell = (cells) => cells[Math.floor(Math.random() * cells.length)]
-
-export const getFreeCells = ({ rowIndex, row }) => {
-  const isCellEmpty = ({ cell: { piece } }) => !piece
-  const mapCellWithIndex = (cell, cellIndex) => ({ rowIndex, cellIndex, cell })
-  return row.map(mapCellWithIndex).filter(isCellEmpty)
-}
-
 export const buildBoardFromFEN = (FEN) => {
   const [piecePlacement] = FEN.split(' ')
   const addEmptyCells = (num) =>

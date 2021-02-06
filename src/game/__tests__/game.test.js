@@ -113,42 +113,6 @@ test('it should return a board with two black pawn in second row', () => {
   })
 })
 
-test('it should create a white pawn in a random place', () => {
-  const initialFEN = '8/2p1p3/8/8/8/8/8/8 w KQkq - 0 1'
-  const { createRandomPiece } = game({ FEN: initialFEN })
-  const { board, FEN } = createRandomPiece({ piece: 'p', color: 'w' })
-  expect(board).not.toEqual([
-    [
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-    ],
-    [
-      { piece: false },
-      { piece: false },
-      { piece: 'p', color: 'b' },
-      { piece: false },
-      { piece: 'p', color: 'b' },
-      { piece: false },
-      { piece: false },
-      { piece: false },
-    ],
-    ...emptyBoard.slice(2, 8),
-  ])
-  const [piecePlacement, ...rest] = FEN.split(' ')
-  expect(piecePlacement).not.toEqual(initialFEN.split(' ')[0])
-  expect(rest[0]).toEqual(initialFEN.split(' ')[1])
-  expect(rest[1]).toEqual(initialFEN.split(' ')[2])
-  expect(rest[2]).toEqual(initialFEN.split(' ')[3])
-  expect(rest[3]).toEqual(initialFEN.split(' ')[4])
-  expect(rest[4]).toEqual(initialFEN.split(' ')[5])
-})
-
 test('it should highlight the legal moves of a piece', () => {
   const initialFEN = '8/2p5/8/8/8/8/8/8 w KQkq - 0 1'
   const { selectPiece } = game({ FEN: initialFEN })

@@ -1,27 +1,21 @@
 import { COLORS } from './colors'
-import { pawn } from './pieces'
+import { NAMES } from './names'
+import { whitePawn, blackPawn, empty } from './moves'
 
-const NAMES = { p: 'p', n: 'n', b: 'b', r: 'r', q: 'q', k: 'k' }
+const makeMoves = (fn) => ({ board, x, y }) =>
+  fn({ board, x, y }).map((move) => ({ ...move, origin: { x, y } }))
 
 export const PIECES = {
-  p: { ...pawn, FEN: { [COLORS.b]: 'p', [COLORS.w]: 'P' } },
-  n: { name: 'n', FEN: { [COLORS.b]: 'n', [COLORS.w]: 'N' } },
-  b: { name: 'b', FEN: { [COLORS.b]: 'b', [COLORS.w]: 'B' } },
-  r: { name: 'r', FEN: { [COLORS.b]: 'r', [COLORS.w]: 'R' } },
-  q: { name: 'q', FEN: { [COLORS.b]: 'q', [COLORS.w]: 'Q' } },
-  k: { name: 'k', FEN: { [COLORS.b]: 'k', [COLORS.w]: 'K' } },
-}
-export const FENPieces = {
-  P: { piece: NAMES.p, color: 'w' },
-  N: { piece: NAMES.n, color: 'w' },
-  B: { piece: NAMES.b, color: 'w' },
-  R: { piece: NAMES.r, color: 'w' },
-  Q: { piece: NAMES.q, color: 'w' },
-  K: { piece: NAMES.k, color: 'w' },
-  p: { piece: NAMES.p, color: 'b' },
-  n: { piece: NAMES.n, color: 'b' },
-  b: { piece: NAMES.b, color: 'b' },
-  r: { piece: NAMES.r, color: 'b' },
-  q: { piece: NAMES.q, color: 'b' },
-  k: { piece: NAMES.k, color: 'b' },
+  [NAMES.P]: { name: NAMES.P, color: COLORS.w, moves: makeMoves(whitePawn) },
+  [NAMES.N]: { name: NAMES.N, color: COLORS.w, moves: makeMoves(empty) },
+  [NAMES.B]: { name: NAMES.B, color: COLORS.w, moves: makeMoves(empty) },
+  [NAMES.R]: { name: NAMES.R, color: COLORS.w, moves: makeMoves(empty) },
+  [NAMES.Q]: { name: NAMES.Q, color: COLORS.w, moves: makeMoves(empty) },
+  [NAMES.K]: { name: NAMES.K, color: COLORS.w, moves: makeMoves(empty) },
+  [NAMES.p]: { name: NAMES.p, color: COLORS.b, moves: makeMoves(blackPawn) },
+  [NAMES.n]: { name: NAMES.n, color: COLORS.b, moves: makeMoves(empty) },
+  [NAMES.b]: { name: NAMES.b, color: COLORS.b, moves: makeMoves(empty) },
+  [NAMES.r]: { name: NAMES.r, color: COLORS.b, moves: makeMoves(empty) },
+  [NAMES.q]: { name: NAMES.q, color: COLORS.b, moves: makeMoves(empty) },
+  [NAMES.k]: { name: NAMES.k, color: COLORS.b, moves: makeMoves(empty) },
 }

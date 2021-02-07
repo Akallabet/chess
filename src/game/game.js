@@ -1,23 +1,29 @@
 import { PIECES } from './constants'
-import {
+import { createHelpers } from './helpers'
+
+const {
   addPieceToBoard,
   buildBoardFromFEN,
   buildFENPiecePlacementFromBoard,
-  highlithMovesToBoard,
+  highligthMovesToBoard,
   cleanBoard,
-  highlithPieceCell,
   removePieceFromBoard,
-} from './helpers'
+  calculateMoves,
+} = createHelpers({ PIECES })
+
+const compose = (...fns) => (x) => fns.reduce((y, fn) => fn(y), x)
 
 export const game = ({
   FEN: initialFEN,
   board: initialBoard,
-  activePiece: initialActivePiece,
   capturedPieces: initialCapturedPieces,
 }) => {
+  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
   let FEN = initialFEN
   let board = initialBoard || buildBoardFromFEN(initialFEN)
-  let activePiece = initialActivePiece || false
+  const turn = FEN.split(' ')[1]
+
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (newFEN) => (FEN = newFEN)
@@ -25,55 +31,52 @@ export const game = ({
   const updatePiecePlacement = (piecePlacement) => {
     updateFEN(`${piecePlacement} ${FEN.split(' ').slice(1).join(' ')}`)
   }
-  const updateActivePiece = (newActivePiece) => (activePiece = newActivePiece)
 
   const getInfo = () => ({
     FEN,
     board,
-    activePiece,
     capturedPieces,
   })
 
-  const deselectPiece = () => {
-    updateBoard(cleanBoard(board))
-    updateActivePiece(false)
+  const FromSAN = (notation) => {
+    const [file, rank] = notation
+    return { y: ranks.indexOf(rank), x: files.indexOf(file) }
   }
 
-  const selectPiece = ({ y, x }) => {
-    const { piece, color } = board[y][x]
-    const { moves } = PIECES[piece]
+  const deselect = () => {
+    updateBoard(cleanBoard(board))
+  }
+
+  const select = ({ y, x }) => {
+    const { name, color } = board[y][x]
+
     updateBoard(
-      highlithMovesToBoard(highlithPieceCell(cleanBoard(board), { y, x }))(
-        moves({ board, color, y, x })
+      highligthMovesToBoard({ board: cleanBoard(board), y, x })(
+        PIECES[name].moves({ board, color, y, x })
       )
     )
-    updateActivePiece({ y, x, piece, color })
   }
 
-  const moveActivePiece = ({ y, x }) => {
-    const cell = { ...board[y][x] }
-    updateBoard(
-      addPieceToBoard({
-        board: removePieceFromBoard({ board: cleanBoard(board), ...activePiece }),
-        ...activePiece,
-        x,
-        y,
-      })
-    )
-    if (cell.piece) capturedPieces.push(cell)
-    updateActivePiece(false)
-    updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
-  }
-
-  const addInfo = (f) => (args) => {
-    f(args)
-    return getInfo()
+  const move = ({ y, x }) => {
+    const moves = calculateMoves({ board, turn, y, x })
+    if (moves.length === 1) {
+      const square = { ...board[moves[0].origin.y][moves[0].origin.x] }
+      updateBoard(
+        addPieceToBoard({
+          board: removePieceFromBoard({ board: cleanBoard(board), ...moves[0].origin }),
+          ...square,
+          x,
+          y,
+        })
+      )
+      updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
+    }
   }
 
   return {
     getInfo,
-    selectPiece: addInfo(selectPiece),
-    deselectPiece: addInfo(deselectPiece),
-    moveActivePiece: addInfo(moveActivePiece),
+    select: compose(FromSAN, select, getInfo),
+    deselect: compose(deselect, getInfo),
+    move: compose(FromSAN, move, getInfo),
   }
 }

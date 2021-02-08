@@ -1,23 +1,23 @@
-import { PIECES } from './constants'
+import { PIECES as defaultPieces } from './constants'
 import { createHelpers } from './helpers'
-
-const {
-  addPieceToBoard,
-  buildBoardFromFEN,
-  buildFENPiecePlacementFromBoard,
-  highligthMovesToBoard,
-  cleanBoard,
-  removePieceFromBoard,
-  calculateMoves,
-} = createHelpers({ PIECES })
-
-const compose = (...fns) => (x) => fns.reduce((y, fn) => fn(y), x)
+import { compose } from './utils'
 
 export const game = ({
   FEN: initialFEN,
   board: initialBoard,
   capturedPieces: initialCapturedPieces,
+  PIECES = defaultPieces,
 }) => {
+  const {
+    addPieceToBoard,
+    buildBoardFromFEN,
+    buildFENPiecePlacementFromBoard,
+    highligthMovesToBoard,
+    cleanBoard,
+    removePieceFromBoard,
+    calculateMoves,
+  } = createHelpers({ PIECES })
+
   const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
   const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
   let FEN = initialFEN

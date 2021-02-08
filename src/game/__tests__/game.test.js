@@ -5,9 +5,9 @@ const emptyBoard = [...Array(8)].map(() => emptyRow)
 
 const highlightedBoard = [
   [...emptyRow],
-  [{}, {}, { name: 'p', color: 'b', highlight: true }, {}, {}, {}, {}, {}],
-  [{}, {}, { highlight: true }, {}, {}, {}, {}, {}],
-  [{}, {}, { highlight: true }, {}, {}, {}, {}, {}],
+  [{}, {}, { name: 'p', color: 'b', selected: true }, {}, {}, {}, {}, {}],
+  [{}, {}, { move: true }, {}, {}, {}, {}, {}],
+  [{}, {}, { move: true }, {}, {}, {}, {}, {}],
   ...emptyBoard.slice(4, 8),
 ]
 
@@ -92,9 +92,9 @@ test('it should highlight the legal moves of a piece', () => {
 
   expect(board).toEqual([
     [...completeBoard[0]],
-    [{ name: 'p', color: 'b', highlight: true }, ...completeBoard[1].slice(1)],
-    [{ highlight: true }, ...emptyRow.slice(1)],
-    [{ highlight: true }, ...emptyRow.slice(1)],
+    [{ name: 'p', color: 'b', selected: true }, ...completeBoard[1].slice(1)],
+    [{ move: true }, ...emptyRow.slice(1)],
+    [{ move: true }, ...emptyRow.slice(1)],
     [...emptyRow],
     [...emptyRow],
     ...completeBoard.slice(6),
@@ -114,7 +114,7 @@ test('it should move white pawn c7 to c4', () => {
   const { move } = game({ FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' })
   const { board, FEN } = move('c5')
 
-  const expectedBoard = [
+  expect(board).toEqual([
     ...completeBoard.slice(0, 4),
     [{}, {}, { name: 'P', color: 'w' }, {}, {}, {}, {}, {}],
     [{}, {}, {}, {}, {}, {}, {}, {}],
@@ -129,7 +129,83 @@ test('it should move white pawn c7 to c4', () => {
       { name: 'P', color: 'w' },
     ],
     [...completeBoard[7]],
-  ]
-  expect(board).toEqual(expectedBoard)
+  ])
   expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 1')
 })
+
+const highlightRookMoves = ({ color, name }) => [
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+  [
+    ...[...Array(3)].map(() => ({ move: true })),
+    { name, color, selected: true },
+    ...[...Array(4)].map(() => ({ move: true })),
+  ],
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+  [{}, {}, {}, { move: true }, {}, {}, {}, {}],
+]
+
+const highlightBishopMoves = ({ color, name }) => [
+  [{}, {}, {}, {}, {}, {}, {}, { move: true }],
+  [{ move: true }, {}, {}, {}, {}, {}, { move: true }, {}],
+  [{}, { move: true }, {}, {}, {}, { move: true }, {}, {}],
+  [{}, {}, { move: true }, {}, { move: true }, {}, {}, {}],
+  [{}, {}, {}, { name, color, selected: true }, {}, {}, {}, {}],
+  [{}, {}, { move: true }, {}, { move: true }, {}, {}, {}],
+  [{}, { move: true }, {}, {}, {}, { move: true }, {}, {}],
+  [{ move: true }, {}, {}, {}, {}, {}, { move: true }, {}],
+]
+
+const highlightKingMoves = ({ color, name }) => [
+  [{}, {}, {}, {}, {}, {}, {}, {}],
+  [{}, {}, {}, {}, {}, {}, {}, {}],
+  [{}, {}, {}, {}, {}, {}, {}, {}],
+  [{}, {}, { move: true }, { move: true }, { move: true }, {}, {}, {}],
+  [{}, {}, { move: true }, { name, color, selected: true }, { move: true }, {}, {}, {}],
+  [{}, {}, { move: true }, { move: true }, { move: true }, {}, {}, {}],
+  [{}, {}, {}, {}, {}, {}, {}, {}],
+  [{}, {}, {}, {}, {}, {}, {}, {}],
+]
+
+const highlightQueenMoves = ({ color, name }) => [
+  [{}, {}, {}, { move: true }, {}, {}, {}, { move: true }],
+  [{ move: true }, {}, {}, { move: true }, {}, {}, { move: true }, {}],
+  [{}, { move: true }, {}, { move: true }, {}, { move: true }, {}, {}],
+  [{}, {}, { move: true }, { move: true }, { move: true }, {}, {}, {}],
+  [
+    { move: true },
+    { move: true },
+    { move: true },
+    { name, color, selected: true },
+    { move: true },
+    { move: true },
+    { move: true },
+    { move: true },
+  ],
+  [{}, {}, { move: true }, { move: true }, { move: true }, {}, {}, {}],
+  [{}, { move: true }, {}, { move: true }, {}, { move: true }, {}, {}],
+  [{ move: true }, {}, {}, { move: true }, {}, {}, { move: true }, {}],
+]
+
+test.each`
+  name   | color  | colorName  | pieceName   | expectedBoard
+  ${'R'} | ${'w'} | ${'white'} | ${'Rook'}   | ${highlightRookMoves}
+  ${'r'} | ${'b'} | ${'black'} | ${'Rook'}   | ${highlightRookMoves}
+  ${'B'} | ${'w'} | ${'white'} | ${'Bishop'} | ${highlightBishopMoves}
+  ${'b'} | ${'b'} | ${'black'} | ${'Bishop'} | ${highlightBishopMoves}
+  ${'K'} | ${'w'} | ${'white'} | ${'King'}   | ${highlightKingMoves}
+  ${'k'} | ${'b'} | ${'black'} | ${'King'}   | ${highlightKingMoves}
+  ${'Q'} | ${'w'} | ${'white'} | ${'Queen'}  | ${highlightQueenMoves}
+  ${'q'} | ${'b'} | ${'black'} | ${'Queen'}  | ${highlightQueenMoves}
+`(
+  'it should highlight all the moves of a $colorName $pieceName',
+  ({ name, color, expectedBoard }) => {
+    const { select } = game({ FEN: `8/8/8/8/3${name}4/8/8/8 ${color} KQkq - 0 1` })
+    const { board } = select('d5')
+
+    expect(board).toEqual(expectedBoard({ name, color }))
+  }
+)

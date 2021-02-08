@@ -36,27 +36,67 @@ export const blackPawn = ({ board, y, x }) => {
   return moves
 }
 
-const straight = ({ board, color, y, x }) => {
+export const rook = ({ board, color, x, y }) => {
+  return [...straight({ board, color, x, y })]
+}
+
+export const bishop = ({ board, color, x, y }) => {
+  return [...oblique({ board, color, x, y })]
+}
+
+export const queen = ({ board, color, x, y }) => {
+  return [...straight({ board, color, x, y }), ...oblique({ board, color, x, y })]
+}
+
+export const king = ({ board, color, x, y }) => {
+  const limit = (pos) => pos.y <= y + 1 && pos.x <= x + 1 && pos.y >= y - 1 && pos.x >= x - 1
+  return [
+    ...traverse(({ y, x }) => ({ y, x: x + 1 }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y, x: x - 1 }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x + 1 }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x + 1 }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x - 1 }), limit)({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x - 1 }), limit)({ board, color, y, x }),
+  ]
+}
+
+const traverse = (incr, limit = () => true) => ({ board, color, y, x }) => {
   const moves = []
-  for (let square = x; square < board.length - 1; square++) {
-    if (board[y][square].color && board[y][square].color !== color) moves.push({ y, x: square })
-    if (board[y][square].color) break
-  }
-  for (let square = x; square >= 0; square--) {
-    if (board[y][square].color && board[y][square].color !== color) moves.push({ y, x: square })
-    if (board[y][square].color) break
-  }
-  for (let line = y; line < board.length - 1; line++) {
-    if (board[line][x].color && board[line][x].color !== color) moves.push({ y: line, x })
-    if (board[line][x].color) break
-  }
-  for (let line = y; line >= 0; line--) {
-    if (board[line][x].color && board[line][x].color !== color) moves.push({ y: line, x })
-    if (board[line][x].color) break
+  let position = incr({ y, x })
+  while (
+    position.y < board.length &&
+    position.x < board.length &&
+    position.y >= 0 &&
+    position.x >= 0 &&
+    limit(position)
+  ) {
+    if (!board[position.y][position.x].name) moves.push(position)
+    if (board[position.y][position.x].color && board[position.y][position.x].color !== color)
+      moves.push(position)
+    if (board[position.y][position.x].color) break
+    position = incr(position)
   }
   return moves
 }
 
+const straight = ({ board, color, y, x }) => {
+  const moves = [
+    ...traverse(({ y, x }) => ({ y, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y, x: x - 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x }))({ board, color, y, x }),
+  ]
+  return moves
+}
+
 const oblique = ({ board, color, y, x }) => {
-  const moves = []
+  const moves = [
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x - 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x - 1 }))({ board, color, y, x }),
+  ]
+  return moves
 }

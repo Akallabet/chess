@@ -1,5 +1,9 @@
 export const cleanBoard = () => (board) =>
   board.map((row) =>
-    // eslint-disable-next-line no-unused-vars
-    row.map(({ move, selected, ...props }) => ({ ...props }))
+    row.map(({ name, color }) => {
+      const ret = {}
+      if (name) ret.name = name
+      if (color) ret.color = color
+      return ret
+    })
   )

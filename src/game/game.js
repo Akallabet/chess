@@ -52,7 +52,7 @@ export const game = ({
 
     updateBoard(
       highligthMovesToBoard({ board: cleanBoard(board), y, x })(
-        PIECES[name].moves({ board, color, y, x })
+        PIECES.get(name, color).moves({ board, color, y, x })
       )
     )
   }

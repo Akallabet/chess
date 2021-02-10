@@ -42,6 +42,8 @@ const oblique = ({ board, color, y, x }) => {
   return moves
 }
 
+export const pawn = ({ color, ...args }) => (color === COLORS.w ? whitePawn(args) : blackPawn(args))
+
 export const whitePawn = ({ board, y, x }) => {
   const moves = []
   if (board[y - 1][x] && !board[y - 1][x].name) {

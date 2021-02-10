@@ -1,6 +1,6 @@
 export const buildBoardFromFEN = ({ PIECES }) => {
   const extractBoardInfo = (square) => {
-    const { name, color } = PIECES[square]
+    const { name, color } = PIECES.get(square)
     return { name, color }
   }
 

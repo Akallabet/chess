@@ -1,21 +1,45 @@
 import { COLORS } from './colors'
-import { NAMES } from './names'
-import { whitePawn, blackPawn, rook, bishop, queen, king, knight } from './moves'
+import { pawn, rook, bishop, queen, king, knight } from './moves'
 
-const makeMoves = (fn) => ({ board, x, y }) =>
-  fn({ board, x, y }).map((move) => ({ ...move, origin: { x, y } }))
+const NAMES = {
+  P: 'P',
+  N: 'N',
+  B: 'B',
+  R: 'R',
+  Q: 'Q',
+  K: 'K',
+}
+
+const makeMoves = (fn) => ({ board, color, x, y }) =>
+  fn({ board, color, x, y }).map((move) => ({ ...move, origin: { x, y } }))
+
+const getFEN = (color, name) =>
+  (color === COLORS.w && NAMES[name]) || (color === COLORS.b && NAMES[name].toLowerCase())
+
+const buildBoardPiece = (name, move) => (color) => ({
+  name: NAMES[name],
+  FEN: getFEN(color, NAMES[name]),
+  color,
+  moves: makeMoves(move),
+})
+
+const boardPieces = {
+  [NAMES.P]: buildBoardPiece(NAMES.P, pawn),
+  [NAMES.N]: buildBoardPiece(NAMES.N, knight),
+  [NAMES.B]: buildBoardPiece(NAMES.B, bishop),
+  [NAMES.R]: buildBoardPiece(NAMES.R, rook),
+  [NAMES.Q]: buildBoardPiece(NAMES.Q, queen),
+  [NAMES.K]: buildBoardPiece(NAMES.K, king),
+}
 
 export const PIECES = {
-  [NAMES.P]: { name: NAMES.P, color: COLORS.w, moves: makeMoves(whitePawn) },
-  [NAMES.N]: { name: NAMES.N, color: COLORS.w, moves: makeMoves(knight) },
-  [NAMES.B]: { name: NAMES.B, color: COLORS.w, moves: makeMoves(bishop) },
-  [NAMES.R]: { name: NAMES.R, color: COLORS.w, moves: makeMoves(rook) },
-  [NAMES.Q]: { name: NAMES.Q, color: COLORS.w, moves: makeMoves(queen) },
-  [NAMES.K]: { name: NAMES.K, color: COLORS.w, moves: makeMoves(king) },
-  [NAMES.p]: { name: NAMES.p, color: COLORS.b, moves: makeMoves(blackPawn) },
-  [NAMES.n]: { name: NAMES.n, color: COLORS.b, moves: makeMoves(knight) },
-  [NAMES.b]: { name: NAMES.b, color: COLORS.b, moves: makeMoves(bishop) },
-  [NAMES.r]: { name: NAMES.r, color: COLORS.b, moves: makeMoves(rook) },
-  [NAMES.q]: { name: NAMES.q, color: COLORS.b, moves: makeMoves(queen) },
-  [NAMES.k]: { name: NAMES.k, color: COLORS.b, moves: makeMoves(king) },
+  get: (name, color) => {
+    if (!color) {
+      return (
+        (NAMES[name] && boardPieces[name](COLORS.w)) ||
+        (NAMES[name.toUpperCase()] && boardPieces[name.toUpperCase()](COLORS.b))
+      )
+    }
+    return boardPieces[name](color)
+  },
 }

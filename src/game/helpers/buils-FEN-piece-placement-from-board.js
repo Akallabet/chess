@@ -1,7 +1,7 @@
 export const buildFENPiecePlacementFromBoard = ({ PIECES }) => {
   const buildRowPlacement = (row) =>
-    row.reduce((str, { name }) => {
-      if (name) return `${str}${PIECES[name].name}`
+    row.reduce((str, { name, color }) => {
+      if (name) return `${str}${PIECES.get(name, color).FEN}`
       if (isNaN(str[str.length - 1])) return `${str}1`
       return `${str.slice(0, str.length - 1)}${Number(str[str.length - 1]) + 1}`
     }, '')

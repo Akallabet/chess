@@ -5,7 +5,7 @@ const emptyBoard = [...Array(8)].map(() => emptyRow)
 
 const highlightedBoard = [
   [...emptyRow],
-  [{}, {}, { name: 'p', color: 'b', selected: true }, {}, {}, {}, {}, {}],
+  [{}, {}, { name: 'P', color: 'b', selected: true }, {}, {}, {}, {}, {}],
   [{}, {}, { move: true }, {}, {}, {}, {}, {}],
   [{}, {}, { move: true }, {}, {}, {}, {}, {}],
   ...emptyBoard.slice(4, 8),
@@ -13,16 +13,16 @@ const highlightedBoard = [
 
 const completeBoard = [
   [
-    { name: 'r', color: 'b' },
-    { name: 'n', color: 'b' },
-    { name: 'b', color: 'b' },
-    { name: 'q', color: 'b' },
-    { name: 'k', color: 'b' },
-    { name: 'b', color: 'b' },
-    { name: 'n', color: 'b' },
-    { name: 'r', color: 'b' },
+    { name: 'R', color: 'b' },
+    { name: 'N', color: 'b' },
+    { name: 'B', color: 'b' },
+    { name: 'Q', color: 'b' },
+    { name: 'K', color: 'b' },
+    { name: 'B', color: 'b' },
+    { name: 'N', color: 'b' },
+    { name: 'R', color: 'b' },
   ],
-  [...Array(8)].map(() => ({ name: 'p', color: 'b' })),
+  [...Array(8)].map(() => ({ name: 'P', color: 'b' })),
   [...emptyRow],
   [...emptyRow],
   [...emptyRow],
@@ -42,7 +42,7 @@ const completeBoard = [
 
 const boardWithBlackPawn = [
   [{}, {}, {}, {}, {}, {}, {}, {}],
-  [{}, {}, { name: 'p', color: 'b' }, {}, {}, {}, {}, {}],
+  [{}, {}, { name: 'P', color: 'b' }, {}, {}, {}, {}, {}],
   ...emptyBoard.slice(2, 8),
 ]
 test('it should return an empty board', () => {
@@ -68,7 +68,7 @@ test('it should return a board with two black pawn in second row', () => {
   expect(getInfo()).toEqual({
     board: [
       [{}, {}, {}, {}, {}, {}, {}, {}],
-      [{}, {}, { name: 'p', color: 'b' }, {}, { name: 'p', color: 'b' }, {}, {}, {}],
+      [{}, {}, { name: 'P', color: 'b' }, {}, { name: 'P', color: 'b' }, {}, {}, {}],
       ...emptyBoard.slice(2, 8),
     ],
     FEN: '8/2p1p3/8/8/8/8/8/8 w KQkq - 0 1',
@@ -154,21 +154,21 @@ const highlightQueenMoves = ({ color, name }) => [
 ]
 
 test.each`
-  name   | color  | colorName  | pieceName   | expectedBoard
-  ${'R'} | ${'w'} | ${'white'} | ${'Rook'}   | ${highlightRookMoves}
-  ${'r'} | ${'b'} | ${'black'} | ${'Rook'}   | ${highlightRookMoves}
-  ${'N'} | ${'w'} | ${'white'} | ${'Knight'} | ${highlightKnightMoves}
-  ${'n'} | ${'b'} | ${'black'} | ${'Knight'} | ${highlightKnightMoves}
-  ${'B'} | ${'w'} | ${'white'} | ${'Bishop'} | ${highlightBishopMoves}
-  ${'b'} | ${'b'} | ${'black'} | ${'Bishop'} | ${highlightBishopMoves}
-  ${'K'} | ${'w'} | ${'white'} | ${'King'}   | ${highlightKingMoves}
-  ${'k'} | ${'b'} | ${'black'} | ${'King'}   | ${highlightKingMoves}
-  ${'Q'} | ${'w'} | ${'white'} | ${'Queen'}  | ${highlightQueenMoves}
-  ${'q'} | ${'b'} | ${'black'} | ${'Queen'}  | ${highlightQueenMoves}
+  name   | FEN    | color  | colorName  | pieceName   | expectedBoard
+  ${'R'} | ${'R'} | ${'w'} | ${'white'} | ${'Rook'}   | ${highlightRookMoves}
+  ${'R'} | ${'r'} | ${'b'} | ${'black'} | ${'Rook'}   | ${highlightRookMoves}
+  ${'N'} | ${'N'} | ${'w'} | ${'white'} | ${'Knight'} | ${highlightKnightMoves}
+  ${'N'} | ${'n'} | ${'b'} | ${'black'} | ${'Knight'} | ${highlightKnightMoves}
+  ${'B'} | ${'B'} | ${'w'} | ${'white'} | ${'Bishop'} | ${highlightBishopMoves}
+  ${'B'} | ${'b'} | ${'b'} | ${'black'} | ${'Bishop'} | ${highlightBishopMoves}
+  ${'K'} | ${'K'} | ${'w'} | ${'white'} | ${'King'}   | ${highlightKingMoves}
+  ${'K'} | ${'k'} | ${'b'} | ${'black'} | ${'King'}   | ${highlightKingMoves}
+  ${'Q'} | ${'Q'} | ${'w'} | ${'white'} | ${'Queen'}  | ${highlightQueenMoves}
+  ${'Q'} | ${'q'} | ${'b'} | ${'black'} | ${'Queen'}  | ${highlightQueenMoves}
 `(
   'it should highlight all the moves of a $colorName $pieceName',
-  ({ name, color, expectedBoard }) => {
-    const { select } = game({ FEN: `8/8/8/8/3${name}4/8/8/8 ${color} KQkq - 0 1` })
+  ({ name, FEN, color, expectedBoard }) => {
+    const { select } = game({ FEN: `8/8/8/8/3${FEN}4/8/8/8 ${color} KQkq - 0 1` })
     const { board } = select('d5')
 
     expect(board).toEqual(expectedBoard({ name, color }))
@@ -182,7 +182,7 @@ test('it should highlight the legal moves of a black pawn for its first move', (
 
   expect(board).toEqual([
     [...completeBoard[0]],
-    [{ name: 'p', color: 'b', selected: true }, ...completeBoard[1].slice(1)],
+    [{ name: 'P', color: 'b', selected: true }, ...completeBoard[1].slice(1)],
     [{ move: true }, ...emptyRow.slice(1)],
     [{ move: true }, ...emptyRow.slice(1)],
     [...emptyRow],

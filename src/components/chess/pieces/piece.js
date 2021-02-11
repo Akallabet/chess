@@ -1,18 +1,8 @@
-import { bool, func, number, shape, string } from 'prop-types'
+import { bool, func, string } from 'prop-types'
 import { withGame } from '../../../game'
 import { Button } from '../../button'
 
-import whitePawn from './assets/white/white-pawn.svg'
-import blackPawn from './assets/black/black-pawn.svg'
-
-const assets = {
-  w: {
-    P: whitePawn,
-  },
-  b: {
-    P: blackPawn,
-  },
-}
+import assets from './assets'
 
 const stopPropagation = (fn) => (e) => {
   e.stopPropagation()

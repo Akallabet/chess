@@ -1,14 +1,14 @@
 import { withGame } from '../../../game'
 import { Box } from '../../box'
-import { Button } from '../../button'
+// import { Button } from '../../button'
 import { Reset } from './reset'
 
-export const Controls = withGame(({ reset, undo, redo }) => {
+export const Controls = withGame(({ reset }) => {
   return (
     <Box flex flexRow spacex={1}>
       <Reset onClick={reset} />
-      <Button onClick={undo}>{'<'}</Button>
-      <Button onClick={redo}>{'>'}</Button>
+      {/* <Button onClick={undo}>{'<'}</Button>
+      <Button onClick={redo}>{'>'}</Button> */}
     </Box>
   )
 })

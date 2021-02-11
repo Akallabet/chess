@@ -40,7 +40,8 @@ export const game = ({
 
   const FromSAN = (notation) => {
     const [file, rank] = notation
-    return { y: ranks.indexOf(rank), x: files.indexOf(file) }
+    const ret = { y: ranks.indexOf(rank), x: files.indexOf(file) }
+    return ret
   }
 
   const deselect = () => {
@@ -59,6 +60,8 @@ export const game = ({
 
   const move = ({ y, x }) => {
     const moves = calculateMoves({ board, turn, y, x })
+    console.log('move', y, x)
+    console.log('moves', moves)
     if (moves.length === 1) {
       const square = { ...board[moves[0].origin.y][moves[0].origin.x] }
       updateBoard(

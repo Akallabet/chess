@@ -34,121 +34,121 @@ test('Should display a chess board', () => {
 
 test('Should display a black pawn', () => {
   const { getByRole } = render(<App />)
-  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
+  expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
 })
 
-test('Should move a pawn on the board', () => {
-  const { getByTestId, getByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c3'))
-  expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
-})
+// test.only('Should move a pawn on the board', () => {
+//   const { getByTestId, getByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c3'))
+//   expect(getByRole('button', { name: 'P b c3' })).toBeDefined()
+// })
 
-test('Should play a sound when moving a piece', () => {
-  const { getByTestId, getByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c3'))
-  expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1)
-})
+// test('Should play a sound when moving a piece', () => {
+//   const { getByTestId, getByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c3'))
+//   expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1)
+// })
 
-test('Should reset the board', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c3'))
-  expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
-  fireEvent.click(getByRole('button', { name: /reset/i }))
-  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
-})
+// test('Should reset the board', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c3'))
+//   expect(getByRole('button', { name: 'P b c3' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
+//   fireEvent.click(getByRole('button', { name: 'reset' }))
+//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
+// })
 
-test('Should undo a move', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c4'))
-  expect(getByRole('button', { name: /p b c4/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+// test('Should undo a move', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c4'))
+//   expect(getByRole('button', { name: 'P b c4' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
 
-  fireEvent.click(getByRole('button', { name: /</i }))
-  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
-})
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c4' })).toBeNull()
+// })
 
-test('Should not redo if at the end of the history stack', async () => {
-  const { getByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: />/i }))
-  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
-})
+// test('Should not redo if at the end of the history stack', async () => {
+//   const { getByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: '>' }))
+//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
+// })
 
-test('Should redo several moves', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c4'))
-  fireEvent.click(getByRole('button', { name: /p b c4/i }))
-  fireEvent.click(getByTestId('c5'))
-  fireEvent.click(getByRole('button', { name: /p b c5/i }))
-  fireEvent.click(getByTestId('c6'))
+// test('Should redo several moves', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c4'))
+//   fireEvent.click(getByRole('button', { name: 'P b c4' }))
+//   fireEvent.click(getByTestId('c5'))
+//   fireEvent.click(getByRole('button', { name: 'P b c5' }))
+//   fireEvent.click(getByTestId('c6'))
 
-  expect(getByRole('button', { name: /p b c6/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
+//   expect(getByRole('button', { name: 'P b c6' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
 
-  fireEvent.click(getByRole('button', { name: /</i }))
-  fireEvent.click(getByRole('button', { name: /</i }))
-  fireEvent.click(getByRole('button', { name: /</i }))
-  fireEvent.click(getByRole('button', { name: /</i }))
-  fireEvent.click(getByRole('button', { name: /</i }))
-  fireEvent.click(getByRole('button', { name: /</i }))
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   fireEvent.click(getByRole('button', { name: '<' }))
 
-  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c6/i })).toBeNull()
+//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c6' })).toBeNull()
 
-  fireEvent.click(getByRole('button', { name: />/i }))
-  fireEvent.click(getByRole('button', { name: />/i }))
-  fireEvent.click(getByRole('button', { name: />/i }))
-  fireEvent.click(getByRole('button', { name: />/i }))
-  fireEvent.click(getByRole('button', { name: />/i }))
-  fireEvent.click(getByRole('button', { name: />/i }))
+//   fireEvent.click(getByRole('button', { name: '>' }))
+//   fireEvent.click(getByRole('button', { name: '>' }))
+//   fireEvent.click(getByRole('button', { name: '>' }))
+//   fireEvent.click(getByRole('button', { name: '>' }))
+//   fireEvent.click(getByRole('button', { name: '>' }))
+//   fireEvent.click(getByRole('button', { name: '>' }))
 
-  expect(getByRole('button', { name: /p b c6/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
-})
+//   expect(getByRole('button', { name: 'P b c6' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
+// })
 
-test('Should write new history after going back', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c4'))
-  fireEvent.click(getByRole('button', { name: /</i }))
-  fireEvent.click(getByTestId('c3'))
+// test('Should write new history after going back', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(<App />)
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c4'))
+//   fireEvent.click(getByRole('button', { name: '<' }))
+//   fireEvent.click(getByTestId('c3'))
 
-  expect(getByRole('button', { name: /p b c3/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p b c2/i })).toBeNull()
-  expect(queryByRole('button', { name: /p b c4/i })).toBeNull()
-})
+//   expect(getByRole('button', { name: 'P b c3' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
+//   expect(queryByRole('button', { name: 'P b c4' })).toBeNull()
+// })
 
-test('Should deselect a piece and select another one by clicking over it', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(
-    <App FEN="8/2p5/8/8/8/8/2P5/8 w KQkq - 0 1" />
-  )
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByRole('button', { name: /p w c7/i }))
-  fireEvent.click(getByTestId('c5'))
+// test('Should deselect a piece and select another one by clicking over it', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(
+//     <App FEN="8/2p5/8/8/8/8/2P5/8 w KQkq - 0 1" />
+//   )
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByRole('button', { name: 'P w c7' }))
+//   fireEvent.click(getByTestId('c5'))
 
-  expect(getByRole('button', { name: /p b c2/i })).toBeDefined()
-  expect(getByRole('button', { name: /p w c5/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p w c7/i })).toBeNull()
-})
+//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
+//   expect(getByRole('button', { name: 'P w c5' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P w c7' })).toBeNull()
+// })
 
-test('Should capture a pawn', async () => {
-  const { getByTestId, getByRole, queryByRole } = render(
-    <App FEN="8/2p5/8/8/8/8/1P6/8 w KQkq - 0 1" />
-  )
-  fireEvent.click(getByRole('button', { name: /p b c2/i }))
-  fireEvent.click(getByTestId('c4'))
-  fireEvent.click(getByRole('button', { name: /p w b7/i }))
-  fireEvent.click(getByTestId('b5'))
+// test('Should capture a pawn', async () => {
+//   const { getByTestId, getByRole, queryByRole } = render(
+//     <App FEN="8/2p5/8/8/8/8/1P6/8 w KQkq - 0 1" />
+//   )
+//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
+//   fireEvent.click(getByTestId('c4'))
+//   fireEvent.click(getByRole('button', { name: 'P w b7' }))
+//   fireEvent.click(getByTestId('b5'))
 
-  fireEvent.click(getByRole('button', { name: /p b c4/i }))
-  fireEvent.click(getByRole('button', { name: /p w b5/i }))
+//   fireEvent.click(getByRole('button', { name: 'P b c4' }))
+//   fireEvent.click(getByRole('button', { name: 'P w b5' }))
 
-  expect(getByRole('button', { name: /p b b5/i })).toBeDefined()
-  expect(queryByRole('button', { name: /p w b5/i })).toBeNull()
-})
+//   expect(getByRole('button', { name: 'P b b5' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'P w b5' })).toBeNull()
+// })

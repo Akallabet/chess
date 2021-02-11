@@ -1,35 +1,28 @@
-import { func, number, shape, string } from 'prop-types'
-import { PIECES, withGame } from '../../../game'
+import { bool, func, number, shape, string } from 'prop-types'
+import { withGame } from '../../../game'
 import { Button } from '../../button'
 
-import { Pawn } from './pawn'
+import whitePawn from './assets/white/white-pawn.svg'
+import blackPawn from './assets/black/black-pawn.svg'
 
-const pieceComponents = {
-  [PIECES.p.name]: Pawn,
+const assets = {
+  w: {
+    P: whitePawn,
+  },
+  b: {
+    P: blackPawn,
+  },
+}
+
+const stopPropagation = (fn) => (e) => {
+  e.stopPropagation()
+  fn()
 }
 
 export const Piece = withGame(
-  ({
-    piece,
-    color,
-    coordinates: { number, letter, y, x },
-    highlight,
-    activePiece,
-    selectPiece,
-    deselectPiece,
-  }) => {
-    const PieceComponent = pieceComponents[piece]
-    const deselectAndStop = ({ x, y, e }) => {
-      e.stopPropagation()
-      deselectPiece({ y, x })
-    }
-    const handleClick = activePiece
-      ? activePiece.y === y && activePiece.x === x
-        ? deselectAndStop
-        : !highlight
-        ? selectPiece
-        : () => {}
-      : selectPiece
+  ({ name, color, coordinates, selected, move, selectPiece, deselectPiece, movePiece }) => {
+    const handleClick = selected ? deselectPiece : move ? movePiece : selectPiece
+
     return (
       <Button
         fullWidth
@@ -37,28 +30,28 @@ export const Piece = withGame(
         backGround={false}
         padding={false}
         borders={false}
-        aria-label={`${piece} ${color} ${letter}${number}`}
-        onClick={(e) => handleClick({ y, x, e })}
+        aria-label={`${name} ${color} ${coordinates}`}
+        onClick={stopPropagation(() => handleClick(`${coordinates}`))}
       >
-        <PieceComponent color={color} />
+        <img src={assets[color][name]} className="w-full h-full" />
       </Button>
     )
   }
 )
 
+Piece.displayName = 'Piece'
+
 Piece.propTypes = {
-  piece: string.isRequired,
+  name: string.isRequired,
   color: string.isRequired,
-  coordinates: shape({
-    y: number.isRequired,
-    x: number.isRequired,
-    number: number.isRequired,
-    letter: string.isRequired,
-  }).isRequired,
-  activePiece: shape({
-    y: string.isRequired,
-    x: string.isRequired,
-  }),
+  coordinates: string.isRequired,
+  selected: bool.isRequired,
+  move: bool.isRequired,
   selectPiece: func,
   deselectPiece: func,
+}
+
+Piece.defaultProps = {
+  selected: false,
+  move: false,
 }

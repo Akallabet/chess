@@ -1,2 +1,2 @@
-export { PIECES, FENPieces, MOVES } from './constants'
+export { PIECES } from './constants'
 export { COLORS } from './colors'

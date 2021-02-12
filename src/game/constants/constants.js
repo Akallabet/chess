@@ -1,27 +1,42 @@
-import { COLORS } from './colors'
-import { pawn } from './pieces'
+import { pawn, rook, bishop, queen, king, knight } from './moves'
 
-const NAMES = { p: 'p', n: 'n', b: 'b', r: 'r', q: 'q', k: 'k' }
+const COLORS = { w: 'w', b: 'b' }
+
+const NAMES = {
+  P: 'P',
+  N: 'N',
+  B: 'B',
+  R: 'R',
+  Q: 'Q',
+  K: 'K',
+}
+
+const buildBoardPiece = (name, move) => (color) => ({
+  name: NAMES[name],
+  FEN: (color === COLORS.w && NAMES[name]) || (color === COLORS.b && NAMES[name].toLowerCase()),
+  color,
+  moves: ({ board, x, y }) =>
+    move({ board, color, x, y, COLORS }).map((move) => ({ ...move, origin: { x, y } })),
+})
+
+const boardPieces = {
+  [NAMES.P]: buildBoardPiece(NAMES.P, pawn),
+  [NAMES.N]: buildBoardPiece(NAMES.N, knight),
+  [NAMES.B]: buildBoardPiece(NAMES.B, bishop),
+  [NAMES.R]: buildBoardPiece(NAMES.R, rook),
+  [NAMES.Q]: buildBoardPiece(NAMES.Q, queen),
+  [NAMES.K]: buildBoardPiece(NAMES.K, king),
+}
 
 export const PIECES = {
-  p: { ...pawn, FEN: { [COLORS.b]: 'p', [COLORS.w]: 'P' } },
-  n: { name: 'n', FEN: { [COLORS.b]: 'n', [COLORS.w]: 'N' } },
-  b: { name: 'b', FEN: { [COLORS.b]: 'b', [COLORS.w]: 'B' } },
-  r: { name: 'r', FEN: { [COLORS.b]: 'r', [COLORS.w]: 'R' } },
-  q: { name: 'q', FEN: { [COLORS.b]: 'q', [COLORS.w]: 'Q' } },
-  k: { name: 'k', FEN: { [COLORS.b]: 'k', [COLORS.w]: 'K' } },
-}
-export const FENPieces = {
-  P: { piece: NAMES.p, color: 'w' },
-  N: { piece: NAMES.n, color: 'w' },
-  B: { piece: NAMES.b, color: 'w' },
-  R: { piece: NAMES.r, color: 'w' },
-  Q: { piece: NAMES.q, color: 'w' },
-  K: { piece: NAMES.k, color: 'w' },
-  p: { piece: NAMES.p, color: 'b' },
-  n: { piece: NAMES.n, color: 'b' },
-  b: { piece: NAMES.b, color: 'b' },
-  r: { piece: NAMES.r, color: 'b' },
-  q: { piece: NAMES.q, color: 'b' },
-  k: { piece: NAMES.k, color: 'b' },
+  names: Object.values(NAMES),
+  get: (name, color) => {
+    if (!color) {
+      return (
+        (NAMES[name] && boardPieces[name](COLORS.w)) ||
+        (NAMES[name.toUpperCase()] && boardPieces[name.toUpperCase()](COLORS.b))
+      )
+    }
+    return boardPieces[name](color)
+  },
 }

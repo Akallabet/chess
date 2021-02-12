@@ -7,7 +7,6 @@ import { string } from 'prop-types'
 
 export const Chess = ({ FEN }) => {
   const { playMove } = useSounds({ hasSound: true })
-
   return (
     <Box px={3} fullWidth className="sm:px-0 sm:w-452 sm:mx-auto">
       <GameProvider onMove={playMove} FEN={FEN}>

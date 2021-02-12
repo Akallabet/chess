@@ -9,7 +9,7 @@ const App = ({ FEN }) => {
     <I18nProvider language="en-GB">
       <Header />
       <Section>
-        <Chess FEN={FEN} />
+        <Chess FEN={FEN.replace(/_/g, ' ')} />
       </Section>
       <Footer />
     </I18nProvider>
@@ -23,5 +23,5 @@ App.propTypes = {
 }
 
 App.defaultProps = {
-  FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1',
+  FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR_w_KQkq_-_0_1',
 }

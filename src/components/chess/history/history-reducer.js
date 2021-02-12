@@ -50,9 +50,8 @@ export default (state, action) => {
       }
     }
     case RESET: {
-      const { stack: currentStack } = state
-      const { onAction } = action
-      const stack = [{ ...currentStack[0] }]
+      const { onAction, configuration } = action
+      const stack = [{ ...configuration }]
       const head = 0
       const current = stack[head]
 

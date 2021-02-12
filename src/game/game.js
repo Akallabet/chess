@@ -1,28 +1,33 @@
-import { PIECES } from './constants'
-import {
-  addPieceToBoard,
-  buildBoardFromFEN,
-  getRandomCell,
-  getFreeCells,
-  getRandomRow,
-  getAvailableRows,
-  buildFENPiecePlacementFromBoard,
-  isValidPiece,
-  highlithMovesToBoard,
-  cleanBoard,
-  highlithPieceCell,
-  removePieceFromBoard,
-} from './helpers'
+import { PIECES as defaultPieces } from './constants'
+import { helpers } from './helpers'
+import { compose, createContext } from './utils'
 
 export const game = ({
   FEN: initialFEN,
   board: initialBoard,
-  activePiece: initialActivePiece,
   capturedPieces: initialCapturedPieces,
+  PIECES = defaultPieces,
 }) => {
+  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  const ranks = ['1', '2', '3', '4', '5', '6', '7', '8']
+
+  const {
+    addPieceToBoard,
+    buildBoardFromFEN,
+    buildFENPiecePlacementFromBoard,
+    highligthMovesToBoard,
+    cleanBoard,
+    removePieceFromBoard,
+    getMovingPieces,
+    getLegalMoves,
+    actions,
+  } = createContext({ PIECES, files, ranks })(helpers)
+
   let FEN = initialFEN
   let board = initialBoard || buildBoardFromFEN(initialFEN)
-  let activePiece = initialActivePiece || false
+  let turn = FEN.split(' ')[1]
+  let activePiece
+
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (newFEN) => (FEN = newFEN)
@@ -30,67 +35,67 @@ export const game = ({
   const updatePiecePlacement = (piecePlacement) => {
     updateFEN(`${piecePlacement} ${FEN.split(' ').slice(1).join(' ')}`)
   }
-  const updateActivePiece = (newActivePiece) => (activePiece = newActivePiece)
+  const changeTurn = () => (turn === 'w' ? (turn = 'b') : (turn = 'w'))
+  const updateActivePiece = (piece) => (activePiece = { ...piece })
+  const deselectPiece = () => (activePiece = null)
 
   const getInfo = () => ({
     FEN,
     board,
-    activePiece,
     capturedPieces,
+    activePiece,
   })
 
-  const createRandomPiece = ({ piece, color }) => {
-    if (getAvailableRows(board, piece).length) {
-      const { rowIndex: y, cellIndex: x } = getRandomCell(
-        getFreeCells(getRandomRow(getAvailableRows(board, piece)))
-      )
-      const newBoard = addPieceToBoard({ piece, color, board, y, x })
-      updateBoard(newBoard)
-      updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
-    }
+  const isValid = (fn) => ({ y, x }) => {
+    const { color } = board[y][x]
+    if (color === turn) fn({ x, y })
   }
 
-  const deselectPiece = () => {
+  const FromSAN = (notation) => {
+    const [, ret] = actions.find(([regexp]) => new RegExp(regexp, 'g').test(notation))
+    return ret(notation)
+  }
+
+  const deselect = () => {
     updateBoard(cleanBoard(board))
-    updateActivePiece(false)
+    deselectPiece()
   }
 
-  const selectPiece = ({ y, x }) => {
-    const { piece, color } = board[y][x]
-    const { moves } = PIECES[piece]
-    updateBoard(
-      highlithMovesToBoard(highlithPieceCell(cleanBoard(board), { y, x }))(
-        moves({ board, color, y, x })
-      )
-    )
-    updateActivePiece({ y, x, piece, color })
+  const select = ({ y, x }) => {
+    const piece = board[y][x]
+    const { name, color } = piece
+    const moves = PIECES.get(name, color).moves({ board, color, y, x })
+
+    compose(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
+    updateActivePiece(piece)
   }
 
-  const moveActivePiece = ({ y, x }) => {
-    const cell = { ...board[y][x] }
-    updateBoard(
-      addPieceToBoard({
-        board: removePieceFromBoard({ board: cleanBoard(board), ...activePiece }),
-        ...activePiece,
-        x,
-        y,
-      })
-    )
-    if (cell.piece) capturedPieces.push(cell)
-    updateActivePiece(false)
-    updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
-  }
+  const move = ({ name, y, x }) => {
+    const legalMove = board
+      .reduce(getMovingPieces(turn, name), [])
+      .reduce(getLegalMoves(board), [])
+      .find((move) => move.x === x && move.y === y)
 
-  const addInfo = (f) => (args) => {
-    f(args)
-    return getInfo()
+    if (legalMove) {
+      const square = { ...board[legalMove.origin.y][legalMove.origin.x] }
+      compose(
+        cleanBoard,
+        removePieceFromBoard({ ...legalMove.origin }),
+        addPieceToBoard({ ...square, x, y }),
+        updateBoard
+      )(board)
+      compose(buildFENPiecePlacementFromBoard, updatePiecePlacement)(board)
+      return true
+    }
+    deselectPiece()
+    return false
   }
+  const hasItMoved = (hasMoved) => (hasMoved ? changeTurn() : () => {})
 
   return {
     getInfo,
-    createRandomPiece: addInfo(createRandomPiece),
-    selectPiece: addInfo(selectPiece),
-    deselectPiece: addInfo(deselectPiece),
-    moveActivePiece: addInfo(moveActivePiece),
+    select: compose(FromSAN, isValid(select), getInfo),
+    deselect: compose(deselect, getInfo),
+    move: compose(FromSAN, move, hasItMoved, getInfo),
   }
 }

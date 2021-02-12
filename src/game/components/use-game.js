@@ -1,44 +1,38 @@
-import { useState } from 'react'
-import { useHistory } from '../../components/chess/history'
+import { useEffect, useState } from 'react'
 import { useLoadData, useStorage } from '../../components/chess/storage'
 import { game } from '../game'
 
 export const useGame = ({ onMove, defaultInitialData }) => {
-  const history = useLoadData()
+  const data = useLoadData() || defaultInitialData
 
-  const data = history ? history.current : defaultInitialData
+  const [{ getInfo, select, deselect, move }, setEngine] = useState(game(data))
 
-  const [
-    { getInfo, createRandomPiece, selectPiece, deselectPiece, moveActivePiece },
-    setEngine,
-  ] = useState(game(data))
+  const resetGame = () => {
+    setEngine(game(defaultInitialData))
+  }
 
-  const resetGame = (configuration) => setEngine(game(configuration))
+  const [{ board, activePiece, FEN }, setInfo] = useState(getInfo())
 
-  const { stack, current, head, undo, reset, add, redo } = useHistory(history, getInfo(), resetGame)
-
-  useStorage({ stack, current, head })
-
-  const { board, activePiece } = current
+  useEffect(() => {
+    setInfo(getInfo())
+  }, [getInfo])
+  useStorage({ board, activePiece, FEN })
 
   return {
     board,
     activePiece,
-    createRandomPiece: (args) => {
-      add(createRandomPiece(args))
-    },
     selectPiece: (args) => {
-      add(selectPiece(args))
+      setInfo(select(args))
     },
     deselectPiece: (args) => {
-      add(deselectPiece(args))
+      setInfo(deselect(args))
     },
     moveActivePiece: (args) => {
-      add(moveActivePiece(args))
+      setInfo(move(args))
       onMove()
     },
-    reset,
-    undo,
-    redo,
+    reset: () => {
+      resetGame()
+    },
   }
 }

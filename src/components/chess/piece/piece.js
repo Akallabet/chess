@@ -10,9 +10,18 @@ const stopPropagation = (fn) => (e) => {
 }
 
 export const Piece = withGame(
-  ({ name, color, coordinates, selected, move, selectPiece, deselectPiece, movePiece }) => {
-    const handleClick = selected ? deselectPiece : move ? movePiece : selectPiece
-
+  ({
+    name,
+    color,
+    coordinates,
+    selected,
+    activePiece,
+    move,
+    selectPiece,
+    deselectPiece,
+    moveActivePiece,
+  }) => {
+    const handleClick = selected ? deselectPiece : move ? moveActivePiece : selectPiece
     return (
       <Button
         fullWidth
@@ -21,7 +30,9 @@ export const Piece = withGame(
         padding={false}
         borders={false}
         aria-label={`${name} ${color} ${coordinates}`}
-        onClick={stopPropagation(() => handleClick(`${coordinates}`))}
+        onClick={stopPropagation(() => {
+          handleClick(`${activePiece ? activePiece.name : ''}${move ? 'x' : ''}${coordinates}`)
+        })}
       >
         <img src={assets[color][name]} className="w-full h-full" />
       </Button>

@@ -1,5 +1,6 @@
-import { COLORS } from './colors'
 import { pawn, rook, bishop, queen, king, knight } from './moves'
+
+const COLORS = { w: 'w', b: 'b' }
 
 const NAMES = {
   P: 'P',
@@ -10,17 +11,12 @@ const NAMES = {
   K: 'K',
 }
 
-const makeMoves = (fn) => ({ board, color, x, y }) =>
-  fn({ board, color, x, y }).map((move) => ({ ...move, origin: { x, y } }))
-
-const getFEN = (color, name) =>
-  (color === COLORS.w && NAMES[name]) || (color === COLORS.b && NAMES[name].toLowerCase())
-
 const buildBoardPiece = (name, move) => (color) => ({
   name: NAMES[name],
-  FEN: getFEN(color, NAMES[name]),
+  FEN: (color === COLORS.w && NAMES[name]) || (color === COLORS.b && NAMES[name].toLowerCase()),
   color,
-  moves: makeMoves(move),
+  moves: ({ board, x, y }) =>
+    move({ board, color, x, y, COLORS }).map((move) => ({ ...move, origin: { x, y } })),
 })
 
 const boardPieces = {
@@ -33,6 +29,7 @@ const boardPieces = {
 }
 
 export const PIECES = {
+  names: Object.values(NAMES),
   get: (name, color) => {
     if (!color) {
       return (

@@ -1,6 +1,6 @@
 import { PIECES as defaultPieces } from './constants'
-import { createHelpers } from './helpers'
-import { compose } from './utils'
+import { helpers } from './helpers'
+import { compose, createContext } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -8,6 +8,9 @@ export const game = ({
   capturedPieces: initialCapturedPieces,
   PIECES = defaultPieces,
 }) => {
+  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  const ranks = ['1', '2', '3', '4', '5', '6', '7', '8']
+
   const {
     addPieceToBoard,
     buildBoardFromFEN,
@@ -15,14 +18,15 @@ export const game = ({
     highligthMovesToBoard,
     cleanBoard,
     removePieceFromBoard,
-    calculateMoves,
-  } = createHelpers({ PIECES })
+    getMovingPieces,
+    getLegalMoves,
+    actions,
+  } = createContext({ PIECES, files, ranks })(helpers)
 
-  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-  const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
   let FEN = initialFEN
   let board = initialBoard || buildBoardFromFEN(initialFEN)
-  const turn = FEN.split(' ')[1]
+  let turn = FEN.split(' ')[1]
+  let activePiece
 
   const capturedPieces = initialCapturedPieces || []
 
@@ -31,53 +35,67 @@ export const game = ({
   const updatePiecePlacement = (piecePlacement) => {
     updateFEN(`${piecePlacement} ${FEN.split(' ').slice(1).join(' ')}`)
   }
+  const changeTurn = () => (turn === 'w' ? (turn = 'b') : (turn = 'w'))
+  const updateActivePiece = (piece) => (activePiece = { ...piece })
+  const deselectPiece = () => (activePiece = null)
 
   const getInfo = () => ({
     FEN,
     board,
     capturedPieces,
+    activePiece,
   })
 
+  const isValid = (fn) => ({ y, x }) => {
+    const { color } = board[y][x]
+    if (color === turn) fn({ x, y })
+  }
+
   const FromSAN = (notation) => {
-    const [file, rank] = notation
-    const ret = { y: ranks.indexOf(rank), x: files.indexOf(file) }
-    return ret
+    const [, ret] = actions.find(([regexp]) => new RegExp(regexp, 'g').test(notation))
+    return ret(notation)
   }
 
   const deselect = () => {
     updateBoard(cleanBoard(board))
+    deselectPiece()
   }
 
   const select = ({ y, x }) => {
-    const { name, color } = board[y][x]
+    const piece = board[y][x]
+    const { name, color } = piece
+    const moves = PIECES.get(name, color).moves({ board, color, y, x })
 
-    updateBoard(
-      highligthMovesToBoard({ board: cleanBoard(board), y, x })(
-        PIECES.get(name, color).moves({ board, color, y, x })
-      )
-    )
+    compose(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
+    updateActivePiece(piece)
   }
 
-  const move = ({ y, x }) => {
-    const moves = calculateMoves({ board, turn, y, x })
-    if (moves.length === 1) {
-      const square = { ...board[moves[0].origin.y][moves[0].origin.x] }
-      updateBoard(
-        addPieceToBoard({
-          board: removePieceFromBoard({ board: cleanBoard(board), ...moves[0].origin }),
-          ...square,
-          x,
-          y,
-        })
-      )
-      updatePiecePlacement(buildFENPiecePlacementFromBoard(board))
+  const move = ({ name, y, x }) => {
+    const legalMove = board
+      .reduce(getMovingPieces(turn, name), [])
+      .reduce(getLegalMoves(board), [])
+      .find((move) => move.x === x && move.y === y)
+
+    if (legalMove) {
+      const square = { ...board[legalMove.origin.y][legalMove.origin.x] }
+      compose(
+        cleanBoard,
+        removePieceFromBoard({ ...legalMove.origin }),
+        addPieceToBoard({ ...square, x, y }),
+        updateBoard
+      )(board)
+      compose(buildFENPiecePlacementFromBoard, updatePiecePlacement)(board)
+      return true
     }
+    deselectPiece()
+    return false
   }
+  const hasItMoved = (hasMoved) => (hasMoved ? changeTurn() : () => {})
 
   return {
     getInfo,
-    select: compose(FromSAN, select, getInfo),
+    select: compose(FromSAN, isValid(select), getInfo),
     deselect: compose(deselect, getInfo),
-    move: compose(FromSAN, move, getInfo),
+    move: compose(FromSAN, move, hasItMoved, getInfo),
   }
 }

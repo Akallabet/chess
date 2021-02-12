@@ -1,38 +1,38 @@
-import { useState } from 'react'
-import { useHistory } from '../../components/chess/history'
+import { useEffect, useState } from 'react'
 import { useLoadData, useStorage } from '../../components/chess/storage'
 import { game } from '../game'
 
 export const useGame = ({ onMove, defaultInitialData }) => {
-  const history = useLoadData()
-
-  const data = history ? history.current : defaultInitialData
+  const data = useLoadData() || defaultInitialData
 
   const [{ getInfo, select, deselect, move }, setEngine] = useState(game(data))
 
-  const resetGame = (configuration) => setEngine(game(configuration))
+  const resetGame = () => {
+    setEngine(game(defaultInitialData))
+  }
 
-  const { stack, current, head, undo, reset, add, redo } = useHistory(history, getInfo(), resetGame)
+  const [{ board, activePiece, FEN }, setInfo] = useState(getInfo())
 
-  useStorage({ stack, current, head })
-
-  const { board, activePiece } = current
+  useEffect(() => {
+    setInfo(getInfo())
+  }, [getInfo])
+  useStorage({ board, activePiece, FEN })
 
   return {
     board,
     activePiece,
     selectPiece: (args) => {
-      add(select(args))
+      setInfo(select(args))
     },
     deselectPiece: (args) => {
-      add(deselect(args))
+      setInfo(deselect(args))
     },
     moveActivePiece: (args) => {
-      add(move(args))
+      setInfo(move(args))
       onMove()
     },
-    reset,
-    undo,
-    redo,
+    reset: () => {
+      resetGame()
+    },
   }
 }

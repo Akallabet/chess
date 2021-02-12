@@ -1,10 +1,17 @@
 import clsx from 'clsx'
-import { Piece } from '../pieces'
+import { Piece } from '../piece'
 import { withGame } from '../../../game'
 import { bool, func, node, shape, string } from 'prop-types'
 
 export const Square = withGame(
-  ({ isWhite, cell: { name, color, move, selected }, coordinates, children, moveActivePiece }) => {
+  ({
+    isWhite,
+    cell: { name, color, move, selected },
+    coordinates,
+    children,
+    activePiece,
+    moveActivePiece,
+  }) => {
     const highlight = selected || move
     const handleClick = highlight ? moveActivePiece : () => {}
     const classes = clsx('relative', 'h-full', 'w-1/8', {
@@ -14,7 +21,11 @@ export const Square = withGame(
       'bg-secondary': !isWhite && !highlight,
     })
     return (
-      <div data-testid={coordinates} className={classes} onClick={() => handleClick(coordinates)}>
+      <div
+        data-testid={coordinates}
+        className={classes}
+        onClick={() => handleClick(`${activePiece ? activePiece.name : ''}${coordinates}`)}
+      >
         {children}
         {name ? (
           <Piece

@@ -1,5 +1,3 @@
-import { COLORS } from './colors'
-
 const isValidMove = ({ board, color, y, x }) =>
   board[y] &&
   board[y][x] &&
@@ -22,29 +20,10 @@ const traverse = (incr, limit = () => true) => ({ board, color, y, x }) => {
   return moves
 }
 
-const straight = ({ board, color, y, x }) => {
-  const moves = [
-    ...traverse(({ y, x }) => ({ y, x: x + 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y, x: x - 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y + 1, x }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y - 1, x }))({ board, color, y, x }),
-  ]
-  return moves
-}
+export const pawn = ({ color, COLORS, ...args }) =>
+  color === COLORS.w ? whitePawn(args) : blackPawn(args)
 
-const oblique = ({ board, color, y, x }) => {
-  const moves = [
-    ...traverse(({ y, x }) => ({ y: y - 1, x: x + 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y + 1, x: x + 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y + 1, x: x - 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y - 1, x: x - 1 }))({ board, color, y, x }),
-  ]
-  return moves
-}
-
-export const pawn = ({ color, ...args }) => (color === COLORS.w ? whitePawn(args) : blackPawn(args))
-
-export const whitePawn = ({ board, y, x }) => {
+export const whitePawn = ({ board, color, y, x }) => {
   const moves = []
   if (board[y - 1][x] && !board[y - 1][x].name) {
     moves.push({ y: y - 1, x })
@@ -52,16 +31,16 @@ export const whitePawn = ({ board, y, x }) => {
   if (y === 6 && board[y - 2][x] && !board[y - 2][x].name) {
     moves.push({ y: y - 2, x })
   }
-  if (board[y - 1][x + 1] && board[y - 1][x + 1].name && board[y - 1][x + 1].color === COLORS.b) {
+  if (board[y - 1][x + 1] && board[y - 1][x + 1].name && board[y - 1][x + 1].color !== color) {
     moves.push({ y: y - 1, x: x + 1 })
   }
-  if (board[y - 1][x - 1] && board[y - 1][x - 1].name && board[y - 1][x - 1].color === COLORS.b) {
+  if (board[y - 1][x - 1] && board[y - 1][x - 1].name && board[y - 1][x - 1].color !== color) {
     moves.push({ y: y - 1, x: x - 1 })
   }
   return moves
 }
 
-export const blackPawn = ({ board, y, x }) => {
+export const blackPawn = ({ board, color, y, x }) => {
   const moves = []
   if (board[y + 1][x] && !board[y + 1][x].name) {
     moves.push({ y: y + 1, x })
@@ -69,10 +48,10 @@ export const blackPawn = ({ board, y, x }) => {
   if (y === 1 && board[y + 2][x] && !board[y + 2][x].name) {
     moves.push({ y: y + 2, x })
   }
-  if (board[y + 1][x + 1] && board[y + 1][x + 1].name && board[y + 1][x + 1].color === COLORS.w) {
+  if (board[y + 1][x + 1] && board[y + 1][x + 1].name && board[y + 1][x + 1].color !== color) {
     moves.push({ y: y + 1, x: x + 1 })
   }
-  if (board[y + 1][x - 1] && board[y + 1][x - 1].name && board[y + 1][x - 1].color === COLORS.w) {
+  if (board[y + 1][x - 1] && board[y + 1][x - 1].name && board[y + 1][x - 1].color !== color) {
     moves.push({ y: y + 1, x: x - 1 })
   }
   return moves
@@ -99,15 +78,34 @@ export const knight = ({ board, color, y: posY, x: posX }) => {
 }
 
 export const rook = ({ board, color, x, y }) => {
-  return [...straight({ board, color, x, y })]
+  return [
+    ...traverse(({ y, x }) => ({ y, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y, x: x - 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x }))({ board, color, y, x }),
+  ]
 }
 
 export const bishop = ({ board, color, x, y }) => {
-  return [...oblique({ board, color, x, y })]
+  return [
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x - 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x - 1 }))({ board, color, y, x }),
+  ]
 }
 
 export const queen = ({ board, color, x, y }) => {
-  return [...straight({ board, color, x, y }), ...oblique({ board, color, x, y })]
+  return [
+    ...traverse(({ y, x }) => ({ y, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y, x: x - 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x + 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y + 1, x: x - 1 }))({ board, color, y, x }),
+    ...traverse(({ y, x }) => ({ y: y - 1, x: x - 1 }))({ board, color, y, x }),
+  ]
 }
 
 export const king = ({ board, color, x, y }) => {

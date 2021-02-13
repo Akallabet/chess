@@ -47,7 +47,7 @@ const boardWithBlackPawn = [
 ]
 test('it should return an empty board', () => {
   const { getInfo } = game({ FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1' })
-  expect(getInfo()).toEqual({
+  expect(getInfo()).toMatchObject({
     board: emptyBoard,
     FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
     capturedPieces: [],
@@ -56,7 +56,7 @@ test('it should return an empty board', () => {
 
 test('it should return a board with a black pawn in second row, third column', () => {
   const { getInfo } = game({ FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1' })
-  expect(getInfo()).toEqual({
+  expect(getInfo()).toMatchObject({
     board: boardWithBlackPawn,
     FEN: '8/2p5/8/8/8/8/8/8 w KQkq - 0 1',
     capturedPieces: [],
@@ -65,7 +65,7 @@ test('it should return a board with a black pawn in second row, third column', (
 
 test('it should return a board with two black pawn in second row', () => {
   const { getInfo } = game({ FEN: '8/2p1p3/8/8/8/8/8/8 w KQkq - 0 1' })
-  expect(getInfo()).toEqual({
+  expect(getInfo()).toMatchObject({
     board: [
       [{}, {}, {}, {}, {}, {}, {}, {}],
       [{}, {}, { name: 'P', color: 'b' }, {}, { name: 'P', color: 'b' }, {}, {}, {}],
@@ -78,11 +78,10 @@ test('it should return a board with two black pawn in second row', () => {
 
 test('it should return a board with all the standard pieces', () => {
   const { getInfo } = game({ FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' })
-  expect(getInfo()).toEqual({
-    board: completeBoard,
-    FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    capturedPieces: [],
-  })
+  const { board, FEN } = getInfo()
+
+  expect(board).toEqual(completeBoard)
+  expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
 })
 
 const highlightRookMoves = ({ color, name }) => [
@@ -169,7 +168,7 @@ test.each`
   'it should highlight all the moves of a $colorName $pieceName',
   ({ name, FEN, color, expectedBoard }) => {
     const { select } = game({ FEN: `8/8/8/8/3${FEN}4/8/8/8 ${color} KQkq - 0 1` })
-    const { board } = select(`${name}d5`)
+    const { board } = select(`${name}d4`)
 
     expect(board).toEqual(expectedBoard({ name, color }))
   }
@@ -178,7 +177,7 @@ test.each`
 test('it should highlight the legal moves of a black pawn for its first move', () => {
   const initialFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1'
   const { select } = game({ FEN: initialFEN })
-  const { board } = select('a2')
+  const { board } = select('a7')
 
   expect(board).toEqual([
     [...completeBoard[0]],
@@ -194,15 +193,15 @@ test('it should highlight the legal moves of a black pawn for its first move', (
 test('it should remove the hihlight squares from the board', () => {
   const initialFEN = '8/2p5/8/8/8/8/8/8 b KQkq - 0 1'
   const { select, deselect } = game({ FEN: initialFEN })
-  const { board } = select('c2')
+  const { board } = select('c7')
   expect(board).toEqual(highlightedBoard)
   const info = deselect()
   expect(info.board).toEqual(boardWithBlackPawn)
 })
 
-test('it should move white pawn c7 to c5', () => {
+test('it should move white pawn c2 to c4', () => {
   const { move } = game({ FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' })
-  const { board, FEN } = move('c5')
+  const { board, FEN } = move('c4')
 
   expect(board).toEqual([
     ...completeBoard.slice(0, 4),
@@ -221,4 +220,13 @@ test('it should move white pawn c7 to c5', () => {
     [...completeBoard[7]],
   ])
   expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq - 0 1')
+})
+
+test('it should not execute an ambiguous move', () => {
+  const { move } = game({
+    FEN: 'r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/2N5/PPPPNPPP/R1BQKB1R w KQkq - 0 4',
+  })
+  const { FEN } = move('Kc3')
+
+  expect(FEN).toEqual('r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/2N5/PPPPNPPP/R1BQKB1R w KQkq - 0 4')
 })

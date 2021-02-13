@@ -7,10 +7,11 @@ export const Square = withGame(
   ({
     isWhite,
     cell: { name, color, move, selected },
-    coordinates,
-    children,
+    rank,
+    file,
     activePiece,
     moveActivePiece,
+    children,
   }) => {
     const highlight = selected || move
     const handleClick = highlight ? moveActivePiece : () => {}
@@ -22,16 +23,16 @@ export const Square = withGame(
     })
     return (
       <div
-        data-testid={coordinates}
+        data-testid={`${file}${rank}`}
         className={classes}
-        onClick={() => handleClick(`${activePiece ? activePiece.name : ''}${coordinates}`)}
+        onClick={() => handleClick(`${activePiece ? activePiece.name : ''}${file}${rank}`)}
       >
         {children}
         {name ? (
           <Piece
             name={name}
             color={color}
-            coordinates={coordinates}
+            coordinates={`${file}${rank}`}
             selected={selected}
             move={move}
           />
@@ -51,7 +52,8 @@ Square.propTypes = {
     selected: bool,
     move: bool,
   }).isRequired,
-  coordinates: string.isRequired,
-  children: node.isRequired,
+  rank: string.isRequired,
+  file: string.isRequired,
   moveActivePiece: func,
+  children: node.isRequired,
 }

@@ -1,13 +1,13 @@
 import { bool, node } from 'prop-types'
 import { Notation } from './notation'
 
-export const Letter = ({ children, isWhite }) => (
-  <Notation isWhite={isWhite} className="right-0.5 bottom-0">
+export const Rank = ({ children, isWhite }) => (
+  <Notation isWhite={isWhite} className="left-1 top-0">
     {children}
   </Notation>
 )
 
-Letter.propTypes = {
+Rank.propTypes = {
   children: node.isRequired,
   isWhite: bool.isRequired,
 }

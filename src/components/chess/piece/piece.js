@@ -31,7 +31,7 @@ export const Piece = withGame(
         borders={false}
         aria-label={`${name} ${color} ${coordinates}`}
         onClick={stopPropagation(() => {
-          handleClick(`${activePiece ? activePiece.name : ''}${move ? 'x' : ''}${coordinates}`)
+          handleClick(`${move ? activePiece.name : ''}${move ? 'x' : ''}${coordinates}`)
         })}
       >
         <img src={assets[color][name]} className="w-full h-full" />

@@ -34,60 +34,60 @@ test('Should display a chess board', () => {
 
 test('Should display a black pawn', () => {
   const { getByRole } = render(<App />)
-  expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
+  expect(getByRole('button', { name: 'P b c7' })).toBeDefined()
 })
 
 test('Should move a pawn on the board', () => {
   const { getByTestId, getByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: 'P w c7' }))
-  fireEvent.click(getByTestId('c5'))
-  expect(getByRole('button', { name: 'P w c5' })).toBeDefined()
+  fireEvent.click(getByRole('button', { name: 'P w c2' }))
+  fireEvent.click(getByTestId('c4'))
+  expect(getByRole('button', { name: 'P w c4' })).toBeDefined()
 })
 
 test('Should play a sound when moving a piece', () => {
   const { getByTestId, getByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: 'P w c7' }))
-  fireEvent.click(getByTestId('c5'))
+  fireEvent.click(getByRole('button', { name: 'P w c2' }))
+  fireEvent.click(getByTestId('c4'))
   expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1)
 })
 
 test('Should reset the board', async () => {
   const { getByTestId, getByRole, queryByRole } = render(<App />)
-  fireEvent.click(getByRole('button', { name: 'P w c7' }))
-  fireEvent.click(getByTestId('c5'))
-  expect(getByRole('button', { name: 'P w c5' })).toBeDefined()
-  expect(queryByRole('button', { name: 'P w c7' })).toBeNull()
+  fireEvent.click(getByRole('button', { name: 'P w c2' }))
+  fireEvent.click(getByTestId('c4'))
+  expect(getByRole('button', { name: 'P w c4' })).toBeDefined()
+  expect(queryByRole('button', { name: 'P w c2' })).toBeNull()
   fireEvent.click(getByRole('button', { name: 'reset' }))
-  expect(getByRole('button', { name: 'P w c7' })).toBeDefined()
+  expect(getByRole('button', { name: 'P w c2' })).toBeDefined()
 })
 
 test('Should deselect a piece and select another one by clicking over it', async () => {
   const { getByTestId, getByRole, queryByRole } = render(
     <App FEN="8/2p5/8/8/8/8/2PP4/8 w KQkq - 0 1" />
   )
-  fireEvent.click(getByRole('button', { name: 'P w c7' }))
-  fireEvent.click(getByRole('button', { name: 'P w d7' }))
-  fireEvent.click(getByTestId('d5'))
+  fireEvent.click(getByRole('button', { name: 'P w c2' }))
+  fireEvent.click(getByRole('button', { name: 'P w d2' }))
+  fireEvent.click(getByTestId('d4'))
 
-  expect(getByRole('button', { name: 'P w c7' })).toBeDefined()
-  expect(getByRole('button', { name: 'P w d5' })).toBeDefined()
-  expect(queryByRole('button', { name: 'P w d7' })).toBeNull()
+  expect(getByRole('button', { name: 'P w c2' })).toBeDefined()
+  expect(getByRole('button', { name: 'P w d4' })).toBeDefined()
+  expect(queryByRole('button', { name: 'P w d2' })).toBeNull()
 })
 
 test('Should capture a pawn', async () => {
   const { getByTestId, getByRole, queryByRole } = render(
     <App FEN="8/2p5/8/8/8/8/1P6/8 b KQkq - 0 1" />
   )
-  fireEvent.click(getByRole('button', { name: 'P b c2' }))
-  fireEvent.click(getByTestId('c4'))
-  fireEvent.click(getByRole('button', { name: 'P w b7' }))
-  fireEvent.click(getByTestId('b5'))
+  fireEvent.click(getByRole('button', { name: 'P b c7' }))
+  fireEvent.click(getByTestId('c5'))
+  fireEvent.click(getByRole('button', { name: 'P w b2' }))
+  fireEvent.click(getByTestId('b4'))
 
-  fireEvent.click(getByRole('button', { name: 'P b c4' }))
-  fireEvent.click(getByRole('button', { name: 'P w b5' }))
+  fireEvent.click(getByRole('button', { name: 'P b c5' }))
+  fireEvent.click(getByRole('button', { name: 'P w b4' }))
 
-  expect(getByRole('button', { name: 'P b b5' })).toBeDefined()
-  expect(queryByRole('button', { name: 'P w b5' })).toBeNull()
+  expect(getByRole('button', { name: 'P b b4' })).toBeDefined()
+  expect(queryByRole('button', { name: 'P w b4' })).toBeNull()
 })
 
 // test('Should undo a move', async () => {

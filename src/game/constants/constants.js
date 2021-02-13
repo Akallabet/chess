@@ -2,7 +2,7 @@ import { pawn, rook, bishop, queen, king, knight } from './moves'
 
 export const COLORS = { w: 'w', b: 'b' }
 export const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-export const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8']
+export const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1']
 
 const NAMES = {
   P: 'P',

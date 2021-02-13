@@ -4,6 +4,8 @@ import { useGame } from './use-game'
 
 export const GameProvider = ({ FEN, onMove, children }) => {
   const {
+    ranks,
+    files,
     board,
     activePiece,
     createRandomPiece,
@@ -21,6 +23,8 @@ export const GameProvider = ({ FEN, onMove, children }) => {
   return (
     <GameContext.Provider
       value={{
+        ranks,
+        files,
         board,
         activePiece,
         selectPiece,

@@ -11,7 +11,7 @@ export const useGame = ({ onMove, defaultInitialData }) => {
     setEngine(game(defaultInitialData))
   }
 
-  const [{ board, activePiece, FEN }, setInfo] = useState(getInfo())
+  const [{ board, activePiece, FEN, ranks, files }, setInfo] = useState(getInfo())
 
   useEffect(() => {
     setInfo(getInfo())
@@ -21,6 +21,8 @@ export const useGame = ({ onMove, defaultInitialData }) => {
   return {
     board,
     activePiece,
+    ranks,
+    files,
     selectPiece: (args) => {
       setInfo(select(args))
     },

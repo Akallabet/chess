@@ -31,7 +31,6 @@ export const game = ({
   let FEN = initialFEN
   let board = initialBoard || buildBoardFromFEN(initialFEN)
   let activePiece
-
   const capturedPieces = initialCapturedPieces || []
 
   const turn = () => FEN.split(' ')[1]
@@ -47,6 +46,8 @@ export const game = ({
   const deselectPiece = () => (activePiece = null)
 
   const getInfo = () => ({
+    files,
+    ranks,
     FEN,
     board,
     capturedPieces,
@@ -78,12 +79,13 @@ export const game = ({
   }
 
   const move = ({ name, y, x }) => {
-    const legalMove = board
+    const legalMoves = board
       .reduce(getMovingPieces(turn(), name), [])
       .reduce(getLegalMoves(board), [])
-      .find((move) => move.x === x && move.y === y)
+      .filter((move) => move.x === x && move.y === y)
 
-    if (legalMove) {
+    if (legalMoves.length === 1) {
+      const legalMove = legalMoves[0]
       const square = { ...board[legalMove.origin.y][legalMove.origin.x] }
       compose(
         cleanBoard,

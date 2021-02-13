@@ -1,1 +1,1 @@
-export { PIECES } from './constants'
+export { FILES, RANKS, COLORS, PIECES } from './constants'

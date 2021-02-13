@@ -1,4 +1,9 @@
-import { PIECES as defaultPieces } from './constants'
+import {
+  PIECES as defaultPieces,
+  COLORS as defaultColors,
+  FILES as defaultFiles,
+  RANKS as defaultRanks,
+} from './constants'
 import { helpers } from './helpers'
 import { compose, createContext } from './utils'
 
@@ -7,10 +12,10 @@ export const game = ({
   board: initialBoard,
   capturedPieces: initialCapturedPieces,
   PIECES = defaultPieces,
+  COLORS = defaultColors,
+  files = defaultFiles,
+  ranks = defaultRanks,
 }) => {
-  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-  const ranks = ['1', '2', '3', '4', '5', '6', '7', '8']
-
   const {
     addPieceToBoard,
     buildBoardFromFEN,
@@ -25,17 +30,19 @@ export const game = ({
 
   let FEN = initialFEN
   let board = initialBoard || buildBoardFromFEN(initialFEN)
-  let turn = FEN.split(' ')[1]
   let activePiece
 
   const capturedPieces = initialCapturedPieces || []
 
-  const updateFEN = (newFEN) => (FEN = newFEN)
+  const turn = () => FEN.split(' ')[1]
+  const updateFEN = (newPart, index) =>
+    (FEN = FEN.split(' ')
+      .map((part, i) => (i === index ? newPart : part))
+      .join(' '))
+  const updatePiecePlacement = (piecePlacement) => updateFEN(piecePlacement, 0)
+  const changeTurn = () => updateFEN(turn() === COLORS.w ? COLORS.b : COLORS.w, 1)
+
   const updateBoard = (newBoard) => (board = newBoard)
-  const updatePiecePlacement = (piecePlacement) => {
-    updateFEN(`${piecePlacement} ${FEN.split(' ').slice(1).join(' ')}`)
-  }
-  const changeTurn = () => (turn === 'w' ? (turn = 'b') : (turn = 'w'))
   const updateActivePiece = (piece) => (activePiece = { ...piece })
   const deselectPiece = () => (activePiece = null)
 
@@ -46,9 +53,9 @@ export const game = ({
     activePiece,
   })
 
-  const isValid = (fn) => ({ y, x }) => {
+  const isValidTurn = (fn) => ({ y, x }) => {
     const { color } = board[y][x]
-    if (color === turn) fn({ x, y })
+    if (color === turn()) fn({ x, y })
   }
 
   const FromSAN = (notation) => {
@@ -72,7 +79,7 @@ export const game = ({
 
   const move = ({ name, y, x }) => {
     const legalMove = board
-      .reduce(getMovingPieces(turn, name), [])
+      .reduce(getMovingPieces(turn(), name), [])
       .reduce(getLegalMoves(board), [])
       .find((move) => move.x === x && move.y === y)
 
@@ -94,7 +101,7 @@ export const game = ({
 
   return {
     getInfo,
-    select: compose(FromSAN, isValid(select), getInfo),
+    select: compose(FromSAN, isValidTurn(select), getInfo),
     deselect: compose(deselect, getInfo),
     move: compose(FromSAN, move, hasItMoved, getInfo),
   }

@@ -220,5 +220,5 @@ test('it should move white pawn c7 to c5', () => {
     ],
     [...completeBoard[7]],
   ])
-  expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 1')
+  expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq - 0 1')
 })

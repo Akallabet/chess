@@ -4,9 +4,8 @@ import { buildFENPiecePlacementFromBoard } from './buils-FEN-piece-placement-fro
 import { cleanBoard } from './clean-board'
 import { highligthMovesToBoard } from './highlight-moves-to-board'
 import { removePieceFromBoard } from './remove-piece-from-board'
-import { getMovingPieces } from './get-moving-pieces'
-import { getLegalMoves } from './get-legal-moves'
 import { actions } from './actions'
+import { getLegalMoves } from './get-legal-moves'
 
 export const helpers = {
   addPieceToBoard,
@@ -15,7 +14,6 @@ export const helpers = {
   cleanBoard,
   highligthMovesToBoard,
   removePieceFromBoard,
-  getMovingPieces,
   getLegalMoves,
   actions,
 }

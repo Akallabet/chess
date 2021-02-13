@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Piece } from '../piece'
+import { Piece } from './piece'
 import { withGame } from '../../../game'
 import { bool, func, node, shape, string } from 'prop-types'
 
@@ -9,12 +9,20 @@ export const Square = withGame(
     cell: { name, color, move, selected },
     rank,
     file,
+    // legalMoves,
     activePiece,
     moveActivePiece,
     children,
   }) => {
+    const handleMove = () => {
+      // if (legalMoves[`${file}${rank}`].length > 1) {
+      //   moveActivePiece(legalMoves[`${file}${rank}`].find(({name}) => name))
+      // }
+      // else
+      console.log(activePiece, `${file}${rank}`)
+      moveActivePiece(`${activePiece.name}${file}${rank}`)
+    }
     const highlight = selected || move
-    const handleClick = highlight ? moveActivePiece : () => {}
     const classes = clsx('relative', 'h-full', 'w-1/8', {
       'bg-primary-dark': isWhite && highlight,
       'bg-primary': isWhite && !highlight,
@@ -25,7 +33,7 @@ export const Square = withGame(
       <div
         data-testid={`${file}${rank}`}
         className={classes}
-        onClick={() => handleClick(`${activePiece ? activePiece.name : ''}${file}${rank}`)}
+        onClick={highlight ? handleMove : () => {}}
       >
         {children}
         {name ? (

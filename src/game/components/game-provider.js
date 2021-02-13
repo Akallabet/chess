@@ -7,6 +7,7 @@ export const GameProvider = ({ FEN, onMove, children }) => {
     ranks,
     files,
     board,
+    legalMoves,
     activePiece,
     createRandomPiece,
     selectPiece,
@@ -25,6 +26,7 @@ export const GameProvider = ({ FEN, onMove, children }) => {
       value={{
         ranks,
         files,
+        legalMoves,
         board,
         activePiece,
         selectPiece,

@@ -5,12 +5,13 @@ import {
   RANKS as defaultRanks,
 } from './constants'
 import { helpers } from './helpers'
-import { compose, createContext } from './utils'
+import { check, pipe, createContext } from './utils'
 
 export const game = ({
   FEN: initialFEN,
   board: initialBoard,
   capturedPieces: initialCapturedPieces,
+  activePiece: initialActivePiece,
   PIECES = defaultPieces,
   COLORS = defaultColors,
   files = defaultFiles,
@@ -23,17 +24,17 @@ export const game = ({
     highligthMovesToBoard,
     cleanBoard,
     removePieceFromBoard,
-    getMovingPieces,
     getLegalMoves,
     actions,
   } = createContext({ PIECES, files, ranks })(helpers)
 
   let FEN = initialFEN
   let board = initialBoard || buildBoardFromFEN(initialFEN)
-  let activePiece
+  const turn = () => FEN.split(' ')[1]
+  let legalMoves = getLegalMoves(board, turn())
+  let activePiece = initialActivePiece
   const capturedPieces = initialCapturedPieces || []
 
-  const turn = () => FEN.split(' ')[1]
   const updateFEN = (newPart, index) =>
     (FEN = FEN.split(' ')
       .map((part, i) => (i === index ? newPart : part))
@@ -42,6 +43,7 @@ export const game = ({
   const changeTurn = () => updateFEN(turn() === COLORS.w ? COLORS.b : COLORS.w, 1)
 
   const updateBoard = (newBoard) => (board = newBoard)
+  const updateLegalMoves = () => (legalMoves = getLegalMoves(board, turn()))
   const updateActivePiece = (piece) => (activePiece = { ...piece })
   const deselectPiece = () => (activePiece = null)
 
@@ -50,14 +52,12 @@ export const game = ({
     ranks,
     FEN,
     board,
+    legalMoves,
     capturedPieces,
     activePiece,
   })
 
-  const isValidTurn = (fn) => ({ y, x }) => {
-    const { color } = board[y][x]
-    if (color === turn()) fn({ x, y })
-  }
+  const isValidTurn = ({ y, x }) => board[y][x].color === turn()
 
   const FromSAN = (notation) => {
     const [, ret] = actions.find(([regexp]) => new RegExp(regexp, 'g').test(notation))
@@ -65,8 +65,7 @@ export const game = ({
   }
 
   const deselect = () => {
-    updateBoard(cleanBoard(board))
-    deselectPiece()
+    pipe(cleanBoard, updateBoard, deselectPiece)(board)
   }
 
   const select = ({ y, x }) => {
@@ -74,37 +73,37 @@ export const game = ({
     const { name, color } = piece
     const moves = PIECES.get(name, color).moves({ board, color, y, x })
 
-    compose(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
+    pipe(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
     updateActivePiece(piece)
   }
 
-  const move = ({ name, y, x }) => {
-    const legalMoves = board
-      .reduce(getMovingPieces(turn(), name), [])
-      .reduce(getLegalMoves(board), [])
-      .filter((move) => move.x === x && move.y === y)
-
-    if (legalMoves.length === 1) {
-      const legalMove = legalMoves[0]
-      const square = { ...board[legalMove.origin.y][legalMove.origin.x] }
-      compose(
-        cleanBoard,
-        removePieceFromBoard({ ...legalMove.origin }),
-        addPieceToBoard({ ...square, x, y }),
-        updateBoard
-      )(board)
-      compose(buildFENPiecePlacementFromBoard, updatePiecePlacement)(board)
-      return true
-    }
-    deselectPiece()
-    return false
+  const findRightMove = (name) => (origin) => {
+    return name ? board[origin.y][origin.x].name === name : true
   }
-  const hasItMoved = (hasMoved) => (hasMoved ? changeTurn() : () => {})
+
+  const isNotDisambiguous = ({ name, y, x }) =>
+    legalMoves[`${files[x]}${ranks[y]}`].filter(findRightMove(name)).length === 1
+
+  const move = ({ name, y, x }) => {
+    const legalMove = legalMoves[`${files[x]}${ranks[y]}`].find(findRightMove(name))
+    pipe(
+      cleanBoard,
+      removePieceFromBoard({ ...legalMove }),
+      addPieceToBoard({ ...board[legalMove.y][legalMove.x], x, y }),
+      updateBoard,
+      buildFENPiecePlacementFromBoard,
+      updatePiecePlacement
+    )(board)
+  }
 
   return {
     getInfo,
-    select: compose(FromSAN, isValidTurn(select), getInfo),
-    deselect: compose(deselect, getInfo),
-    move: compose(FromSAN, move, hasItMoved, getInfo),
+    select: pipe(FromSAN, check(isValidTurn, select), getInfo),
+    deselect: pipe(deselect, getInfo),
+    move: pipe(
+      FromSAN,
+      check(isNotDisambiguous, pipe(move, deselect, changeTurn, updateLegalMoves)),
+      getInfo
+    ),
   }
 }

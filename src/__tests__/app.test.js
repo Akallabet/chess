@@ -90,6 +90,26 @@ test('Should capture a pawn', async () => {
   expect(queryByRole('button', { name: 'P w b4' })).toBeNull()
 })
 
+test('Should create an unambiguous move by specifiyng the file', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/8/PPPPNPPP/RNBQKB1R w KQkq - 0 1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'N w b1' }))
+  fireEvent.click(getByTestId('c3'))
+  expect(getByRole('button', { name: 'N w c3' })).toBeDefined()
+  expect(queryByRole('button', { name: 'N w b1' })).toBeNull()
+})
+
+test('Should create an unambiguous move by specifiyng the file and the rank', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="r1bqkb1r/ppp1pp1p/2n3p1/1N5n/2PpP3/8/PP1P1PPP/RNBQKB1R w KQkq - 0 1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'N w b1' }))
+  fireEvent.click(getByTestId('c3'))
+  expect(getByRole('button', { name: 'N w c3' })).toBeDefined()
+  expect(queryByRole('button', { name: 'N w b1' })).toBeNull()
+})
+
 // test('Should undo a move', async () => {
 //   const { getByTestId, getByRole, queryByRole } = render(<App />)
 //   fireEvent.click(getByRole('button', { name: 'P b c2' }))

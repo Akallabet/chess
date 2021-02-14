@@ -18,7 +18,7 @@ const buildBoardPiece = (name, move) => (color) => ({
   FEN: (color === COLORS.w && NAMES[name]) || (color === COLORS.b && NAMES[name].toLowerCase()),
   color,
   moves: ({ board, x, y }) =>
-    move({ board, color, x, y, COLORS }).map((move) => ({ ...move, origin: { x, y } })),
+    move({ board, color, x, y, COLORS }).map((move) => ({ ...move, origin: { name, x, y } })),
 })
 
 const boardPieces = {

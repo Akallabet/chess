@@ -226,7 +226,34 @@ test('it should not execute an ambiguous move', () => {
   const { move } = game({
     FEN: 'r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/2N5/PPPPNPPP/R1BQKB1R w KQkq - 0 4',
   })
-  const { FEN } = move('Kc3')
+  const { FEN } = move('Nc3')
 
   expect(FEN).toEqual('r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/2N5/PPPPNPPP/R1BQKB1R w KQkq - 0 4')
+})
+
+test('it should move a piece give its name', () => {
+  const { move } = game({
+    FEN: 'r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/8/PPPPNPPP/RNBQKB1R w KQkq - 0 4',
+  })
+  const { FEN } = move('Pc3')
+
+  expect(FEN).toEqual('r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/2P5/PP1PNPPP/RNBQKB1R b KQkq - 0 4')
+})
+
+test('it should move a piece given its name and file', () => {
+  const { move } = game({
+    FEN: 'r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/8/PPPPNPPP/RNBQKB1R w KQkq - 0 4',
+  })
+  const { FEN } = move('Nbc3')
+
+  expect(FEN).toEqual('r1bqkb1r/ppp1pppp/2n2n2/3p4/4P3/2N5/PPPPNPPP/R1BQKB1R b KQkq - 0 4')
+})
+
+test('it should move a piece given its name, file and rank', () => {
+  const { move } = game({
+    FEN: 'r1bqkb1r/ppp1pp1p/2n3p1/1N5n/2PpP3/8/PP1P1PPP/RNBQKB1R w KQkq - 0 4',
+  })
+  const { FEN } = move('Nb5c3')
+
+  expect(FEN).toEqual('r1bqkb1r/ppp1pp1p/2n3p1/7n/2PpP3/2N5/PP1P1PPP/RNBQKB1R b KQkq - 0 4')
 })

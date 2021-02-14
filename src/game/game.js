@@ -64,9 +64,7 @@ export const game = ({
     return ret(notation)
   }
 
-  const deselect = () => {
-    pipe(cleanBoard, updateBoard, deselectPiece)(board)
-  }
+  const deselect = () => pipe(cleanBoard, updateBoard, deselectPiece)(board)
 
   const select = ({ y, x }) => {
     const piece = board[y][x]
@@ -74,18 +72,13 @@ export const game = ({
     const moves = PIECES.get(name, color).moves({ board, color, y, x })
 
     pipe(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
-    updateActivePiece(piece)
+    updateActivePiece({ ...piece, y, x })
   }
 
-  const findRightMove = (name) => (origin) => {
-    return name ? board[origin.y][origin.x].name === name : true
-  }
+  const isDisambiguous = (info) => legalMoves.getMoves(info).length === 1
 
-  const isNotDisambiguous = ({ name, y, x }) =>
-    legalMoves[`${files[x]}${ranks[y]}`].filter(findRightMove(name)).length === 1
-
-  const move = ({ name, y, x }) => {
-    const legalMove = legalMoves[`${files[x]}${ranks[y]}`].find(findRightMove(name))
+  const move = ({ name, originY, originX, y, x }) => {
+    const legalMove = legalMoves.getMoves({ name, originY, originX, y, x })[0]
     pipe(
       cleanBoard,
       removePieceFromBoard({ ...legalMove }),
@@ -102,7 +95,7 @@ export const game = ({
     deselect: pipe(deselect, getInfo),
     move: pipe(
       FromSAN,
-      check(isNotDisambiguous, pipe(move, deselect, changeTurn, updateLegalMoves)),
+      check(isDisambiguous, pipe(move, deselect, changeTurn, updateLegalMoves)),
       getInfo
     ),
   }

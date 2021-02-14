@@ -64,7 +64,6 @@ export const knight = ({ board, color, y: posY, x: posX }) => {
     [posY - 2, posX - 1],
     [posY - 2, posX + 1],
     [posY - 1, posX + 2],
-    [posY - 1, posX - 2],
     [posY + 1, posX + 2],
     [posY + 2, posX + 1],
     [posY + 2, posX - 1],

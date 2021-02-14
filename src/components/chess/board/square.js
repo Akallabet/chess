@@ -9,18 +9,13 @@ export const Square = withGame(
     cell: { name, color, move, selected },
     rank,
     file,
-    // legalMoves,
+    legalMoves,
     activePiece,
     moveActivePiece,
     children,
   }) => {
     const handleMove = () => {
-      // if (legalMoves[`${file}${rank}`].length > 1) {
-      //   moveActivePiece(legalMoves[`${file}${rank}`].find(({name}) => name))
-      // }
-      // else
-      console.log(activePiece, `${file}${rank}`)
-      moveActivePiece(`${activePiece.name}${file}${rank}`)
+      moveActivePiece(legalMoves.getSAN(activePiece, { file, rank }))
     }
     const highlight = selected || move
     const classes = clsx('relative', 'h-full', 'w-1/8', {

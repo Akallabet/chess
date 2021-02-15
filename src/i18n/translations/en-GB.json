@@ -2,5 +2,9 @@
   "controls": {
     "randomWhitePawn": "Add white pawn",
     "reset": "reset"
+  },
+  "activeColor": {
+    "w": "White to move",
+    "b": "Black to move"
   }
 }

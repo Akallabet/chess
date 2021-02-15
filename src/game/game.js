@@ -53,6 +53,7 @@ export const game = ({
     legalMoves,
     capturedPieces,
     activePiece,
+    ...FEN,
   })
 
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor

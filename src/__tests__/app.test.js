@@ -41,7 +41,7 @@ test('Should move a pawn on the board', () => {
   const { getByTestId, getByRole } = render(<App />)
   fireEvent.click(getByRole('button', { name: 'P w c2' }))
   fireEvent.click(getByTestId('c4'))
-  // expect(getByRole('button', { name: 'P w c4' })).toBeDefined()
+  expect(getByRole('button', { name: 'P w c4' })).toBeDefined()
 })
 
 test('Should play a sound when moving a piece', () => {
@@ -120,6 +120,14 @@ test('Should create an unambiguous move by specifiyng the file and the rank', ()
   expect(queryByRole('button', { name: 'N w b1' })).toBeNull()
 })
 
+test('Should display which color has to move', () => {
+  const { getByTestId, getByRole, getByText } = render(<App />)
+  expect(getByText('White to move')).toBeDefined()
+  fireEvent.click(getByRole('button', { name: 'P w c2' }))
+  fireEvent.click(getByTestId('c4'))
+  expect(getByRole('button', { name: 'P w c4' })).toBeDefined()
+  expect(getByText('Black to move')).toBeDefined()
+})
 // test('Should undo a move', async () => {
 //   const { getByTestId, getByRole, queryByRole } = render(<App />)
 //   fireEvent.click(getByRole('button', { name: 'P b c2' }))

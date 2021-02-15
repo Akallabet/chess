@@ -4,6 +4,7 @@ import { Controls } from './controls'
 import { useSounds } from './sounds/use-sounds'
 import { Box } from '../box'
 import { string } from 'prop-types'
+import { Logs } from './logs'
 
 export const Chess = ({ FEN }) => {
   const { playMove } = useSounds({ hasSound: true })
@@ -13,6 +14,7 @@ export const Chess = ({ FEN }) => {
         <Box pb={1}>
           <Board />
         </Box>
+        <Logs />
         <Controls />
       </GameProvider>
     </Box>

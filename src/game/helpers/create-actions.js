@@ -1,4 +1,4 @@
-export const actions = ({ PIECES, ranks, files }) => [
+export const createActions = ({ PIECES, ranks, files }) => [
   [
     `^[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
     ([file, rank]) => ({ y: ranks.indexOf(rank), x: files.indexOf(file) }),

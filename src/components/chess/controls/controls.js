@@ -1,4 +1,4 @@
-import { withGame } from '../../../game'
+import { withGame } from '../game'
 import { Box } from '../../box'
 // import { Button } from '../../button'
 import { Reset } from './reset'

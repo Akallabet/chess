@@ -1,5 +1,5 @@
 import { Board } from './board'
-import { GameProvider } from '../../game'
+import { GameProvider } from './game'
 import { Controls } from './controls'
 import { useSounds } from './sounds/use-sounds'
 import { Box } from '../box'

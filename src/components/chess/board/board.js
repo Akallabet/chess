@@ -1,5 +1,5 @@
 import { array, arrayOf } from 'prop-types'
-import { withGame } from '../../../game'
+import { withGame } from '../game'
 import { Row } from './row'
 
 export const Board = withGame(({ board, ranks }) => (

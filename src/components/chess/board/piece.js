@@ -1,5 +1,5 @@
 import { bool, func, string } from 'prop-types'
-import { withGame } from '../../../game'
+import { withGame } from '../game'
 import { Button } from '../../button'
 
 import assets from './assets'

@@ -4,8 +4,19 @@ import {
   FILES as defaultFiles,
   RANKS as defaultRanks,
 } from './constants'
-import { helpers } from './helpers'
-import { check, pipe, createContext } from './utils'
+import {
+  buildBoardFromFEN,
+  buildFENPiecePlacementFromBoard,
+  addPieceToBoard,
+  highligthMovesToBoard,
+  cleanBoard,
+  removePieceFromBoard,
+  createActions,
+  generateMoves,
+  buildFENString,
+  buildFENObject,
+} from './helpers'
+import { check, pipe } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -17,47 +28,34 @@ export const game = ({
   files = defaultFiles,
   ranks = defaultRanks,
 }) => {
-  const {
-    addPieceToBoard,
-    buildBoardFromFEN,
-    buildFENPiecePlacementFromBoard,
-    highligthMovesToBoard,
-    cleanBoard,
-    removePieceFromBoard,
-    getLegalMoves,
-    actions,
-  } = createContext({ PIECES, files, ranks })(helpers)
-
-  let FEN = initialFEN
-  let board = initialBoard || buildBoardFromFEN(initialFEN)
-  const turn = () => FEN.split(' ')[1]
-  let legalMoves = getLegalMoves(board, turn())
+  let FEN = buildFENObject(initialFEN)
+  let board = initialBoard || buildBoardFromFEN({ PIECES, ...FEN })
+  let legalMoves = generateMoves({ PIECES, ranks, files, board, ...FEN })
   let activePiece = initialActivePiece
   const capturedPieces = initialCapturedPieces || []
+  const actions = createActions({ PIECES, ranks, files })
 
-  const updateFEN = (newPart, index) =>
-    (FEN = FEN.split(' ')
-      .map((part, i) => (i === index ? newPart : part))
-      .join(' '))
-  const updatePiecePlacement = (piecePlacement) => updateFEN(piecePlacement, 0)
-  const changeTurn = () => updateFEN(turn() === COLORS.w ? COLORS.b : COLORS.w, 1)
-
+  const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
+  const updatePiecePlacement = (piecePlacement) => updateFEN({ piecePlacement })
+  const changeTurn = () =>
+    updateFEN({ activeColor: FEN.activeColor === COLORS.w ? COLORS.b : COLORS.w })
   const updateBoard = (newBoard) => (board = newBoard)
-  const updateLegalMoves = () => (legalMoves = getLegalMoves(board, turn()))
+  const updateLegalMoves = () =>
+    (legalMoves = generateMoves({ PIECES, ranks, files, board, ...FEN }))
   const updateActivePiece = (piece) => (activePiece = { ...piece })
   const deselectPiece = () => (activePiece = null)
 
   const getInfo = () => ({
     files,
     ranks,
-    FEN,
+    FEN: buildFENString(FEN),
     board,
     legalMoves,
     capturedPieces,
     activePiece,
   })
 
-  const isValidTurn = ({ y, x }) => board[y][x].color === turn()
+  const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
 
   const FromSAN = (notation) => {
     const [, ret] = actions.find(([regexp]) => new RegExp(regexp, 'g').test(notation))
@@ -84,14 +82,14 @@ export const game = ({
       removePieceFromBoard({ ...legalMove }),
       addPieceToBoard({ ...board[legalMove.y][legalMove.x], x, y }),
       updateBoard,
-      buildFENPiecePlacementFromBoard,
+      buildFENPiecePlacementFromBoard({ PIECES }),
       updatePiecePlacement
     )(board)
   }
 
   return {
     getInfo,
-    select: pipe(FromSAN, check(isValidTurn, select), getInfo),
+    select: pipe(FromSAN, check(isValidColor, select), getInfo),
     deselect: pipe(deselect, getInfo),
     move: pipe(
       FromSAN,

@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { Piece } from './piece'
-import { withGame } from '../../../game'
+import { withGame } from '../game'
 import { bool, func, node, shape, string } from 'prop-types'
 
 export const Square = withGame(

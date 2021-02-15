@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useLoadData, useStorage } from '../../components/chess/storage'
-import { game } from '../game'
+import { useLoadData, useStorage } from '../storage'
+import { game } from '../../../game'
 
 export const useGame = ({ onMove, defaultInitialData }) => {
   const data = useLoadData() || defaultInitialData

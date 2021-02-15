@@ -1,7 +1,7 @@
 import { arrayOf, bool, object, string } from 'prop-types'
 import { Square } from './square'
 import { Rank, File } from './notation'
-import { withGame } from '../../../game'
+import { withGame } from '../game'
 
 export const Row = withGame(({ row, isOdd, isLast, rank, files }) => (
   <div data-testid="row" className="flex flex-row w-full h-1/8">

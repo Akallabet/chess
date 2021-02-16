@@ -257,3 +257,10 @@ test('it should move a piece given its name, file and rank', () => {
 
   expect(FEN).toEqual('r1bqkb1r/ppp1pp1p/2n3p1/7n/2PpP3/2N5/PP1P1PPP/RNBQKB1R b KQkq - 0 4')
 })
+
+test("it should increment the number of moves after Black's move", () => {
+  const { move } = game({ FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' })
+  expect(move('c3').move('c5').fullmoveNumber).toEqual(2)
+  expect(move('b3').fullmoveNumber).toEqual(2)
+  expect(move('b5').fullmoveNumber).toEqual(3)
+})

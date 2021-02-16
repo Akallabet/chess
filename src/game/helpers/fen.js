@@ -7,7 +7,14 @@ export const buildFENObject = (FEN) => {
     halfmoveClock,
     fullmoveNumber,
   ] = FEN.split(' ')
-  return { piecePlacement, activeColor, castling, enPassant, halfmoveClock, fullmoveNumber }
+  return {
+    piecePlacement,
+    activeColor,
+    castling,
+    enPassant,
+    halfmoveClock,
+    fullmoveNumber: Number(fullmoveNumber),
+  }
 }
 
 export const buildFENString = ({

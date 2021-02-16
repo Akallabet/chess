@@ -33,6 +33,7 @@ const createBoardMoves = ({ PIECES, files, ranks, board, activeColor, moves }) =
     )
     .reduce((allMoves, moves) => [...allMoves, ...moves], [])
     .forEach(({ y, x, origin }) => moves[`${files[x]}${ranks[y]}`].push(origin))
+  // console.log(moves)
   return { PIECES, files, ranks, board, activeColor, moves }
 }
 
@@ -52,7 +53,6 @@ const buildGetters = ({ files, ranks, moves }) => ({
     const buildOriginNameAndFile = ([{ name, x }]) => buildOrigin(`${name}${files[x]}`)
     const buildOriginNameFileAndRank = ([{ name, y, x }]) =>
       buildOrigin(`${name}${files[x]}${ranks[y]}`)
-
     return pipe(
       check(
         isUnambiguous,

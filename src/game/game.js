@@ -17,8 +17,18 @@ import {
   generateMoves,
   buildFENString,
   buildFENObject,
+  removeCastlingColor,
 } from './helpers'
-import { check, isDefined, log, noop, pipe, when } from './utils'
+import {
+  check,
+  isDefined,
+  noop,
+  pipe,
+  filterByName,
+  filterByFile,
+  filterByRank,
+  log,
+} from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -48,15 +58,7 @@ export const game = ({
   const removeCastling = () => updateCastling('-')
   const disallowCastling = (color) =>
     pipe(
-      ({ castling }) =>
-        castling
-          .split('')
-          .filter(
-            (name) =>
-              (color === COLORS.w && name !== NAMES[name]) ||
-              (color === COLORS.b && name !== NAMES[name.toUpperCase()].toLowerCase())
-          )
-          .join(''),
+      removeCastlingColor(color, COLORS, NAMES),
       check(isDefined, updateCastling, removeCastling)
     )
   const updateBoard = (newBoard) => (board = newBoard)
@@ -69,7 +71,16 @@ export const game = ({
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isCastling = ({ isCastling }) => isCastling
-  const isDisambiguous = (info) => legalMoves.getMoves(info).length === 1
+
+  const getMoves = ({ name, originY, originX, y, x }) =>
+    pipe(
+      filterByName(name),
+      filterByFile(originX),
+      filterByRank(originY)
+    )(legalMoves[`${files[x]}${ranks[y]}`])
+
+  const extractOrigin = (origins) => origins[0]
+  const isDisambiguous = (origins) => origins.length === 1
   const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
   const isMissingName = ({ name = names.P, ...info }) => ({ name, ...info })
 
@@ -124,17 +135,45 @@ export const game = ({
     return pipe(isKingside ? kingsideCastling : isQueenside ? queensideCastling : noop)(king)
   }
 
-  const move = ({ name, originY, originX, y, x }) => {
-    const legalMove = legalMoves.getMoves({ name, originY, originX, y, x })[0]
+  const move = ({ y, x, destination }) => {
     pipe(
       cleanBoard,
-      removePieceFromBoard({ ...legalMove }),
-      addPieceToBoard({ ...board[legalMove.y][legalMove.x], x, y }),
+      removePieceFromBoard({ y, x }),
+      addPieceToBoard({ ...board[y][x], ...destination }),
       updateBoardAfterMove,
       updatePiecePlacement,
       updateFENAfterMove,
       cleanupAfterMove
     )(board)
+  }
+
+  const getSAN = (piece, { rank, file }) => {
+    const buildOrigin = (origin) => `${origin}${file}${rank}`
+    const buildOriginName = ([{ name }]) => buildOrigin(`${name}`)
+    const buildOriginNameAndFile = ([{ name, x }]) => buildOrigin(`${name}${files[x]}`)
+    const buildOriginNameFileAndRank = ([{ name, y, x }]) =>
+      buildOrigin(`${name}${files[x]}${ranks[y]}`)
+    return pipe(
+      check(
+        isDisambiguous,
+        buildOriginName,
+        pipe(
+          filterByName(piece.name),
+          check(
+            isDisambiguous,
+            buildOriginName,
+            pipe(
+              filterByFile(piece.x),
+              check(
+                isDisambiguous,
+                buildOriginNameAndFile,
+                pipe(filterByRank(piece.y), check(isDisambiguous, buildOriginNameFileAndRank))
+              )
+            )
+          )
+        )
+      )
+    )(legalMoves[`${file}${rank}`])
   }
 
   const getInfo = () => ({
@@ -156,9 +195,10 @@ export const game = ({
     move: pipe(
       FromSAN,
       isMissingName,
-      check(isCastling, castling, check(isDisambiguous, move)),
+      check(isCastling, castling, pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))),
       getInfo
     ),
+    getSAN,
   }
   return ret
 }

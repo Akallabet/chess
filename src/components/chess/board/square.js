@@ -9,13 +9,13 @@ export const Square = withGame(
     cell: { name, color, move, selected },
     rank,
     file,
-    legalMoves,
+    getSAN,
     activePiece,
     moveActivePiece,
     children,
   }) => {
     const handleMove = () => {
-      moveActivePiece(legalMoves.getSAN(activePiece, { file, rank }))
+      moveActivePiece(getSAN(activePiece, { file, rank }))
     }
     const highlight = selected || move
     const classes = clsx('relative', 'h-full', 'w-1/8', {

@@ -1,3 +1,6 @@
+import { check } from 'prettier'
+import { pipe } from '../utils'
+
 export const buildFENObject = (FEN) => {
   const [
     piecePlacement,
@@ -27,3 +30,13 @@ export const buildFENString = ({
 }) => {
   return `${piecePlacement} ${activeColor} ${castling} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`
 }
+
+export const removeCastlingColor = (color, COLORS, NAMES) => ({ castling }) =>
+  castling
+    .split('')
+    .filter(
+      (name) =>
+        (color === COLORS.w && name !== NAMES[name]) ||
+        (color === COLORS.b && name !== NAMES[name.toUpperCase()].toLowerCase())
+    )
+    .join('')

@@ -48,4 +48,20 @@ export const createActions = ({ PIECES, ranks, files }) => [
       capture: true,
     }),
   ],
+  [
+    `^0-0$`,
+    () => ({
+      name: 'K',
+      isCastling: true,
+      isKingside: true,
+    }),
+  ],
+  [
+    `^0-0-0$`,
+    () => ({
+      name: 'K',
+      isCastling: true,
+      isQueenside: true,
+    }),
+  ],
 ]

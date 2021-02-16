@@ -264,3 +264,35 @@ test("it should increment the number of moves after Black's move", () => {
   expect(move('b3').fullmoveNumber).toEqual(2)
   expect(move('b5').fullmoveNumber).toEqual(3)
 })
+
+test('it should castle the white King on King side', () => {
+  const { move } = game({ FEN: '8/8/8/8/8/8/8/R3K2R w KQkq - 0 1' })
+  expect(move('0-0').FEN).toEqual('8/8/8/8/8/8/8/R4RK1 b kq - 0 1')
+})
+
+test('it should castle the white King on Queen side', () => {
+  const { move } = game({ FEN: '8/8/8/8/8/8/8/R3K2R w KQkq - 0 1' })
+  expect(move('0-0-0').FEN).toEqual('8/8/8/8/8/8/8/2KR3R b kq - 0 1')
+})
+
+test('it should castle the black King on King side', () => {
+  const { move } = game({ FEN: 'r3k2r/8/8/8/8/8/8/8 b KQkq - 0 1' })
+  expect(move('0-0').FEN).toEqual('r4rk1/8/8/8/8/8/8/8 w KQ - 0 2')
+})
+
+test('it should castle the black King on Queen side', () => {
+  const { move } = game({ FEN: 'r3k2r/8/8/8/8/8/8/8 b KQkq - 0 1' })
+  expect(move('0-0-0').FEN).toEqual('2kr3r/8/8/8/8/8/8/8 w KQ - 0 2')
+})
+
+test('it should disable castling availability after both colors have castled', () => {
+  const { move } = game({ FEN: 'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1' })
+  const { FEN } = move('0-0').move('0-0-0')
+  expect(FEN).toEqual('2kr3r/8/8/8/8/8/8/R4RK1 w - - 0 2')
+})
+
+// test('it should not castle if there is no availability', () => {
+//   const { move } = game({ FEN: 'r3k2r/8/8/8/8/8/8/R3K2R w kq - 0 1' })
+//   const { FEN } = move('0-0')
+//   expect(FEN).toEqual('r3k2r/8/8/8/8/8/8/R4RK1 w kq - 0 1')
+// })

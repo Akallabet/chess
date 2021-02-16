@@ -9,3 +9,6 @@ export const log = (label) => (args) => {
   console.log(label, args)
   return args
 }
+
+export const isDefined = (input) => !!input
+export const noop = () => {}

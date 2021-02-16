@@ -5,5 +5,10 @@ export { highligthMovesToBoard } from './highlight-moves-to-board'
 export { cleanBoard } from './clean-board'
 export { removePieceFromBoard } from './remove-piece-from-board'
 export { createActions } from './create-actions'
-export { generateMoves } from './generate-moves'
-export { buildFENObject, buildFENString, removeCastlingColor } from './fen'
+export { generateMoves, filterByFile, filterByName, filterByRank } from './moves'
+export {
+  buildFENObject,
+  buildFENString,
+  removeCastlingColor,
+} from // isKingsideCastlingColorAvailable,
+'./fen'

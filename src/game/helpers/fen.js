@@ -31,6 +31,8 @@ export const buildFENString = ({
   return `${piecePlacement} ${activeColor} ${castling} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`
 }
 
+// export isKingsideCastlingColorAvailable = color => color === COLORS.b && name !== NAMES[name.toUpperCase()].toLowerCase()
+
 export const removeCastlingColor = (color, COLORS, NAMES) => ({ castling }) =>
   castling
     .split('')

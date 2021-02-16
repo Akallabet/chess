@@ -18,17 +18,11 @@ import {
   buildFENString,
   buildFENObject,
   removeCastlingColor,
-} from './helpers'
-import {
-  check,
-  isDefined,
-  noop,
-  pipe,
   filterByName,
   filterByFile,
   filterByRank,
-  log,
-} from './utils'
+} from './helpers'
+import { check, isDefined, noop, pipe, pipeCond, when } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -71,6 +65,11 @@ export const game = ({
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isCastling = ({ isCastling }) => isCastling
+  const isCastlingAvailable = ({ kingsideCastling, queensideCastling }) =>
+    pipe(
+      // check(() => kingsideCastling, isKingsideCastlingColorAvailable)
+      () => ({ kingsideCastling, queensideCastling })
+    )(FEN.castling.split(''))
 
   const getMoves = ({ name, originY, originX, y, x }) =>
     pipe(
@@ -153,26 +152,11 @@ export const game = ({
     const buildOriginNameAndFile = ([{ name, x }]) => buildOrigin(`${name}${files[x]}`)
     const buildOriginNameFileAndRank = ([{ name, y, x }]) =>
       buildOrigin(`${name}${files[x]}${ranks[y]}`)
-    return pipe(
-      check(
-        isDisambiguous,
-        buildOriginName,
-        pipe(
-          filterByName(piece.name),
-          check(
-            isDisambiguous,
-            buildOriginName,
-            pipe(
-              filterByFile(piece.x),
-              check(
-                isDisambiguous,
-                buildOriginNameAndFile,
-                pipe(filterByRank(piece.y), check(isDisambiguous, buildOriginNameFileAndRank))
-              )
-            )
-          )
-        )
-      )
+    return pipeCond(
+      [isDisambiguous, buildOriginName, filterByName(piece.name)],
+      [isDisambiguous, buildOriginName, filterByFile(piece.x)],
+      [isDisambiguous, buildOriginNameAndFile, filterByRank(piece.y)],
+      [isDisambiguous, buildOriginNameFileAndRank]
     )(legalMoves[`${file}${rank}`])
   }
 
@@ -195,7 +179,11 @@ export const game = ({
     move: pipe(
       FromSAN,
       isMissingName,
-      check(isCastling, castling, pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))),
+      check(
+        when(isCastling, isCastlingAvailable),
+        castling,
+        pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))
+      ),
       getInfo
     ),
     getSAN,

@@ -31,3 +31,11 @@ const createBoardMoves = ({ PIECES, files, ranks, board, activeColor, moves }) =
 }
 
 export const generateMoves = pipe(createEmptyMoves, createBoardMoves) //, buildGetters)
+
+const byName = (name) => (origin) => (name ? origin.name === name : true)
+const byFile = (x) => (origin) => (x ? origin.x === x : true)
+const byRank = (y) => (origin) => (y ? origin.y === y : true)
+
+export const filterByName = (name) => (origins) => origins.filter(byName(name))
+export const filterByFile = (x) => (origins) => origins.filter(byFile(x))
+export const filterByRank = (y) => (origins) => origins.filter(byRank(y))

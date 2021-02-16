@@ -294,5 +294,5 @@ test('it should disable castling availability after both colors have castled', (
 // test('it should not castle if there is no availability', () => {
 //   const { move } = game({ FEN: 'r3k2r/8/8/8/8/8/8/R3K2R w kq - 0 1' })
 //   const { FEN } = move('0-0')
-//   expect(FEN).toEqual('r3k2r/8/8/8/8/8/8/R4RK1 w kq - 0 1')
+//   expect(FEN).toEqual('r3k2r/8/8/8/8/8/8/R3K2R w kq - 0 1')
 // })

@@ -1,10 +1,9 @@
+import { rules as defaultRules } from './rules'
 import {
-  PIECES as defaultPieces,
   COLORS as defaultColors,
   FILES as defaultFiles,
   RANKS as defaultRanks,
   NAMES as defaultNames,
-  NAMES,
 } from './constants'
 import {
   buildBoardFromFEN,
@@ -30,16 +29,16 @@ export const game = ({
   board: initialBoard,
   capturedPieces: initialCapturedPieces,
   activePiece: initialActivePiece,
-  PIECES = defaultPieces,
   pieces = defaultNames,
   COLORS = defaultColors,
   files = defaultFiles,
   ranks = defaultRanks,
-  names = defaultNames,
+  NAMES = defaultNames,
+  rules = defaultRules,
 }) => {
   let FEN = buildFENObject(initialFEN)
   let board = initialBoard || buildBoardFromFEN({ pieces, COLORS, ...FEN })
-  let legalMoves = generateMoves({ PIECES, ranks, files, board, ...FEN })
+  let legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FEN })
   let activePiece = initialActivePiece
   const capturedPieces = initialCapturedPieces || []
   const actions = createActions({ pieces, ranks, files })
@@ -59,7 +58,7 @@ export const game = ({
     )
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
-    (legalMoves = generateMoves({ PIECES, ranks, files, board, ...FENInfo }))
+    (legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FENInfo }))
   const selectPiece = (piece) => (activePiece = { ...piece })
   const deselectPiece = () => (activePiece = null)
 
@@ -80,14 +79,14 @@ export const game = ({
   const extractOrigin = (origins) => origins[0]
   const isDisambiguous = (origins) => origins.length === 1
   const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
-  const isMissingName = ({ name = names.P, ...info }) => ({ name, ...info })
+  const isMissingName = ({ name = NAMES.P, ...info }) => ({ name, ...info })
 
   const deselect = () => pipe(cleanBoard, updateBoard, deselectPiece)(board)
 
   const select = ({ y, x }) => {
     const piece = board[y][x]
     const { name, color } = piece
-    const moves = PIECES.get(name, color).moves({ board, color, y, x })
+    const moves = rules[name]({ COLORS, board, color, y, x })
 
     pipe(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
     selectPiece({ ...piece, y, x })

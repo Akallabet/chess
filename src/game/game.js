@@ -18,7 +18,7 @@ import {
   buildFENString,
   buildFENObject,
   removeCastlingColor,
-  isCastlingAvailable,
+  checkCastlingAvailability,
   filterByName,
   filterByFile,
   filterByRank,
@@ -31,17 +31,18 @@ export const game = ({
   capturedPieces: initialCapturedPieces,
   activePiece: initialActivePiece,
   PIECES = defaultPieces,
+  pieces = defaultNames,
   COLORS = defaultColors,
   files = defaultFiles,
   ranks = defaultRanks,
   names = defaultNames,
 }) => {
   let FEN = buildFENObject(initialFEN)
-  let board = initialBoard || buildBoardFromFEN({ PIECES, ...FEN })
+  let board = initialBoard || buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let legalMoves = generateMoves({ PIECES, ranks, files, board, ...FEN })
   let activePiece = initialActivePiece
   const capturedPieces = initialCapturedPieces || []
-  const actions = createActions({ PIECES, ranks, files })
+  const actions = createActions({ pieces, ranks, files })
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
   const updatePiecePlacement = (piecePlacement) => updateFEN({ piecePlacement })
@@ -66,6 +67,8 @@ export const game = ({
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isCastling = ({ isCastling }) => isCastling
+  const isCastlingAvailable = (castling) =>
+    checkCastlingAvailability({ NAMES, COLORS })(FEN, castling)
 
   const getMoves = ({ name, originY, originX, y, x }) =>
     pipe(
@@ -90,7 +93,10 @@ export const game = ({
     selectPiece({ ...piece, y, x })
   }
 
-  const updateBoardAfterMove = pipe(updateBoard, buildFENPiecePlacementFromBoard({ PIECES }))
+  const updateBoardAfterMove = pipe(
+    updateBoard,
+    buildFENPiecePlacementFromBoard({ pieces, COLORS })
+  )
   const updateFENAfterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove))
   const cleanupAfterMove = pipe(updateLegalMoves, deselect)
 
@@ -177,7 +183,7 @@ export const game = ({
       isMissingName,
       check(
         isCastling,
-        check(isCastlingAvailable(COLORS, NAMES, FEN), castling),
+        check(isCastlingAvailable, castling),
         pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))
       ),
       getInfo

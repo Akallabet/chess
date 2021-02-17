@@ -1,6 +1,3 @@
-import { check } from 'prettier'
-import { pipe } from '../utils'
-
 export const buildFENObject = (FEN) => {
   const [
     piecePlacement,
@@ -41,7 +38,10 @@ export const removeCastlingColor = (color, COLORS, NAMES) => ({ castling }) =>
     )
     .join('')
 
-export const isCastlingAvailable = (COLORS, NAMES, FEN) => ({ isKingside, isQueenside }) => {
+export const checkCastlingAvailability = ({ COLORS, NAMES }) => (
+  FEN,
+  { isKingside, isQueenside }
+) => {
   const castling = FEN.castling.split('')
   if (isKingside)
     return (

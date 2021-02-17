@@ -1,16 +1,16 @@
-export const createActions = ({ PIECES, ranks, files }) => [
+export const createActions = ({ pieces, ranks, files }) => [
   [
     `^[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
     ([file, rank]) => ({ y: ranks.indexOf(rank), x: files.indexOf(file) }),
   ],
   [
-    `^[${PIECES.names}]{1}[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
+    `^[${Object.values(pieces)}]{1}[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
     ([name, file, rank]) => ({ name, y: ranks.indexOf(rank), x: files.indexOf(file) }),
   ],
   [
-    `^[${PIECES.names.join('')}]{1}[${files.join('')}]{1}[${files.join('')}]{1}[${ranks.join(
+    `^[${Object.values(pieces).join('')}]{1}[${files.join('')}]{1}[${files.join(
       ''
-    )}]{1}$`,
+    )}]{1}[${ranks.join('')}]{1}$`,
     ([name, originFile, file, rank]) => ({
       name,
       originX: files.indexOf(originFile),
@@ -19,9 +19,9 @@ export const createActions = ({ PIECES, ranks, files }) => [
     }),
   ],
   [
-    `^[${PIECES.names.join('')}]{1}[${files.join('')}]{1}[${ranks.join('')}]{1}[${files.join(
+    `^[${Object.values(pieces).join('')}]{1}[${files.join('')}]{1}[${ranks.join(
       ''
-    )}]{1}[${ranks.join('')}]{1}$`,
+    )}]{1}[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
     ([name, originFile, originRank, file, rank]) => ({
       name,
       originX: files.indexOf(originFile),
@@ -33,14 +33,14 @@ export const createActions = ({ PIECES, ranks, files }) => [
   [
     `^[${files.join('')}]{1}x[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
     ([, , file, rank]) => ({
-      name: PIECES.get('P').name,
+      name: pieces.P,
       y: ranks.indexOf(rank),
       x: files.indexOf(file),
       capture: true,
     }),
   ],
   [
-    `^[${PIECES.names.join('')}]{1}x[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
+    `^[${Object.values(pieces).join('')}]{1}x[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
     ([name, , file, rank]) => ({
       name,
       y: ranks.indexOf(rank),

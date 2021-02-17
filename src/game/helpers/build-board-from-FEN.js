@@ -1,6 +1,7 @@
-export const buildBoardFromFEN = ({ PIECES, piecePlacement }) => {
+export const buildBoardFromFEN = ({ pieces, COLORS, piecePlacement }) => {
   const extractBoardInfo = (square) => {
-    const { name, color } = PIECES.get(square)
+    const color = pieces[square] ? COLORS.w : COLORS.b
+    const name = pieces[square.toUpperCase()]
     return { name, color }
   }
   const addEmptyCells = (num) => [...Array(Number(num))].map(() => ({}))

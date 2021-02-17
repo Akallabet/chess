@@ -128,65 +128,14 @@ test('Should display which color has to move', () => {
   expect(getByRole('button', { name: 'P w c4' })).toBeDefined()
   expect(getByText('Black to move')).toBeDefined()
 })
-// test('Should undo a move', async () => {
-//   const { getByTestId, getByRole, queryByRole } = render(<App />)
-//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
-//   fireEvent.click(getByTestId('c4'))
-//   expect(getByRole('button', { name: 'P b c4' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
 
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'P b c4' })).toBeNull()
-// })
-
-// test('Should not redo if at the end of the history stack', async () => {
-//   const { getByRole } = render(<App />)
-//   fireEvent.click(getByRole('button', { name: '>' }))
-//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
-// })
-
-// test('Should redo several moves', async () => {
-//   const { getByTestId, getByRole, queryByRole } = render(<App />)
-//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
-//   fireEvent.click(getByTestId('c4'))
-//   fireEvent.click(getByRole('button', { name: 'P b c4' }))
-//   fireEvent.click(getByTestId('c5'))
-//   fireEvent.click(getByRole('button', { name: 'P b c5' }))
-//   fireEvent.click(getByTestId('c6'))
-
-//   expect(getByRole('button', { name: 'P b c6' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
-
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   fireEvent.click(getByRole('button', { name: '<' }))
-
-//   expect(getByRole('button', { name: 'P b c2' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'P b c6' })).toBeNull()
-
-//   fireEvent.click(getByRole('button', { name: '>' }))
-//   fireEvent.click(getByRole('button', { name: '>' }))
-//   fireEvent.click(getByRole('button', { name: '>' }))
-//   fireEvent.click(getByRole('button', { name: '>' }))
-//   fireEvent.click(getByRole('button', { name: '>' }))
-//   fireEvent.click(getByRole('button', { name: '>' }))
-
-//   expect(getByRole('button', { name: 'P b c6' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
-// })
-
-// test('Should write new history after going back', async () => {
-//   const { getByTestId, getByRole, queryByRole } = render(<App />)
-//   fireEvent.click(getByRole('button', { name: 'P b c2' }))
-//   fireEvent.click(getByTestId('c4'))
-//   fireEvent.click(getByRole('button', { name: '<' }))
-//   fireEvent.click(getByTestId('c3'))
-
-//   expect(getByRole('button', { name: 'P b c3' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'P b c2' })).toBeNull()
-//   expect(queryByRole('button', { name: 'P b c4' })).toBeNull()
+// test('it should castle the white king on the king side', () => {
+//   const { getByTestId, getByRole, queryByRole } = render(
+//     <App FEN="r3k2r/8/8/8/8/8/8/R3K2R_w_KQkq_-_0_1" />
+//   )
+//   fireEvent.click(getByRole('button', { name: 'K w e1' }))
+//   fireEvent.click(getByTestId('g1'))
+//   expect(getByRole('button', { name: 'K w g1' })).toBeDefined()
+//   expect(getByRole('button', { name: 'R w f1' })).toBeDefined()
+//   expect(queryByRole('button', { name: 'R w h1' })).toBeNull()
 // })

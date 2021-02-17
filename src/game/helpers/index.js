@@ -10,5 +10,5 @@ export {
   buildFENObject,
   buildFENString,
   removeCastlingColor,
-} from // isKingsideCastlingColorAvailable,
-'./fen'
+  isCastlingAvailable, // isKingsideCastlingColorAvailable,
+} from './fen'

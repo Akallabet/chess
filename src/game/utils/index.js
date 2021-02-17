@@ -1,9 +1,9 @@
 export const pipe = (...fns) => (x) => fns.reduce((y, fn) => fn(y), x)
 export const pipeCond = (...fns) => (x) => {
   let res = x
-  for (const [cond, then, instead] of fns) {
+  for (const [cond, then, otherwise] of fns) {
     if (cond(res)) return then(res)
-    res = instead(res)
+    res = otherwise(res)
   }
 }
 

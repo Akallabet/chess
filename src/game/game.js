@@ -18,11 +18,12 @@ import {
   buildFENString,
   buildFENObject,
   removeCastlingColor,
+  isCastlingAvailable,
   filterByName,
   filterByFile,
   filterByRank,
 } from './helpers'
-import { check, isDefined, noop, pipe, pipeCond, when } from './utils'
+import { check, isDefined, noop, pipe, pipeCond } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -65,11 +66,6 @@ export const game = ({
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isCastling = ({ isCastling }) => isCastling
-  const isCastlingAvailable = ({ kingsideCastling, queensideCastling }) =>
-    pipe(
-      // check(() => kingsideCastling, isKingsideCastlingColorAvailable)
-      () => ({ kingsideCastling, queensideCastling })
-    )(FEN.castling.split(''))
 
   const getMoves = ({ name, originY, originX, y, x }) =>
     pipe(
@@ -180,8 +176,8 @@ export const game = ({
       FromSAN,
       isMissingName,
       check(
-        when(isCastling, isCastlingAvailable),
-        castling,
+        isCastling,
+        check(isCastlingAvailable(COLORS, NAMES, FEN), castling),
         pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))
       ),
       getInfo

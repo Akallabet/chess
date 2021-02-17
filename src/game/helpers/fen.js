@@ -31,8 +31,6 @@ export const buildFENString = ({
   return `${piecePlacement} ${activeColor} ${castling} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`
 }
 
-// export isKingsideCastlingColorAvailable = color => color === COLORS.b && name !== NAMES[name.toUpperCase()].toLowerCase()
-
 export const removeCastlingColor = (color, COLORS, NAMES) => ({ castling }) =>
   castling
     .split('')
@@ -42,3 +40,15 @@ export const removeCastlingColor = (color, COLORS, NAMES) => ({ castling }) =>
         (color === COLORS.b && name !== NAMES[name.toUpperCase()].toLowerCase())
     )
     .join('')
+
+export const isCastlingAvailable = (COLORS, NAMES, FEN) => ({ isKingside, isQueenside }) => {
+  const castling = FEN.castling.split('')
+  if (isKingside)
+    return (
+      castling.indexOf(FEN.activeColor === COLORS.w ? NAMES.K : NAMES.K.toLocaleLowerCase()) !== -1
+    )
+  if (isQueenside)
+    return (
+      castling.indexOf(FEN.activeColor === COLORS.w ? NAMES.Q : NAMES.Q.toLocaleLowerCase()) !== -1
+    )
+}

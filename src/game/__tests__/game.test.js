@@ -291,8 +291,37 @@ test('it should disable castling availability after both colors have castled', (
   expect(FEN).toEqual('2kr3r/8/8/8/8/8/8/R4RK1 w - - 0 2')
 })
 
-// test('it should not castle if there is no availability', () => {
-//   const { move } = game({ FEN: 'r3k2r/8/8/8/8/8/8/R3K2R w kq - 0 1' })
-//   const { FEN } = move('0-0')
-//   expect(FEN).toEqual('r3k2r/8/8/8/8/8/8/R3K2R w kq - 0 1')
-// })
+test.each`
+  color  | side       | SAN        | availability
+  ${'w'} | ${'king'}  | ${'0-0'}   | ${'kq'}
+  ${'w'} | ${'king'}  | ${'0-0'}   | ${'Qkq'}
+  ${'w'} | ${'king'}  | ${'0-0'}   | ${'Q'}
+  ${'w'} | ${'king'}  | ${'0-0'}   | ${'k'}
+  ${'w'} | ${'king'}  | ${'0-0'}   | ${'q'}
+  ${'w'} | ${'king'}  | ${'0-0'}   | ${'-'}
+  ${'w'} | ${'queen'} | ${'0-0-0'} | ${'kq'}
+  ${'w'} | ${'queen'} | ${'0-0-0'} | ${'Kkq'}
+  ${'w'} | ${'queen'} | ${'0-0-0'} | ${'K'}
+  ${'w'} | ${'queen'} | ${'0-0-0'} | ${'k'}
+  ${'w'} | ${'queen'} | ${'0-0-0'} | ${'q'}
+  ${'w'} | ${'queen'} | ${'0-0-0'} | ${'-'}
+  ${'b'} | ${'king'}  | ${'0-0'}   | ${'KQ'}
+  ${'b'} | ${'king'}  | ${'0-0'}   | ${'KQq'}
+  ${'b'} | ${'king'}  | ${'0-0'}   | ${'q'}
+  ${'b'} | ${'king'}  | ${'0-0'}   | ${'K'}
+  ${'b'} | ${'king'}  | ${'0-0'}   | ${'Q'}
+  ${'b'} | ${'king'}  | ${'0-0'}   | ${'-'}
+  ${'b'} | ${'queen'} | ${'0-0-0'} | ${'KQ'}
+  ${'b'} | ${'queen'} | ${'0-0-0'} | ${'KQk'}
+  ${'b'} | ${'queen'} | ${'0-0-0'} | ${'K'}
+  ${'b'} | ${'queen'} | ${'0-0-0'} | ${'k'}
+  ${'b'} | ${'queen'} | ${'0-0-0'} | ${'Q'}
+  ${'b'} | ${'queen'} | ${'0-0-0'} | ${'-'}
+`(
+  'it should not castle $color King on $side side when castling availability is $availability',
+  ({ color, SAN, availability }) => {
+    const { move } = game({ FEN: `r3k2r/8/8/8/8/8/8/R3K2R ${color} ${availability} - 0 1` })
+    const { FEN } = move(SAN)
+    expect(FEN).toEqual(`r3k2r/8/8/8/8/8/8/R3K2R ${color} ${availability} - 0 1`)
+  }
+)

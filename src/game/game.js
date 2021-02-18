@@ -25,7 +25,7 @@ import {
   isDisambiguous,
   isCastling,
 } from './helpers'
-import { check, isDefined, pipe, pipeCond } from './utils'
+import { check, isDefined, log, pipe, pipeCond } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -107,37 +107,23 @@ export const game = ({
       updateLegalMoves
     )(board)
 
-  const queensideCastling = ({ y, x }) =>
-    executeCastling({
-      king: { x, y },
-      rook: { y, x: 0 },
-      destination: {
-        king: { x: 2 },
-        rook: { x: 3 },
-      },
-    })
-
-  const kingsideCastling = ({ y, x }) =>
-    executeCastling({
-      king: { x, y },
-      rook: { y, x: files.length - 1 },
-      destination: {
-        king: { x: files.length - 2 },
-        rook: { x: files.length - 3 },
-      },
-    })
-
-  const castling = ({ isKingside, isQueenside }) =>
-    pipe(
-      check(
-        () => isKingside,
-        kingsideCastling,
-        check(() => isQueenside, queensideCastling)
-      )
-    )({
+  const setCastlingSide = ({ isKingside, isQueenside }) => {
+    const king = {
       y: FEN.activeColor === COLORS.w ? 7 : 0,
       x: 4,
-    })
+    }
+    const rook = { ...king, x: (isKingside && files.length - 1) || (isQueenside && 0) }
+    const destination = {
+      king: { ...king, x: (isKingside && files.length - 2) || (isQueenside && 2) },
+      rook: { ...rook, x: (isKingside && files.length - 3) || (isQueenside && 3) },
+    }
+    return {
+      king,
+      rook,
+      destination,
+    }
+  }
+  const castling = (args) => pipe(setCastlingSide, executeCastling)(args)
 
   const move = ({ y, x, destination }) => {
     pipe(

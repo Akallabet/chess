@@ -21,8 +21,11 @@ import {
   filterByName,
   filterByFile,
   filterByRank,
+  extractOrigin,
+  isDisambiguous,
+  isCastling,
 } from './helpers'
-import { check, isDefined, noop, pipe, pipeCond } from './utils'
+import { check, isDefined, pipe, pipeCond } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -45,8 +48,8 @@ export const game = ({
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
   const updatePiecePlacement = (piecePlacement) => updateFEN({ piecePlacement })
-  const changeTurn = ({ activeColor }) =>
-    updateFEN({ activeColor: activeColor === COLORS.w ? COLORS.b : COLORS.w })
+  const changeTurn = () =>
+    updateFEN({ activeColor: FEN.activeColor === COLORS.w ? COLORS.b : COLORS.w })
   const incrementFullmove = ({ fullmoveNumber }) =>
     updateFEN({ fullmoveNumber: fullmoveNumber + 1 })
   const updateCastling = (castling) => updateFEN({ castling })
@@ -65,10 +68,8 @@ export const game = ({
   const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
-  const isCastling = ({ isCastling }) => isCastling
   const isCastlingAvailable = (castling) =>
     checkCastlingAvailability({ NAMES, COLORS })(FEN, castling)
-
   const getMoves = ({ name, originY, originX, y, x }) =>
     pipe(
       filterByName(name),
@@ -76,8 +77,6 @@ export const game = ({
       filterByRank(originY)
     )(legalMoves[`${files[x]}${ranks[y]}`])
 
-  const extractOrigin = (origins) => origins[0]
-  const isDisambiguous = (origins) => origins.length === 1
   const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
   const isMissingName = ({ name = NAMES.P, ...info }) => ({ name, ...info })
 
@@ -92,58 +91,65 @@ export const game = ({
     selectPiece({ ...piece, y, x })
   }
 
-  const updateBoardAfterMove = pipe(
-    updateBoard,
-    buildFENPiecePlacementFromBoard({ pieces, COLORS })
-  )
-  const updateFENAfterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove))
-  const cleanupAfterMove = pipe(updateLegalMoves, deselect)
+  const executeCastling = ({ king, rook, destination }) =>
+    pipe(
+      cleanBoard,
+      removePieceFromBoard(king),
+      removePieceFromBoard(rook),
+      addPieceToBoard({ name: NAMES.K, color: FEN.activeColor, ...king, ...destination.king }),
+      addPieceToBoard({ name: NAMES.R, color: FEN.activeColor, ...rook, ...destination.rook }),
+      updateBoard,
+      buildFENPiecePlacementFromBoard({ pieces, COLORS }),
+      updatePiecePlacement,
+      disallowCastling(FEN.activeColor),
+      changeTurn,
+      check(isWhiteTurn, incrementFullmove),
+      updateLegalMoves
+    )(board)
 
   const queensideCastling = ({ y, x }) =>
-    pipe(
-      cleanBoard,
-      removePieceFromBoard({ y, x }),
-      removePieceFromBoard({ y, x: 0 }),
-      addPieceToBoard({ name: NAMES.K, color: FEN.activeColor, y, x: 2 }),
-      addPieceToBoard({ name: NAMES.R, color: FEN.activeColor, y, x: 3 }),
-      updateBoardAfterMove,
-      updatePiecePlacement,
-      disallowCastling(FEN.activeColor),
-      updateFENAfterMove,
-      cleanupAfterMove
-    )(board)
+    executeCastling({
+      king: { x, y },
+      rook: { y, x: 0 },
+      destination: {
+        king: { x: 2 },
+        rook: { x: 3 },
+      },
+    })
 
   const kingsideCastling = ({ y, x }) =>
-    pipe(
-      cleanBoard,
-      removePieceFromBoard({ y, x }),
-      removePieceFromBoard({ y, x: files.length - 1 }),
-      addPieceToBoard({ name: NAMES.K, color: FEN.activeColor, y, x: files.length - 2 }),
-      addPieceToBoard({ name: NAMES.R, color: FEN.activeColor, y, x: files.length - 3 }),
-      updateBoardAfterMove,
-      updatePiecePlacement,
-      disallowCastling(FEN.activeColor),
-      updateFENAfterMove,
-      cleanupAfterMove
-    )(board)
+    executeCastling({
+      king: { x, y },
+      rook: { y, x: files.length - 1 },
+      destination: {
+        king: { x: files.length - 2 },
+        rook: { x: files.length - 3 },
+      },
+    })
 
-  const castling = ({ isKingside, isQueenside }) => {
-    const king = {
+  const castling = ({ isKingside, isQueenside }) =>
+    pipe(
+      check(
+        () => isKingside,
+        kingsideCastling,
+        check(() => isQueenside, queensideCastling)
+      )
+    )({
       y: FEN.activeColor === COLORS.w ? 7 : 0,
       x: 4,
-    }
-    return pipe(isKingside ? kingsideCastling : isQueenside ? queensideCastling : noop)(king)
-  }
+    })
 
   const move = ({ y, x, destination }) => {
     pipe(
       cleanBoard,
       removePieceFromBoard({ y, x }),
       addPieceToBoard({ ...board[y][x], ...destination }),
-      updateBoardAfterMove,
+      updateBoard,
+      buildFENPiecePlacementFromBoard({ pieces, COLORS }),
       updatePiecePlacement,
-      updateFENAfterMove,
-      cleanupAfterMove
+      changeTurn,
+      check(isWhiteTurn, incrementFullmove),
+      updateLegalMoves
     )(board)
   }
 
@@ -185,6 +191,7 @@ export const game = ({
         check(isCastlingAvailable, castling),
         pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))
       ),
+      deselect,
       getInfo
     ),
     getSAN,

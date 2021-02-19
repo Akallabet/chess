@@ -167,7 +167,7 @@ test.each`
 `(
   'it should highlight all the moves of a $colorName $pieceName',
   ({ name, FEN, color, expectedBoard }) => {
-    const { select } = game({ FEN: `8/8/8/8/3${FEN}4/8/8/8 ${color} KQkq - 0 1` })
+    const { select } = game({ FEN: `8/8/8/8/3${FEN}4/8/8/8 ${color} - - 0 1` })
     const { board } = select(`${name}d4`)
 
     expect(board).toEqual(expectedBoard({ name, color }))

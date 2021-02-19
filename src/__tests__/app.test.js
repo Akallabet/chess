@@ -129,13 +129,13 @@ test('Should display which color has to move', () => {
   expect(getByText('Black to move')).toBeDefined()
 })
 
-// test('it should castle the white king on the king side', () => {
-//   const { getByTestId, getByRole, queryByRole } = render(
-//     <App FEN="r3k2r/8/8/8/8/8/8/R3K2R_w_KQkq_-_0_1" />
-//   )
-//   fireEvent.click(getByRole('button', { name: 'K w e1' }))
-//   fireEvent.click(getByTestId('g1'))
-//   expect(getByRole('button', { name: 'K w g1' })).toBeDefined()
-//   expect(getByRole('button', { name: 'R w f1' })).toBeDefined()
-//   expect(queryByRole('button', { name: 'R w h1' })).toBeNull()
-// })
+test('it should castle the white king on the king side', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="r3k2r/8/8/8/8/8/8/R3K2R_w_KQkq_-_0_1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'K w e1' }))
+  fireEvent.click(getByTestId('g1'))
+  expect(getByRole('button', { name: 'K w g1' })).toBeDefined()
+  expect(getByRole('button', { name: 'R w f1' })).toBeDefined()
+  expect(queryByRole('button', { name: 'R w h1' })).toBeNull()
+})

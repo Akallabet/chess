@@ -5,6 +5,7 @@ import {
   RANKS as defaultRanks,
   NAMES as defaultNames,
 } from './constants'
+
 import {
   buildBoardFromFEN,
   buildFENPiecePlacementFromBoard,
@@ -25,7 +26,8 @@ import {
   isDisambiguous,
   isCastling,
 } from './helpers'
-import { check, isDefined, log, pipe, pipeCond } from './utils'
+import { check, falsy, identity, isDefined, log, pipe, pipeCond, when } from './utils'
+import { findByCastling } from './helpers/moves'
 
 export const game = ({
   FEN: initialFEN,
@@ -55,10 +57,7 @@ export const game = ({
   const updateCastling = (castling) => updateFEN({ castling })
   const removeCastling = () => updateCastling('-')
   const disallowCastling = (color) =>
-    pipe(
-      removeCastlingColor(color, COLORS, NAMES),
-      check(isDefined, updateCastling, removeCastling)
-    )
+    pipe(removeCastlingColor(color), check(isDefined, updateCastling, removeCastling))
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
     (legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FENInfo }))
@@ -68,8 +67,7 @@ export const game = ({
   const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
-  const isCastlingAvailable = (castling) =>
-    checkCastlingAvailability({ NAMES, COLORS })(FEN, castling)
+  const isCastlingAvailable = (castling) => checkCastlingAvailability(FEN, castling)
   const getMoves = ({ name, originY, originX, y, x }) =>
     pipe(
       filterByName(name),
@@ -85,7 +83,7 @@ export const game = ({
   const select = ({ y, x }) => {
     const piece = board[y][x]
     const { name, color } = piece
-    const moves = rules[name]({ COLORS, board, color, y, x })
+    const moves = rules[name]({ COLORS, board, color, y, x, FEN })
 
     pipe(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
     selectPiece({ ...piece, y, x })
@@ -139,17 +137,29 @@ export const game = ({
     )(board)
   }
 
+  const isKing = (name) => name === NAMES.K
+  const hasCastling = (name) => () => isKing(name) && findByCastling(name)
+
   const getSAN = (piece, { rank, file }) => {
     const buildOrigin = (origin) => `${origin}${file}${rank}`
     const buildOriginName = ([{ name }]) => buildOrigin(`${name}`)
     const buildOriginNameAndFile = ([{ name, x }]) => buildOrigin(`${name}${files[x]}`)
     const buildOriginNameFileAndRank = ([{ name, y, x }]) =>
       buildOrigin(`${name}${files[x]}${ranks[y]}`)
-    return pipeCond(
-      [isDisambiguous, buildOriginName, filterByName(piece.name)],
-      [isDisambiguous, buildOriginName, filterByFile(piece.x)],
-      [isDisambiguous, buildOriginNameAndFile, filterByRank(piece.y)],
-      [isDisambiguous, buildOriginNameFileAndRank]
+    const buildCastlingSAN = ({ castling: { isKingside, isQueenside } }) =>
+      (isKingside && '0-0') || (isQueenside && '0-0-0')
+
+    return pipe(
+      check(
+        hasCastling(piece.name),
+        pipe(findByCastling(piece.name), buildCastlingSAN),
+        pipeCond(
+          [isDisambiguous, buildOriginName, filterByName(piece.name)],
+          [isDisambiguous, buildOriginName, filterByFile(piece.x)],
+          [isDisambiguous, buildOriginNameAndFile, filterByRank(piece.y)],
+          [isDisambiguous, buildOriginNameFileAndRank]
+        )
+      )
     )(legalMoves[`${file}${rank}`])
   }
 

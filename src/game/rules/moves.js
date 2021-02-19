@@ -107,9 +107,10 @@ export const queen = ({ board, color, x, y }) => {
   ]
 }
 
-export const king = ({ board, color, x, y }) => {
+export const king = ({ board, color, x, y, FEN }) => {
+  // console.log(FEN)
   const limit = (pos) => pos.y <= y + 1 && pos.x <= x + 1 && pos.y >= y - 1 && pos.x >= x - 1
-  return [
+  const moves = [
     ...traverse(({ y, x }) => ({ y, x: x + 1 }), limit)({ board, color, y, x }),
     ...traverse(({ y, x }) => ({ y, x: x - 1 }), limit)({ board, color, y, x }),
     ...traverse(({ y, x }) => ({ y: y + 1, x }), limit)({ board, color, y, x }),
@@ -119,4 +120,16 @@ export const king = ({ board, color, x, y }) => {
     ...traverse(({ y, x }) => ({ y: y + 1, x: x - 1 }), limit)({ board, color, y, x }),
     ...traverse(({ y, x }) => ({ y: y - 1, x: x - 1 }), limit)({ board, color, y, x }),
   ]
+
+  if (FEN.castling[color].isKingside && !board[y][x + 1].color && !board[y][x + 2].color)
+    moves.push({ y, x: x + 2, castling: { isKingside: true } })
+  if (
+    FEN.castling[color].isQueenside &&
+    !board[y][x - 1].color &&
+    !board[y][x - 2].color &&
+    !board[y][x - 3].color
+  )
+    moves.push({ y, x: x - 2, castling: { isQueenside: true } })
+  // console.log('moves', moves)
+  return moves
 }

@@ -48,13 +48,17 @@ export const buildFENString = ({
   )} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`
 }
 
-export const removeCastlingColor = (color) => ({ castling }) => ({
+export const removeCastlingColor = ({ castling, activeColor }) => ({
   ...castling,
-  [color]: { isKingside: false, isQueenside: false },
+  [activeColor]: { isKingside: false, isQueenside: false },
 })
 
-export const checkCastlingAvailability = (FEN, { isKingside, isQueenside }) => {
-  const castling = FEN.castling
-  if (isKingside) return castling[FEN.activeColor].isKingside
-  if (isQueenside) return castling[FEN.activeColor].isQueenside
-}
+export const removeKingsideCastlingColor = ({ castling, activeColor }) => ({
+  ...castling,
+  [activeColor]: { ...castling[activeColor], isKingside: false },
+})
+
+export const removeQueensideCastlingColor = ({ castling, activeColor }) => ({
+  ...castling,
+  [activeColor]: { ...castling[activeColor], isQueenside: false },
+})

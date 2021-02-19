@@ -10,9 +10,12 @@ export {
   buildFENObject,
   buildFENString,
   removeCastlingColor,
-  checkCastlingAvailability,
+  removeKingsideCastlingColor,
+  removeQueensideCastlingColor,
 } from './fen'
 
 export const extractOrigin = (origins) => origins[0]
 export const isDisambiguous = (origins) => origins.length === 1
-export const isCastling = ({ isCastling }) => isCastling
+export const isCastlingMove = ({ isCastling }) => isCastling
+export const isKingsideCastlingMove = ({ isKingside }) => isKingside
+export const isQueensideCastlingMove = ({ isQueenside }) => isQueenside

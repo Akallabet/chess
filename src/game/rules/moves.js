@@ -108,7 +108,6 @@ export const queen = ({ board, color, x, y }) => {
 }
 
 export const king = ({ board, color, x, y, FEN }) => {
-  // console.log(FEN)
   const limit = (pos) => pos.y <= y + 1 && pos.x <= x + 1 && pos.y >= y - 1 && pos.x >= x - 1
   const moves = [
     ...traverse(({ y, x }) => ({ y, x: x + 1 }), limit)({ board, color, y, x }),
@@ -130,6 +129,5 @@ export const king = ({ board, color, x, y, FEN }) => {
     !board[y][x - 3].color
   )
     moves.push({ y, x: x - 2, castling: { isQueenside: true } })
-  // console.log('moves', moves)
   return moves
 }

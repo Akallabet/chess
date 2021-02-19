@@ -5,7 +5,7 @@ import { game } from '../../../game'
 export const useGame = ({ onMove, defaultInitialData }) => {
   const data = useLoadData() || defaultInitialData
 
-  const [{ getInfo, select, deselect, move }, setEngine] = useState(game(data))
+  const [{ getInfo, select, deselect, move }, setEngine] = useState(() => game(data))
 
   const resetGame = () => {
     setEngine(game(defaultInitialData))

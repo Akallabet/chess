@@ -139,3 +139,60 @@ test('it should castle the white king on the king side', () => {
   expect(getByRole('button', { name: 'R w f1' })).toBeDefined()
   expect(queryByRole('button', { name: 'R w h1' })).toBeNull()
 })
+
+test('it should disable castling if king moves', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="rnbqkbnr/pppppppp/8/8/8/8/8/R3K2R_w_KQkq_-_0_1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'K w e1' }))
+  fireEvent.click(getByTestId('f1'))
+  fireEvent.click(getByRole('button', { name: 'P b c7' }))
+  fireEvent.click(getByTestId('c6'))
+  fireEvent.click(getByRole('button', { name: 'K w f1' }))
+  fireEvent.click(getByTestId('e1'))
+  fireEvent.click(getByRole('button', { name: 'P b c6' }))
+  fireEvent.click(getByTestId('c5'))
+  fireEvent.click(getByRole('button', { name: 'K w e1' }))
+  fireEvent.click(getByTestId('g1'))
+  expect(queryByRole('button', { name: 'K w g1' })).toBeNull()
+  expect(getByRole('button', { name: 'R w h1' })).toBeDefined()
+  expect(queryByRole('button', { name: 'R w f1' })).toBeNull()
+})
+
+test('it should disable kingside castling if kigside rook moves', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="rnbqkbnr/pppppppp/8/8/8/8/8/R3K2R_w_KQkq_-_0_1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'R w h1' }))
+  fireEvent.click(getByTestId('g1'))
+  fireEvent.click(getByRole('button', { name: 'P b c7' }))
+  fireEvent.click(getByTestId('c6'))
+  fireEvent.click(getByRole('button', { name: 'R w g1' }))
+  fireEvent.click(getByTestId('h1'))
+  fireEvent.click(getByRole('button', { name: 'P b c6' }))
+  fireEvent.click(getByTestId('c5'))
+  fireEvent.click(getByRole('button', { name: 'K w e1' }))
+  fireEvent.click(getByTestId('g1'))
+  expect(queryByRole('button', { name: 'K w g1' })).toBeNull()
+  expect(getByRole('button', { name: 'R w h1' })).toBeDefined()
+  expect(queryByRole('button', { name: 'R w f1' })).toBeNull()
+})
+
+test('it should disable queenside castling if queenside rook moves', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="rnbqkbnr/pppppppp/8/8/8/8/8/R3K2R_w_KQkq_-_0_1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'R w a1' }))
+  fireEvent.click(getByTestId('b1'))
+  fireEvent.click(getByRole('button', { name: 'P b c7' }))
+  fireEvent.click(getByTestId('c6'))
+  fireEvent.click(getByRole('button', { name: 'R w b1' }))
+  fireEvent.click(getByTestId('a1'))
+  fireEvent.click(getByRole('button', { name: 'P b c6' }))
+  fireEvent.click(getByTestId('c5'))
+  fireEvent.click(getByRole('button', { name: 'K w e1' }))
+  fireEvent.click(getByTestId('c1'))
+  expect(queryByRole('button', { name: 'K w c1' })).toBeNull()
+  expect(getByRole('button', { name: 'R w a1' })).toBeDefined()
+  expect(queryByRole('button', { name: 'R w d1' })).toBeNull()
+})

@@ -39,9 +39,10 @@ export const generateMoves = pipe(createEmptyMoves, createBoardMoves)
 const byName = (name) => (origin) => (name ? origin.name === name : true)
 const byFile = (x) => (origin) => (x ? origin.x === x : true)
 const byRank = (y) => (origin) => (y ? origin.y === y : true)
-const byCastling = (name) => (origin) => name === origin.name && origin.castling
+const byCastling = ({ name, x, y }) => (origin) =>
+  origin.castling && name === origin.name && y === origin.y && x === origin.x
 
 export const filterByName = (name) => (origins) => origins.filter(byName(name))
 export const filterByFile = (x) => (origins) => origins.filter(byFile(x))
 export const filterByRank = (y) => (origins) => origins.filter(byRank(y))
-export const findByCastling = (name) => (origins) => origins.find(byCastling(name))
+export const findByCastling = (piece) => (origins) => origins.find(byCastling(piece))

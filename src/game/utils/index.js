@@ -7,9 +7,6 @@ export const pipeCond = (...fns) => (x) => {
   }
 }
 
-export const check = (condition, yes, no = (input) => input) => (input) =>
-  condition(input) ? yes(input) : no(input)
-
 export const when = (...fns) => (x) => fns.reduce((y, fn) => y && fn(x), x)
 export const isDefined = (input) => !!input
 export const noop = () => {}
@@ -19,3 +16,6 @@ export const log = (label) => (args) => {
   console.log(label, args)
   return args
 }
+
+export const check = (condition, yes, no = identity) => (input) =>
+  condition(input) ? yes(input) : no(input)

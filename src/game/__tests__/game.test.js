@@ -219,7 +219,7 @@ test('it should move white pawn c2 to c4', () => {
     ],
     [...completeBoard[7]],
   ])
-  expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq - 0 1')
+  expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1')
 })
 
 test('it should not execute an ambiguous move', () => {
@@ -325,3 +325,9 @@ test.each`
     expect(FEN).toEqual(`r3k2r/8/8/8/8/8/8/R3K2R ${color} ${availability} - 0 1`)
   }
 )
+
+test('it should flag a paws as en-passant if it moves of 2 squares at once', () => {
+  const { move } = game({ FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' })
+  const { FEN } = move('c4')
+  expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1')
+})

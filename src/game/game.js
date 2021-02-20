@@ -57,6 +57,7 @@ export const game = ({
     updateFEN({ activeColor: FEN.activeColor === COLORS.w ? COLORS.b : COLORS.w })
   const incrementFullmove = ({ fullmoveNumber }) =>
     updateFEN({ fullmoveNumber: fullmoveNumber + 1 })
+  const updateEnPassant = (enPassant) => updateFEN({ enPassant })
   const updateCastling = (castling) => updateFEN({ castling })
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
@@ -80,6 +81,7 @@ export const game = ({
 
   const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
   const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
+  const toSAN = ({ y, x }) => `${files[x]}${ranks[y]}`
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isKingsideCastlingAvailable = () => FEN.castling[FEN.activeColor].isKingside
   const isQueensideCastlingAvailable = () => FEN.castling[FEN.activeColor].isQueenside
@@ -106,52 +108,54 @@ export const game = ({
     selectPiece({ ...piece, y, x })
   }
 
-  const executeCastling = ({ king, rook, destination }) =>
-    pipe(
-      cleanBoard,
-      removePieceFromBoard(king),
-      removePieceFromBoard(rook),
-      addPieceToBoard({ name: NAMES.K, color: FEN.activeColor, ...king, ...destination.king }),
-      addPieceToBoard({ name: NAMES.R, color: FEN.activeColor, ...rook, ...destination.rook }),
-      updateBoard,
-      buildFENPiecePlacementFromBoard({ pieces, COLORS }),
-      updatePiecePlacement,
-      disallowCastling,
-      changeTurn,
-      check(isWhiteTurn, incrementFullmove),
-      updateLegalMoves
-    )(board)
+  const castling = (args) => {
+    const executeCastling = ({ king, rook, destination }) =>
+      pipe(
+        cleanBoard,
+        removePieceFromBoard(king),
+        removePieceFromBoard(rook),
+        addPieceToBoard({ name: NAMES.K, color: FEN.activeColor, ...king, ...destination.king }),
+        addPieceToBoard({ name: NAMES.R, color: FEN.activeColor, ...rook, ...destination.rook }),
+        updateBoard,
+        buildFENPiecePlacementFromBoard({ pieces, COLORS }),
+        updatePiecePlacement,
+        disallowCastling,
+        changeTurn,
+        check(isWhiteTurn, incrementFullmove),
+        updateLegalMoves
+      )(board)
 
-  const setCastlingSide = ({ isKingside, isQueenside }) => {
-    const king = {
-      y: FEN.activeColor === COLORS.w ? 7 : 0,
-      x: 4,
+    const setCastlingSide = ({ isKingside, isQueenside }) => {
+      const king = {
+        y: FEN.activeColor === COLORS.w ? 7 : 0,
+        x: 4,
+      }
+      const rook = { ...king, x: (isKingside && files.length - 1) || (isQueenside && 0) }
+      const destination = {
+        king: { ...king, x: (isKingside && files.length - 2) || (isQueenside && 2) },
+        rook: { ...rook, x: (isKingside && files.length - 3) || (isQueenside && 3) },
+      }
+      return {
+        king,
+        rook,
+        destination,
+      }
     }
-    const rook = { ...king, x: (isKingside && files.length - 1) || (isQueenside && 0) }
-    const destination = {
-      king: { ...king, x: (isKingside && files.length - 2) || (isQueenside && 2) },
-      rook: { ...rook, x: (isKingside && files.length - 3) || (isQueenside && 3) },
-    }
-    return {
-      king,
-      rook,
-      destination,
-    }
+
+    pipe(setCastlingSide, executeCastling)(args)
   }
-  const castling = (args) => pipe(setCastlingSide, executeCastling)(args)
 
-  const hasKingMoved = ({ y, x }) => ({ activeColor }) =>
-    board[y][x].name === NAMES.K && board[y][x].color === activeColor
-  const hasKingsideRookMoved = ({ y, x, destination }) => ({ activeColor }) =>
-    x === files.length - 1 &&
-    y === (activeColor === COLORS.w ? files.length - 1 : 0) &&
-    board[destination.y][destination.x].name === NAMES.R &&
-    board[destination.y][destination.x].color === activeColor
-  const hasQueensideRookMoved = ({ y, x, destination }) => ({ activeColor }) =>
-    x === 0 &&
-    y === (activeColor === COLORS.w ? files.length - 1 : 0) &&
-    board[destination.y][destination.x].name === NAMES.R &&
-    board[destination.y][destination.x].color === activeColor
+  const hasPieceMoves = (name) => ({ y, x }) => () => board[y][x].name === name
+  const hasKingMoved = hasPieceMoves(NAMES.K)
+  const hasRookMoved = hasPieceMoves(NAMES.R)
+  const hasPawnMoved = hasPieceMoves(NAMES.P)
+  const isKingsideRook = ({ x }) => () => x === files.length - 1
+  const isQueensideRook = ({ x }) => () => x === 0
+  const isEnPassant = ({ y, destination }) => () => Math.abs(destination.y - y) === 2
+  const getEnPassantSquare = ({ y, x }, colors) => ({ activeColor }) => ({
+    x,
+    y: activeColor === colors.w ? y + 1 : y - 1,
+  })
 
   const move = ({ y, x, destination }) => {
     pipe(
@@ -164,13 +168,18 @@ export const game = ({
       pipeCond(
         [when(isCastlingAvailable, hasKingMoved(destination)), disallowCastling, identity],
         [
-          when(isKingsideCastlingAvailable, hasKingsideRookMoved({ y, x, destination })),
+          when(isKingsideCastlingAvailable, hasRookMoved(destination), isKingsideRook({ x, y })),
           disallowKingsideCastling,
           identity,
         ],
         [
-          when(isQueensideCastlingAvailable, hasQueensideRookMoved({ y, x, destination })),
+          when(isQueensideCastlingAvailable, hasRookMoved(destination), isQueensideRook({ x, y })),
           disallowQueensideCastling,
+          identity,
+        ],
+        [
+          when(hasPawnMoved(destination), isEnPassant({ y, destination })),
+          pipe(getEnPassantSquare(destination, COLORS), toSAN, updateEnPassant),
           identity,
         ]
       ),

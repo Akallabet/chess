@@ -1,7 +1,7 @@
 export const createActions = ({ pieces, ranks, files }) => [
   [
     `^[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
-    ([file, rank]) => ({ y: ranks.indexOf(rank), x: files.indexOf(file) }),
+    ([file, rank]) => ({ name: pieces.P, y: ranks.indexOf(rank), x: files.indexOf(file) }),
   ],
   [
     `^[${Object.values(pieces)}]{1}[${files.join('')}]{1}[${ranks.join('')}]{1}$`,

@@ -1,6 +1,5 @@
-import { withI18n } from '../../../i18n'
 import { withGame } from '../game'
 
-export const ActiveColor = withGame(({ activeColor, content }) => (
+export const ActiveColor = withGame(({ game: { activeColor }, content }) => (
   <p>{content.activeColor[activeColor]}</p>
 ))

@@ -23,7 +23,6 @@ import {
   filterByRank,
   extractOrigin,
   isDisambiguous,
-  isCastlingMove,
   isKingsideCastlingMove,
   isQueensideCastlingMove,
   removeKingsideCastlingColor,
@@ -44,12 +43,16 @@ export const game = ({
   NAMES = defaultNames,
   rules = defaultRules,
 }) => {
-  let FEN = buildFENObject(initialFEN)
+  const actions = createActions({ pieces, ranks, files })
+  const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
+  const fromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
+  const toSAN = ({ y, x }) => `${files[x]}${ranks[y]}`
+
+  let FEN = buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FEN })
   let activePiece = initialActivePiece
   const capturedPieces = initialCapturedPieces || []
-  const actions = createActions({ pieces, ranks, files })
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
   const updatePiecePlacement = (piecePlacement) => updateFEN({ piecePlacement })
@@ -65,6 +68,7 @@ export const game = ({
   const selectPiece = (piece) => (activePiece = { ...piece })
   const deselectPiece = () => (activePiece = null)
 
+  const removeEnPassant = () => updateEnPassant(false)
   const removeCastling = () => updateCastling('-')
   const disallowCastling = pipe(
     removeCastlingColor,
@@ -79,23 +83,19 @@ export const game = ({
     check(isDefined, updateCastling, removeCastling)
   )
 
-  const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
-  const FromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
-  const toSAN = ({ y, x }) => `${files[x]}${ranks[y]}`
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isKingsideCastlingAvailable = () => FEN.castling[FEN.activeColor].isKingside
   const isQueensideCastlingAvailable = () => FEN.castling[FEN.activeColor].isQueenside
   const isCastlingAvailable = () => isKingsideCastlingAvailable() || isQueensideCastlingAvailable()
+  const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
 
-  const getMoves = ({ name, originY, originX, y, x }) =>
-    pipe(
+  const getMoves = ({ name, originY, originX, y, x }) => {
+    return pipe(
       filterByName(name),
       filterByFile(originX),
       filterByRank(originY)
     )(legalMoves[`${files[x]}${ranks[y]}`])
-
-  const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
-  const isMissingName = ({ name = NAMES.P, ...info }) => ({ name, ...info })
+  }
 
   const deselect = () => pipe(cleanBoard, updateBoard, deselectPiece)(board)
 
@@ -107,6 +107,8 @@ export const game = ({
     pipe(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
     selectPiece({ ...piece, y, x })
   }
+
+  const afterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
   const castling = (args) => {
     const executeCastling = ({ king, rook, destination }) =>
@@ -120,9 +122,7 @@ export const game = ({
         buildFENPiecePlacementFromBoard({ pieces, COLORS }),
         updatePiecePlacement,
         disallowCastling,
-        changeTurn,
-        check(isWhiteTurn, incrementFullmove),
-        updateLegalMoves
+        removeEnPassant
       )(board)
 
     const setCastlingSide = ({ isKingside, isQueenside }) => {
@@ -165,6 +165,7 @@ export const game = ({
       updateBoard,
       buildFENPiecePlacementFromBoard({ pieces, COLORS }),
       updatePiecePlacement,
+      removeEnPassant,
       pipeCond(
         [when(isCastlingAvailable, hasKingMoved(destination)), disallowCastling, identity],
         [
@@ -179,13 +180,10 @@ export const game = ({
         ],
         [
           when(hasPawnMoved(destination), isEnPassant({ y, destination })),
-          pipe(getEnPassantSquare(destination, COLORS), toSAN, updateEnPassant),
+          pipe(getEnPassantSquare(destination, COLORS), updateEnPassant),
           identity,
         ]
-      ),
-      changeTurn,
-      check(isWhiteTurn, incrementFullmove),
-      updateLegalMoves
+      )
     )(board)
   }
 
@@ -215,7 +213,7 @@ export const game = ({
   const getInfo = () => ({
     files,
     ranks,
-    FEN: buildFENString(FEN),
+    FEN: buildFENString(FEN)(toSAN),
     board,
     legalMoves,
     capturedPieces,
@@ -226,18 +224,26 @@ export const game = ({
 
   const ret = {
     getInfo,
-    select: pipe(FromSAN, check(isValidColor, select), getInfo),
+    select: pipe(fromSAN, check(isValidColor, select), getInfo),
     deselect: pipe(deselect, getInfo),
     move: pipe(
-      FromSAN,
-      isMissingName,
-      check(
-        isCastlingMove,
-        pipeCond(
-          [when(isKingsideCastlingMove, isKingsideCastlingAvailable), castling, identity],
-          [when(isQueensideCastlingMove, isQueensideCastlingAvailable), castling, identity]
-        ),
-        pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move)))
+      fromSAN,
+      pipeCond(
+        [
+          isKingsideCastlingMove,
+          check(isKingsideCastlingAvailable, pipe(castling, afterMove)),
+          identity,
+        ],
+        [
+          isQueensideCastlingMove,
+          check(isQueensideCastlingAvailable, pipe(castling, afterMove)),
+          identity,
+        ],
+        [
+          identity,
+          pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move, afterMove))),
+          identity,
+        ]
       ),
       deselect,
       getInfo

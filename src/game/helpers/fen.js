@@ -1,4 +1,4 @@
-export const buildFENObject = (FEN) => {
+export const buildFENObject = (FEN) => (fromSAN) => {
   const [
     piecePlacement,
     activeColor,
@@ -20,7 +20,7 @@ export const buildFENObject = (FEN) => {
       },
       { w: { isKingside: false, isQueenside: false }, b: { isKingside: false, isQueenside: false } }
     ),
-    enPassant,
+    enPassant: enPassant === '-' ? false : fromSAN(enPassant),
     halfmoveClock,
     fullmoveNumber: Number(fullmoveNumber),
   }
@@ -42,10 +42,10 @@ export const buildFENString = ({
   enPassant,
   halfmoveClock,
   fullmoveNumber,
-}) => {
-  return `${piecePlacement} ${activeColor} ${buildCastlingString(
-    castling
-  )} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`
+}) => (toSAN) => {
+  return `${piecePlacement} ${activeColor} ${buildCastlingString(castling)} ${
+    enPassant ? toSAN(enPassant) : '-'
+  } ${halfmoveClock} ${fullmoveNumber}`
 }
 
 export const removeCastlingColor = ({ castling, activeColor }) => ({

@@ -6,13 +6,13 @@ import { bool, func, node, shape, string } from 'prop-types'
 export const Square = withGame(
   ({
     isWhite,
-    cell: { name, color, move, selected },
+    name,
+    color,
+    meta: { move, selected },
     rank,
     file,
-    getSAN,
-    activePiece,
-    moveActivePiece,
     children,
+    game: { getSAN, activePiece, moveActivePiece },
   }) => {
     const handleMove = () => {
       moveActivePiece(getSAN(activePiece, { file, rank }))
@@ -49,9 +49,9 @@ Square.displayName = 'Square'
 
 Square.propTypes = {
   isWhite: bool.isRequired,
-  cell: shape({
-    name: string,
-    color: string,
+  name: string,
+  color: string,
+  meta: shape({
     selected: bool,
     move: bool,
   }).isRequired,

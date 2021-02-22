@@ -3,8 +3,6 @@ import GameContext from './game-context'
 
 export const withGame = (Component) => (props) => {
   return (
-    <GameContext.Consumer>
-      {(engineProps) => <Component {...props} {...engineProps} />}
-    </GameContext.Consumer>
+    <GameContext.Consumer>{(game) => <Component {...props} game={game} />}</GameContext.Consumer>
   )
 }

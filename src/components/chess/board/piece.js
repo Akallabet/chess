@@ -15,11 +15,8 @@ export const Piece = withGame(
     color,
     coordinates,
     selected,
-    activePiece,
     move,
-    selectPiece,
-    deselectPiece,
-    moveActivePiece,
+    game: { activePiece, selectPiece, deselectPiece, moveActivePiece },
   }) => {
     const handleClick = selected ? deselectPiece : move ? moveActivePiece : selectPiece
     return (

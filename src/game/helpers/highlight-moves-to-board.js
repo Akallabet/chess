@@ -1,11 +1,14 @@
-const highligthPieceCell = (board, { y, x }) =>
-  board.map((row, i) =>
-    row.map((cell, j) => (i === y && j === x ? { ...cell, selected: true } : { ...cell }))
+export const highligthMovesToBoard = ({ moves, ...origin }) => (board) =>
+  board.map((row, y) =>
+    row
+      .map(({ meta = {}, ...square }, x) => {
+        return moves.find((move) => move.y === y && move.x === x)
+          ? { ...square, meta: { ...meta, move: true } }
+          : { ...square, meta }
+      })
+      .map(({ meta = {}, ...square }, x) =>
+        origin.y === y && origin.x === x
+          ? { ...square, meta: { ...meta, selected: true } }
+          : { ...square, meta }
+      )
   )
-
-export const highligthMovesToBoard = ({ y, x, moves }) => (board) => {
-  moves.forEach(({ y, x }) => {
-    board[y][x].move = true
-  })
-  return highligthPieceCell(board, { y, x })
-}

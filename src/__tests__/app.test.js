@@ -196,3 +196,16 @@ test('it should disable queenside castling if queenside rook moves', () => {
   expect(getByRole('button', { name: 'R w a1' })).toBeDefined()
   expect(queryByRole('button', { name: 'R w d1' })).toBeNull()
 })
+
+test('it should capture a pawn as en-passant', () => {
+  const { getByTestId, getByRole, queryByRole } = render(
+    <App FEN="rnbqkbnr/ppp1pppp/8/8/3p4/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" />
+  )
+  fireEvent.click(getByRole('button', { name: 'P w c2' }))
+  fireEvent.click(getByTestId('c4'))
+  fireEvent.click(getByRole('button', { name: 'P b d4' }))
+  fireEvent.click(getByTestId('c3'))
+  expect(getByRole('button', { name: 'P b c3' })).toBeDefined()
+  expect(queryByRole('button', { name: 'P w c4' })).toBeNull()
+  expect(queryByRole('button', { name: 'P b c5' })).toBeNull()
+})

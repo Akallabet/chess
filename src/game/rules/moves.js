@@ -23,7 +23,8 @@ const traverse = (incr, limit = () => true) => ({ board, color, y, x }) => {
 export const pawn = ({ color, COLORS, ...args }) =>
   color === COLORS.w ? whitePawn(args) : blackPawn(args)
 
-export const whitePawn = ({ board, color, y, x }) => {
+export const whitePawn = ({ board, color, y, x, FEN }) => {
+  const { enPassant } = FEN
   const moves = []
   if (board[y - 1][x] && !board[y - 1][x].name) {
     moves.push({ y: y - 1, x })
@@ -31,16 +32,32 @@ export const whitePawn = ({ board, color, y, x }) => {
   if (y === 6 && board[y - 2][x] && !board[y - 2][x].name) {
     moves.push({ y: y - 2, x })
   }
-  if (board[y - 1][x + 1] && board[y - 1][x + 1].name && board[y - 1][x + 1].color !== color) {
-    moves.push({ y: y - 1, x: x + 1 })
+  if (
+    board[y - 1][x + 1] &&
+    ((board[y - 1][x + 1].name && board[y - 1][x + 1].color !== color) ||
+      (enPassant && enPassant.y === y - 1 && enPassant.x === x + 1))
+  ) {
+    moves.push({
+      y: y - 1,
+      x: x + 1,
+      enPassant: enPassant && enPassant.y === y - 1 && enPassant.x === x + 1,
+    })
   }
-  if (board[y - 1][x - 1] && board[y - 1][x - 1].name && board[y - 1][x - 1].color !== color) {
-    moves.push({ y: y - 1, x: x - 1 })
+  if (
+    board[y - 1][x - 1] &&
+    ((board[y - 1][x - 1].name && board[y - 1][x - 1].color !== color) ||
+      (enPassant && enPassant.y === y - 1 && enPassant.x === x - 1))
+  ) {
+    moves.push({
+      y: y - 1,
+      x: x - 1,
+      enPassant: enPassant && enPassant.y === y - 1 && enPassant.x === x - 1,
+    })
   }
   return moves
 }
 
-export const blackPawn = ({ board, color, y, x }) => {
+export const blackPawn = ({ board, color, y, x, FEN: { enPassant } }) => {
   const moves = []
   if (board[y + 1][x] && !board[y + 1][x].name) {
     moves.push({ y: y + 1, x })
@@ -48,11 +65,27 @@ export const blackPawn = ({ board, color, y, x }) => {
   if (y === 1 && board[y + 2][x] && !board[y + 2][x].name) {
     moves.push({ y: y + 2, x })
   }
-  if (board[y + 1][x + 1] && board[y + 1][x + 1].name && board[y + 1][x + 1].color !== color) {
-    moves.push({ y: y + 1, x: x + 1 })
+  if (
+    board[y + 1][x + 1] &&
+    ((board[y + 1][x + 1].name && board[y + 1][x + 1].color !== color) ||
+      (enPassant && enPassant.y === y + 1 && enPassant.x === x + 1))
+  ) {
+    moves.push({
+      y: y + 1,
+      x: x + 1,
+      enPassant: enPassant && enPassant.y === y + 1 && enPassant.x === x + 1,
+    })
   }
-  if (board[y + 1][x - 1] && board[y + 1][x - 1].name && board[y + 1][x - 1].color !== color) {
-    moves.push({ y: y + 1, x: x - 1 })
+  if (
+    board[y + 1][x - 1] &&
+    ((board[y + 1][x - 1].name && board[y + 1][x - 1].color !== color) ||
+      (enPassant && enPassant.y === y + 1 && enPassant.x === x - 1))
+  ) {
+    moves.push({
+      y: y + 1,
+      x: x - 1,
+      enPassant: enPassant && enPassant.y === y + 1 && enPassant.x === x - 1,
+    })
   }
   return moves
 }

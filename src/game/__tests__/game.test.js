@@ -426,7 +426,7 @@ test.each`
   }
 )
 
-test('it should flag a paws as en-passant if it moves of 2 squares at once', () => {
+test('it should flag a pawn as en-passant if it moves of 2 squares at once', () => {
   const { move } = game({ FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' })
   const { FEN } = move('c4')
   expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1')

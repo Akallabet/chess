@@ -1,3 +1,5 @@
+import { isTruthy } from '../utils'
+
 export { buildBoardFromFEN } from './build-board-from-FEN'
 export { buildFENPiecePlacementFromBoard } from './buils-FEN-piece-placement-from-board'
 export { addPieceToBoard } from './add-piece-to-board'
@@ -17,5 +19,6 @@ export {
 export const extractOrigin = (origins) => origins[0]
 export const isDisambiguous = (origins) => origins.length === 1
 export const isCastlingMove = ({ isCastling }) => isCastling
-export const isKingsideCastlingMove = ({ isKingside }) => isKingside
-export const isQueensideCastlingMove = ({ isQueenside }) => isQueenside
+export const isKingsideCastlingMove = ({ isKingside }) => isTruthy(isKingside)
+export const isQueensideCastlingMove = ({ isQueenside }) => isTruthy(isQueenside)
+export const isCapture = ({ capture }) => isTruthy(capture)

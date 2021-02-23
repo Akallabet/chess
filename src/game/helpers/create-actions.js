@@ -49,6 +49,19 @@ export const createActions = ({ pieces, ranks, files }) => [
     }),
   ],
   [
+    `^[${files.join('')}]{1}x[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
+    ([name, , file, rank]) => {
+      console.log('lalalalalal')
+      return {
+        name,
+        y: ranks.indexOf(rank),
+        x: files.indexOf(file),
+        capture: true,
+        enPassant: true,
+      }
+    },
+  ],
+  [
     `^0-0$`,
     () => ({
       name: 'K',

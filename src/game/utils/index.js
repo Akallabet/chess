@@ -12,6 +12,8 @@ export const isDefined = (input) => !!input
 export const noop = () => {}
 export const identity = (input) => input
 export const falsy = () => false
+export const isTruthy = (value) => !!value
+export const isFalsy = (value) => !value
 export const log = (label) => (args) => {
   console.log(label, args)
   return args

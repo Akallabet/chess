@@ -27,9 +27,10 @@ import {
   isQueensideCastlingMove,
   removeKingsideCastlingColor,
   removeQueensideCastlingColor,
+  isCapture,
 } from './helpers'
-import { check, identity, isDefined, pipe, pipeCond, when } from './utils'
-import { findByCastling } from './helpers/moves'
+import { check, identity, isDefined, isTruthy, log, pipe, pipeCond, when } from './utils'
+import { findByCastling, findByEnPassant } from './helpers/moves'
 
 export const game = ({
   FEN: initialFEN,
@@ -145,17 +146,34 @@ export const game = ({
     pipe(setCastlingSide, executeCastling)(args)
   }
 
-  const hasPieceMoves = (name) => ({ y, x }) => () => board[y][x].name === name
-  const hasKingMoved = hasPieceMoves(NAMES.K)
-  const hasRookMoved = hasPieceMoves(NAMES.R)
-  const hasPawnMoved = hasPieceMoves(NAMES.P)
+  const hasPieceMoved = (name) => ({ y, x }) => () => board[y][x].name === name
+  const hasKingMoved = hasPieceMoved(NAMES.K)
+  const hasRookMoved = hasPieceMoved(NAMES.R)
+  const hasPawnMoved = hasPieceMoved(NAMES.P)
   const isKingsideRook = ({ x }) => () => x === files.length - 1
   const isQueensideRook = ({ x }) => () => x === 0
-  const isEnPassant = ({ y, destination }) => () => Math.abs(destination.y - y) === 2
+  const isEnPassant = ({ y, x }) => () =>
+    FEN.enPassant && FEN.enPassant.y === y && FEN.enPassant.x === x
+  const isEnPassantMove = ({ y, destination }) => () => Math.abs(destination.y - y) === 2
   const getEnPassantSquare = ({ y, x }, colors) => ({ activeColor }) => ({
     x,
     y: activeColor === colors.w ? y + 1 : y - 1,
   })
+
+  const capture = ({ y, x, destination }) => {
+    pipe(
+      check(
+        isEnPassant(destination),
+        removePieceFromBoard({ y, x: destination.x }),
+        removePieceFromBoard({ y, x })
+      ),
+      addPieceToBoard({ ...board[y][x], ...destination }),
+      updateBoard,
+      buildFENPiecePlacementFromBoard({ pieces, COLORS }),
+      updatePiecePlacement,
+      removeEnPassant
+    )(board)
+  }
 
   const move = ({ y, x, destination }) => {
     pipe(
@@ -179,7 +197,7 @@ export const game = ({
           identity,
         ],
         [
-          when(hasPawnMoved(destination), isEnPassant({ y, destination })),
+          when(hasPawnMoved(destination), isEnPassantMove({ y, destination })),
           pipe(getEnPassantSquare(destination, COLORS), updateEnPassant),
           identity,
         ]
@@ -195,18 +213,15 @@ export const game = ({
       buildOrigin(`${name}${files[x]}${ranks[y]}`)
     const buildCastlingSAN = ({ castling: { isKingside, isQueenside } }) =>
       (isKingside && '0-0') || (isQueenside && '0-0-0')
+    const buildEnPassantSAN = ({ x }) => buildOrigin(`${files[x]}x`)
 
-    return pipe(
-      check(
-        findByCastling(piece),
-        pipe(findByCastling(piece), buildCastlingSAN),
-        pipeCond(
-          [isDisambiguous, buildOriginName, filterByName(piece.name)],
-          [isDisambiguous, buildOriginName, filterByFile(piece.x)],
-          [isDisambiguous, buildOriginNameAndFile, filterByRank(piece.y)],
-          [isDisambiguous, buildOriginNameFileAndRank]
-        )
-      )
+    return pipeCond(
+      [findByEnPassant(piece), pipe(findByEnPassant(piece), buildEnPassantSAN), identity],
+      [findByCastling(piece), pipe(findByCastling(piece), buildCastlingSAN), identity],
+      [isDisambiguous, buildOriginName, filterByName(piece.name)],
+      [isDisambiguous, buildOriginName, filterByFile(piece.x)],
+      [isDisambiguous, buildOriginNameAndFile, filterByRank(piece.y)],
+      [isDisambiguous, buildOriginNameFileAndRank]
     )(legalMoves[`${file}${rank}`])
   }
 
@@ -237,6 +252,11 @@ export const game = ({
         [
           isQueensideCastlingMove,
           check(isQueensideCastlingAvailable, pipe(castling, afterMove)),
+          identity,
+        ],
+        [
+          isCapture,
+          pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, capture, afterMove))),
           identity,
         ],
         [

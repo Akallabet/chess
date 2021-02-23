@@ -15,7 +15,8 @@ export const Square = withGame(
     game: { getSAN, activePiece, moveActivePiece },
   }) => {
     const handleMove = () => {
-      moveActivePiece(getSAN(activePiece, { file, rank }))
+      const SAN = getSAN(activePiece, { file, rank })
+      moveActivePiece(SAN)
     }
     const highlight = selected || move
     const classes = clsx('relative', 'h-full', 'w-1/8', {

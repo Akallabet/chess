@@ -162,11 +162,8 @@ export const game = ({
 
   const capture = ({ y, x, destination }) => {
     pipe(
-      check(
-        isEnPassant(destination),
-        removePieceFromBoard({ y, x: destination.x }),
-        removePieceFromBoard({ y, x })
-      ),
+      check(isEnPassant(destination), removePieceFromBoard({ y, x: destination.x })),
+      removePieceFromBoard({ y, x }),
       addPieceToBoard({ ...board[y][x], ...destination }),
       updateBoard,
       buildFENPiecePlacementFromBoard({ pieces, COLORS }),

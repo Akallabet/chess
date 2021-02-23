@@ -32,8 +32,9 @@ export const createActions = ({ pieces, ranks, files }) => [
   ],
   [
     `^[${files.join('')}]{1}x[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
-    ([, , file, rank]) => ({
+    ([originX, , file, rank]) => ({
       name: pieces.P,
+      originX: files.indexOf(originX),
       y: ranks.indexOf(rank),
       x: files.indexOf(file),
       capture: true,
@@ -47,19 +48,6 @@ export const createActions = ({ pieces, ranks, files }) => [
       x: files.indexOf(file),
       capture: true,
     }),
-  ],
-  [
-    `^[${files.join('')}]{1}x[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
-    ([name, , file, rank]) => {
-      console.log('lalalalalal')
-      return {
-        name,
-        y: ranks.indexOf(rank),
-        x: files.indexOf(file),
-        capture: true,
-        enPassant: true,
-      }
-    },
   ],
   [
     `^0-0$`,

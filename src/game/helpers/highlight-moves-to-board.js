@@ -1,4 +1,4 @@
-export const highligthMovesToBoard = ({ moves, ...origin }) => (board) =>
+export const highligthMovesToBoard = ({ moves, board }) =>
   board.map((row, y) =>
     row
       .map(({ meta = {}, ...square }, x) => {
@@ -11,9 +11,4 @@ export const highligthMovesToBoard = ({ moves, ...origin }) => (board) =>
           ? { ...square, meta: { ...meta, check: true } }
           : { ...square, meta }
       })
-      .map(({ meta = {}, ...square }, x) =>
-        origin.y === y && origin.x === x
-          ? { ...square, meta: { ...meta, selected: true } }
-          : { ...square, meta }
-      )
   )

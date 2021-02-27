@@ -86,19 +86,17 @@ export const game = ({
   const isCastlingAvailable = () => isKingsideCastlingAvailable() || isQueensideCastlingAvailable()
   const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
 
-  const getMoves = ({ name, originY, originX, y, x }) =>
+  const getOrigins = ({ name, originY, originX, y, x }) =>
     pipe(
       filterByName(name),
       filterByFile(originX),
       filterByRank(originY)
     )(legalMoves[`${files[x]}${ranks[y]}`])
 
-  const moves = ({ y, x }) =>
-    highligthMoves({
-      y,
-      x,
-      moves: rules[board[y][x].name]({ COLORS, board, color: board[y][x].color, y, x, FEN }),
-    })(board)
+  const getPieceMoves = ({ x, y }) => ({
+    moves: rules[board[y][x].name]({ COLORS, board, color: board[y][x].color, y, x, FEN }),
+    board,
+  })
 
   const afterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
@@ -227,7 +225,7 @@ export const game = ({
 
   const ret = {
     getInfo,
-    moves: pipe(fromSAN, check(isValidColor, moves, board)),
+    moves: pipe(fromSAN, check(isValidColor, pipe(getPieceMoves, highligthMoves), board)),
     move: pipe(
       fromSAN,
       pipeCond(
@@ -243,12 +241,12 @@ export const game = ({
         ],
         [
           isCapture,
-          pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, capture, afterMove))),
+          pipe(getOrigins, check(isDisambiguous, pipe(extractOrigin, capture, afterMove))),
           identity,
         ],
         [
           identity,
-          pipe(getMoves, check(isDisambiguous, pipe(extractOrigin, move, afterMove))),
+          pipe(getOrigins, check(isDisambiguous, pipe(extractOrigin, move, afterMove))),
           identity,
         ]
       ),

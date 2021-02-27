@@ -4,23 +4,6 @@ const empty = { meta: {} }
 const emptyRow = [...Array(8)].map(() => empty)
 const emptyBoard = [...Array(8)].map(() => emptyRow)
 
-const highlightedBoard = [
-  [...emptyRow],
-  [
-    empty,
-    empty,
-    { name: 'P', color: 'b', meta: { selected: true } },
-    empty,
-    empty,
-    empty,
-    empty,
-    empty,
-  ],
-  [empty, empty, { meta: { move: true } }, empty, empty, empty, empty, empty],
-  [empty, empty, { meta: { move: true } }, empty, empty, empty, empty, empty],
-  ...emptyBoard.slice(4, 8),
-]
-
 const completeBoard = [
   [
     { name: 'R', color: 'b', meta: {} },
@@ -110,7 +93,7 @@ const highlightRookMoves = ({ color, name }) => [
   [empty, empty, empty, { meta: { move: true } }, empty, empty, empty, empty],
   [
     ...[...Array(3)].map(() => ({ meta: { move: true } })),
-    { name, color, meta: { selected: true } },
+    { name, color, meta: {} },
     ...[...Array(4)].map(() => ({ meta: { move: true } })),
   ],
   [empty, empty, empty, { meta: { move: true } }, empty, empty, empty, empty],
@@ -123,7 +106,7 @@ const highlightKnightMoves = ({ color, name }) => [
   [empty, empty, empty, empty, empty, empty, empty, empty],
   [empty, empty, { meta: { move: true } }, empty, { meta: { move: true } }, empty, empty, empty],
   [empty, { meta: { move: true } }, empty, empty, empty, { meta: { move: true } }, empty, empty],
-  [empty, empty, empty, { name, color, meta: { selected: true } }, empty, empty, empty, empty],
+  [empty, empty, empty, { name, color, meta: {} }, empty, empty, empty, empty],
   [empty, { meta: { move: true } }, empty, empty, empty, { meta: { move: true } }, empty, empty],
   [empty, empty, { meta: { move: true } }, empty, { meta: { move: true } }, empty, empty, empty],
   [empty, empty, empty, empty, empty, empty, empty, empty],
@@ -134,7 +117,7 @@ const highlightBishopMoves = ({ color, name }) => [
   [{ meta: { move: true } }, empty, empty, empty, empty, empty, { meta: { move: true } }, empty],
   [empty, { meta: { move: true } }, empty, empty, empty, { meta: { move: true } }, empty, empty],
   [empty, empty, { meta: { move: true } }, empty, { meta: { move: true } }, empty, empty, empty],
-  [empty, empty, empty, { name, color, meta: { selected: true } }, empty, empty, empty, empty],
+  [empty, empty, empty, { name, color, meta: {} }, empty, empty, empty, empty],
   [empty, empty, { meta: { move: true } }, empty, { meta: { move: true } }, empty, empty, empty],
   [empty, { meta: { move: true } }, empty, empty, empty, { meta: { move: true } }, empty, empty],
   [{ meta: { move: true } }, empty, empty, empty, empty, empty, { meta: { move: true } }, empty],
@@ -158,7 +141,7 @@ const highlightKingMoves = ({ color, name }) => [
     empty,
     empty,
     { meta: { move: true } },
-    { name, color, meta: { selected: true } },
+    { name, color, meta: {} },
     { meta: { move: true } },
     empty,
     empty,
@@ -214,7 +197,7 @@ const highlightQueenMoves = ({ color, name }) => [
     { meta: { move: true } },
     { meta: { move: true } },
     { meta: { move: true } },
-    { name, color, meta: { selected: true } },
+    { name, color, meta: {} },
     { meta: { move: true } },
     { meta: { move: true } },
     { meta: { move: true } },
@@ -281,7 +264,7 @@ test('it should highlight the legal moves of a black pawn for its first move', (
 
   expect(board).toEqual([
     [...completeBoard[0]],
-    [{ name: 'P', color: 'b', meta: { selected: true } }, ...completeBoard[1].slice(1)],
+    [{ name: 'P', color: 'b', meta: {} }, ...completeBoard[1].slice(1)],
     [{ meta: { move: true } }, ...emptyRow.slice(1)],
     [{ meta: { move: true } }, ...emptyRow.slice(1)],
     [...emptyRow],

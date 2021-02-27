@@ -10,7 +10,7 @@ import {
   buildBoardFromFEN,
   buildFENPiecePlacementFromBoard,
   addPieceToBoard,
-  highligthMovesToBoard,
+  highligthMoves,
   cleanBoard,
   removePieceFromBoard,
   createActions,
@@ -29,14 +29,13 @@ import {
   removeQueensideCastlingColor,
   isCapture,
 } from './helpers'
-import { check, identity, isDefined, isTruthy, log, pipe, pipeCond, when } from './utils'
+import { check, identity, isDefined, pipe, pipeCond, when } from './utils'
 import { findByCastling, findByEnPassant } from './helpers/moves'
 
 export const game = ({
   FEN: initialFEN,
   board: initialBoard,
   capturedPieces: initialCapturedPieces,
-  activePiece: initialActivePiece,
   pieces = defaultNames,
   COLORS = defaultColors,
   files = defaultFiles,
@@ -52,7 +51,6 @@ export const game = ({
   let FEN = buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FEN })
-  let activePiece = initialActivePiece
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
@@ -66,8 +64,6 @@ export const game = ({
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
     (legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FENInfo }))
-  const selectPiece = (piece) => (activePiece = { ...piece })
-  const deselectPiece = () => (activePiece = null)
 
   const removeEnPassant = () => updateEnPassant(false)
   const removeCastling = () => updateCastling('-')
@@ -90,24 +86,19 @@ export const game = ({
   const isCastlingAvailable = () => isKingsideCastlingAvailable() || isQueensideCastlingAvailable()
   const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
 
-  const getMoves = ({ name, originY, originX, y, x }) => {
-    return pipe(
+  const getMoves = ({ name, originY, originX, y, x }) =>
+    pipe(
       filterByName(name),
       filterByFile(originX),
       filterByRank(originY)
     )(legalMoves[`${files[x]}${ranks[y]}`])
-  }
 
-  const deselect = () => pipe(cleanBoard, updateBoard, deselectPiece)(board)
-
-  const select = ({ y, x }) => {
-    const piece = board[y][x]
-    const { name, color } = piece
-    const moves = rules[name]({ COLORS, board, color, y, x, FEN })
-
-    pipe(cleanBoard, highligthMovesToBoard({ y, x, moves }), updateBoard)(board)
-    selectPiece({ ...piece, y, x })
-  }
+  const moves = ({ y, x }) =>
+    highligthMoves({
+      y,
+      x,
+      moves: rules[board[y][x].name]({ COLORS, board, color: board[y][x].color, y, x, FEN }),
+    })(board)
 
   const afterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
@@ -174,7 +165,6 @@ export const game = ({
 
   const move = ({ y, x, destination }) => {
     pipe(
-      cleanBoard,
       removePieceFromBoard({ y, x }),
       addPieceToBoard({ ...board[y][x], ...destination }),
       updateBoard,
@@ -202,7 +192,9 @@ export const game = ({
     )(board)
   }
 
-  const getSAN = (piece, { rank, file }) => {
+  const getSAN = (origin, destination) => {
+    const { file, rank } = destination
+    const piece = { ...origin, x: files.indexOf(origin.file), y: ranks.indexOf(origin.rank) }
     const buildOrigin = (origin) => `${origin}${file}${rank}`
     const buildOriginName = ([{ name }]) => buildOrigin(`${name}`)
     const buildOriginNameAndFile = ([{ name, x }]) => buildOrigin(`${name}${files[x]}`)
@@ -229,15 +221,13 @@ export const game = ({
     board,
     legalMoves,
     capturedPieces,
-    activePiece,
     ...FEN,
     ...ret,
   })
 
   const ret = {
     getInfo,
-    select: pipe(fromSAN, check(isValidColor, select), getInfo),
-    deselect: pipe(deselect, getInfo),
+    moves: pipe(fromSAN, check(isValidColor, moves, board)),
     move: pipe(
       fromSAN,
       pipeCond(
@@ -262,7 +252,6 @@ export const game = ({
           identity,
         ]
       ),
-      deselect,
       getInfo
     ),
     getSAN,

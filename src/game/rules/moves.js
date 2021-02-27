@@ -13,7 +13,11 @@ const traverse = (incr, limit = () => true) => ({ board, color, y, x }) => {
     position.x >= 0 &&
     limit(position)
   ) {
-    if (isValidMove({ board, color, ...position })) moves.push(position)
+    if (isValidMove({ board, color, ...position })) {
+      if (board[position.y][position.x].name && board[position.y][position.x].name === 'K')
+        moves.push({ ...position, check: true })
+      else moves.push(position)
+    }
     if (board[position.y][position.x].color) break
     position = incr(position)
   }

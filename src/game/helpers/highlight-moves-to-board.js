@@ -6,6 +6,11 @@ export const highligthMovesToBoard = ({ moves, ...origin }) => (board) =>
           ? { ...square, meta: { ...meta, move: true } }
           : { ...square, meta }
       })
+      .map(({ meta = {}, ...square }, x) => {
+        return moves.find((move) => move.y === y && move.x === x && move.check)
+          ? { ...square, meta: { ...meta, check: true } }
+          : { ...square, meta }
+      })
       .map(({ meta = {}, ...square }, x) =>
         origin.y === y && origin.x === x
           ? { ...square, meta: { ...meta, selected: true } }

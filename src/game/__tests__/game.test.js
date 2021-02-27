@@ -267,8 +267,8 @@ test.each`
 `(
   'it should highlight all the moves of a $colorName $pieceName',
   ({ name, FEN, color, expectedBoard }) => {
-    const { select } = game({ FEN: `8/8/8/8/3${FEN}4/8/8/8 ${color} - - 0 1` })
-    const { board } = select(`${name}d4`)
+    const { moves } = game({ FEN: `8/8/8/8/3${FEN}4/8/8/8 ${color} - - 0 1` })
+    const board = moves(`${name}d4`)
 
     expect(board).toEqual(expectedBoard({ name, color }))
   }
@@ -276,8 +276,8 @@ test.each`
 
 test('it should highlight the legal moves of a black pawn for its first move', () => {
   const initialFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1'
-  const { select } = game({ FEN: initialFEN })
-  const { board } = select('a7')
+  const { moves } = game({ FEN: initialFEN })
+  const board = moves('a7')
 
   expect(board).toEqual([
     [...completeBoard[0]],
@@ -288,15 +288,6 @@ test('it should highlight the legal moves of a black pawn for its first move', (
     [...emptyRow],
     ...completeBoard.slice(6),
   ])
-})
-
-test('it should remove the hihlight squares from the board', () => {
-  const initialFEN = '8/2p5/8/8/8/8/8/8 b KQkq - 0 1'
-  const { select, deselect } = game({ FEN: initialFEN })
-  const { board } = select('c7')
-  expect(board).toEqual(highlightedBoard)
-  const info = deselect()
-  expect(info.board).toEqual(boardWithBlackPawn)
 })
 
 test('it should move white pawn c2 to c4', () => {

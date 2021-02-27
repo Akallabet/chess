@@ -15,7 +15,7 @@ export const Square = withGame(
     game: { getSAN, activePiece, moveActivePiece },
   }) => {
     const handleMove = () => {
-      const SAN = getSAN(activePiece, { file, rank })
+      const SAN = getSAN(activePiece, { rank, file })
       moveActivePiece(SAN)
     }
     const highlight = selected || move
@@ -36,6 +36,8 @@ export const Square = withGame(
           <Piece
             name={name}
             color={color}
+            file={file}
+            rank={rank}
             coordinates={`${file}${rank}`}
             selected={selected}
             move={move}

@@ -5,19 +5,21 @@ import { game } from '../../../game'
 export const useGame = ({ onMove, defaultInitialData }) => {
   const data = useLoadData() || defaultInitialData
 
-  const [{ getInfo, select, deselect, move }, setEngine] = useState(() => game(data))
+  const [{ getInfo, moves, move }, setEngine] = useState(() => game(data))
 
   const resetGame = () => {
     setEngine(game(defaultInitialData))
   }
 
-  const [{ board, activePiece, activeColor, FEN, ranks, files, getSAN }, setInfo] = useState(
-    getInfo()
-  )
+  const [info, setInfo] = useState(getInfo())
+  const { board, activeColor, FEN, ranks, files, getSAN } = info
+
+  const [activePiece, setActivePiece] = useState()
 
   useEffect(() => {
     setInfo(getInfo())
   }, [getInfo])
+
   useStorage({ board, activePiece, FEN })
 
   return {
@@ -27,11 +29,14 @@ export const useGame = ({ onMove, defaultInitialData }) => {
     ranks,
     getSAN,
     files,
-    selectPiece: (args) => {
-      setInfo(select(args))
+    selectPiece: (piece) => {
+      const { file, rank } = piece
+      setActivePiece(piece)
+      setInfo({ ...info, board: moves(`${file}${rank}`) })
     },
-    deselectPiece: (args) => {
-      setInfo(deselect(args))
+    deselectPiece: () => {
+      setActivePiece()
+      setInfo(getInfo())
     },
     moveActivePiece: (args) => {
       setInfo(move(args))

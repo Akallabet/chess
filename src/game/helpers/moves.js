@@ -48,9 +48,4 @@ export const filterByName = (name) => (origins) => origins.filter(byName(name))
 export const filterByFile = (x) => (origins) => origins.filter(byFile(x))
 export const filterByRank = (y) => (origins) => origins.filter(byRank(y))
 export const findByCastling = (piece) => (origins) => origins.find(byCastling(piece))
-export const findByEnPassant = (piece) => (origins) => {
-  // console.log(piece, origins)
-  const res = origins.find(byEnPassant(piece))
-  // console.log(res)
-  return res
-}
+export const findByEnPassant = (piece) => (origins) => origins.find(byEnPassant(piece))

@@ -13,12 +13,19 @@ export const Piece = withGame(
   ({
     name,
     color,
+    file,
+    rank,
     coordinates,
     selected,
     move,
     game: { activePiece, selectPiece, deselectPiece, moveActivePiece },
   }) => {
-    const handleClick = selected ? deselectPiece : move ? moveActivePiece : selectPiece
+    const handleClick = () => {
+      if (selected) deselectPiece()
+      else if (move) {
+        moveActivePiece(`${activePiece.name}x${coordinates}`)
+      } else selectPiece({ name, color, file, rank })
+    }
     return (
       <Button
         fullWidth
@@ -27,9 +34,7 @@ export const Piece = withGame(
         padding={false}
         borders={false}
         aria-label={`${name} ${color} ${coordinates}`}
-        onClick={stopPropagation(() => {
-          handleClick(`${move ? activePiece.name : ''}${move ? 'x' : ''}${coordinates}`)
-        })}
+        onClick={stopPropagation(handleClick)}
       >
         <img src={assets[color][name]} className="w-full h-full" />
       </Button>
@@ -42,6 +47,8 @@ Piece.displayName = 'Piece'
 Piece.propTypes = {
   name: string.isRequired,
   color: string.isRequired,
+  file: string.isRequired,
+  rank: string.isRequired,
   coordinates: string.isRequired,
   selected: bool.isRequired,
   move: bool.isRequired,

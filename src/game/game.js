@@ -1,4 +1,4 @@
-import { rules as defaultRules } from './rules'
+import { getMoves as defaultGetMoves } from './rules'
 import {
   COLORS as defaultColors,
   FILES as defaultFiles,
@@ -41,7 +41,7 @@ export const game = ({
   files = defaultFiles,
   ranks = defaultRanks,
   NAMES = defaultNames,
-  rules = defaultRules,
+  getMoves = defaultGetMoves,
 }) => {
   const actions = createActions({ pieces, ranks, files })
   const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
@@ -50,7 +50,7 @@ export const game = ({
 
   let FEN = buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || buildBoardFromFEN({ pieces, COLORS, ...FEN })
-  let legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FEN })
+  let legalMoves = generateMoves({ getMoves, COLORS, ranks, files, board, ...FEN })
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
@@ -63,7 +63,7 @@ export const game = ({
   const updateCastling = (castling) => updateFEN({ castling })
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
-    (legalMoves = generateMoves({ rules, COLORS, ranks, files, board, ...FENInfo }))
+    (legalMoves = generateMoves({ getMoves, COLORS, ranks, files, board, ...FENInfo }))
 
   const removeEnPassant = () => updateEnPassant(false)
   const removeCastling = () => updateCastling('-')
@@ -94,7 +94,7 @@ export const game = ({
     )(legalMoves[`${files[x]}${ranks[y]}`])
 
   const getPieceMoves = ({ x, y }) => ({
-    moves: rules[board[y][x].name]({ COLORS, board, color: board[y][x].color, y, x, FEN }),
+    moves: getMoves({ y, x, board, COLORS, FEN }), //[board[y][x].name]({ COLORS, board, color: board[y][x].color, y, x, FEN }),
     board,
   })
 

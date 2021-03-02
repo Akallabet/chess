@@ -1,7 +1,26 @@
+const isValidStep = (board) => ({ y, x }) => board[y] && board[y][x] && !board[y][x].name
+const isValidCapture = (board, color) => ({ y, x }) =>
+  board[y] && board[y][x] && board[y][x].name && board[y][x].color !== color
+const isValidEnPassant = (board, enPassant) => ({ y, x }) =>
+  board[y] && board[y][x] && enPassant && enPassant.y === y && enPassant.x === x
+const isValidStepOrCapture = (board, color) => ({ y, x }) =>
+  isValidStep(board)({ y, x }) || isValidCapture(board, color)({ y, x })
+
 const isValidMove = ({ board, color, y, x }) =>
   board[y] &&
   board[y][x] &&
   ((board[y][x].color && board[y][x].color !== color) || !board[y][x].color)
+
+const validate = (isValid) => (moves) => {
+  const ret = []
+  for (const steps of moves) {
+    for (const step of steps) {
+      if (!isValid(step)) break
+      ret.push(step)
+    }
+  }
+  return ret
+}
 
 const traverse = (incr, limit = () => true) => ({ board, color, y, x }) => {
   const moves = []
@@ -24,103 +43,49 @@ const traverse = (incr, limit = () => true) => ({ board, color, y, x }) => {
   return moves
 }
 
-export const pawn = ({ color, COLORS, ...args }) =>
-  color === COLORS.w ? whitePawn(args) : blackPawn(args)
+export const pawn = ({ color, COLORS, board, y, x, FEN: { enPassant } }) => {
+  const start = color === COLORS.w ? 6 : 1
+  const step = (row) => (color === COLORS.w ? row - 1 : row + 1)
 
-export const whitePawn = ({ board, color, y, x, FEN }) => {
-  const { enPassant } = FEN
-  const moves = []
-  if (board[y - 1][x] && !board[y - 1][x].name) {
-    moves.push({ y: y - 1, x })
-  }
-  if (y === 6 && board[y - 2][x] && !board[y - 2][x].name) {
-    moves.push({ y: y - 2, x })
-  }
-  if (
-    board[y - 1][x + 1] &&
-    ((board[y - 1][x + 1].name && board[y - 1][x + 1].color !== color) ||
-      (enPassant && enPassant.y === y - 1 && enPassant.x === x + 1))
-  ) {
-    moves.push({
-      y: y - 1,
-      x: x + 1,
-      enPassant: enPassant && enPassant.y === y - 1 && enPassant.x === x + 1,
-    })
-  }
-  if (
-    board[y - 1][x - 1] &&
-    ((board[y - 1][x - 1].name && board[y - 1][x - 1].color !== color) ||
-      (enPassant && enPassant.y === y - 1 && enPassant.x === x - 1))
-  ) {
-    moves.push({
-      y: y - 1,
-      x: x - 1,
-      enPassant: enPassant && enPassant.y === y - 1 && enPassant.x === x - 1,
-    })
-  }
-  return moves
-}
+  const steps = [{ y: color === COLORS.w ? y - 1 : y + 1, x }]
+  if (y === start) steps.push({ y: color === COLORS.w ? y - 2 : y + 2, x })
 
-export const blackPawn = ({ board, color, y, x, FEN: { enPassant } }) => {
-  const moves = []
-  if (board[y + 1][x] && !board[y + 1][x].name) {
-    moves.push({ y: y + 1, x })
-  }
-  if (y === 1 && board[y + 2][x] && !board[y + 2][x].name) {
-    moves.push({ y: y + 2, x })
-  }
-  if (
-    board[y + 1][x + 1] &&
-    ((board[y + 1][x + 1].name && board[y + 1][x + 1].color !== color) ||
-      (enPassant && enPassant.y === y + 1 && enPassant.x === x + 1))
-  ) {
-    moves.push({
-      y: y + 1,
-      x: x + 1,
-      enPassant: enPassant && enPassant.y === y + 1 && enPassant.x === x + 1,
-    })
-  }
-  if (
-    board[y + 1][x - 1] &&
-    ((board[y + 1][x - 1].name && board[y + 1][x - 1].color !== color) ||
-      (enPassant && enPassant.y === y + 1 && enPassant.x === x - 1))
-  ) {
-    moves.push({
-      y: y + 1,
-      x: x - 1,
-      enPassant: enPassant && enPassant.y === y + 1 && enPassant.x === x - 1,
-    })
-  }
-  return moves
-}
-
-export const knight = ({ board, color, y: posY, x: posX }) => {
-  const moves = []
-  const positions = [
-    [posY - 1, posX - 2],
-    [posY - 2, posX - 1],
-    [posY - 2, posX + 1],
-    [posY - 1, posX + 2],
-    [posY + 1, posX + 2],
-    [posY + 2, posX + 1],
-    [posY + 2, posX - 1],
-    [posY + 1, posX - 2],
+  const captures = [
+    { y: step(y), x: x + 1 },
+    { y: step(y), x: x - 1 },
   ]
 
-  for (const [y, x] of positions) {
-    if (isValidMove({ board, color, y, x })) moves.push({ y, x })
-  }
-  return moves
-}
+  const enPassants = [
+    { y: step(y), x: x + 1, enPassant: true },
+    { y: step(y), x: x - 1, enPassant: true },
+  ]
 
-export const rook = ({ board, color, x, y }) => {
   return [
-    ...traverse(({ y, x }) => ({ y, x: x + 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y, x: x - 1 }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y + 1, x }))({ board, color, y, x }),
-    ...traverse(({ y, x }) => ({ y: y - 1, x }))({ board, color, y, x }),
+    ...steps.filter(isValidStep(board)),
+    ...captures.filter(isValidCapture(board, color)),
+    ...enPassants.filter(isValidEnPassant(board, enPassant)),
   ]
 }
+
+export const knight = ({ board, color, y: posY, x: posX }) =>
+  validate(isValidStepOrCapture(board, color))([
+    [{ y: posY - 1, x: posX - 2 }],
+    [{ y: posY - 2, x: posX - 1 }],
+    [{ y: posY - 2, x: posX + 1 }],
+    [{ y: posY - 1, x: posX + 2 }],
+    [{ y: posY + 1, x: posX + 2 }],
+    [{ y: posY + 2, x: posX + 1 }],
+    [{ y: posY + 2, x: posX - 1 }],
+    [{ y: posY + 1, x: posX - 2 }],
+  ])
+
+export const rook = ({ board, color, x, y }) =>
+  validate(isValidStepOrCapture(board, color))([
+    [...new Array(board.length - 1 - x)].map((_, i) => ({ y, x: x + 1 + i })),
+    [...new Array(x)].map((_, i) => ({ y, x: x - 1 - i })),
+    [...new Array(board.length - 1 - y)].map((_, i) => ({ y: y + 1 + i, x })),
+    [...new Array(y)].map((_, i) => ({ y: y - 1 - i, x })),
+  ])
 
 export const bishop = ({ board, color, x, y }) => {
   return [

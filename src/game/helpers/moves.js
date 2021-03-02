@@ -10,7 +10,7 @@ const createEmptyMoves = ({ ranks, files, ...args }) => {
   return { moves, ranks, files, ...args }
 }
 
-const createBoardMoves = ({ rules, COLORS, files, ranks, board, moves, ...FEN }) => {
+const createBoardMoves = ({ getMoves, COLORS, files, ranks, board, moves, ...FEN }) => {
   const { activeColor } = FEN
   board
     .reduce(
@@ -18,7 +18,7 @@ const createBoardMoves = ({ rules, COLORS, files, ranks, board, moves, ...FEN })
         ...pieces,
         ...row.map(({ name, color }, x) =>
           name && color === activeColor
-            ? rules[name]({ COLORS, rules, board, color, y, x, FEN }).map((move) => ({
+            ? getMoves({ y, x, COLORS, board, FEN }).map((move) => ({
                 ...move,
                 origin: { name, x, y },
               }))

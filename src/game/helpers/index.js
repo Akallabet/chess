@@ -7,7 +7,15 @@ export { highligthMovesToBoard as highligthMoves } from './highlight-moves-to-bo
 export { cleanBoard } from './clean-board'
 export { removePieceFromBoard } from './remove-piece-from-board'
 export { createActions } from './create-actions'
-export { generateMoves, filterByFile, filterByName, filterByRank } from './moves'
+export {
+  generateMoves,
+  filterByFile,
+  filterByName,
+  filterByRank,
+  findByCastling,
+  findByEnPassant,
+  buildGetMoves,
+} from './moves'
 export {
   buildFENObject,
   buildFENString,

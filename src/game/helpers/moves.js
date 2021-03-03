@@ -49,3 +49,37 @@ export const filterByFile = (x) => (origins) => origins.filter(byFile(x))
 export const filterByRank = (y) => (origins) => origins.filter(byRank(y))
 export const findByCastling = (piece) => (origins) => origins.find(byCastling(piece))
 export const findByEnPassant = (piece) => (origins) => origins.find(byEnPassant(piece))
+
+const isValidStep = (board) => ({ y, x }) => board[y] && board[y][x] && !board[y][x].name
+const isValidCapture = (board, color) => ({ y, x }) =>
+  board[y] && board[y][x] && board[y][x].name && board[y][x].color !== color
+const isValidMove = (board, color) => ({ y, x }) =>
+  isValidStep(board)({ y, x }) || isValidCapture(board, color)({ y, x })
+
+const validate = (isValid) => (moves) => {
+  const ret = []
+  for (const steps of moves) {
+    for (const step of steps) {
+      if (!isValid(step)) break
+      ret.push(step)
+    }
+  }
+  return ret
+}
+
+export const buildGetMoves = (rules) => (args) => {
+  const {
+    y,
+    x,
+    board,
+    FEN: { activeColor },
+  } = args
+
+  const { moves = [], steps = [], captures = [] } = rules[board[y][x].name](args)
+  const results = [
+    ...validate(isValidMove(board, activeColor))(moves),
+    ...validate(isValidStep(board))(steps),
+    ...validate(isValidCapture(board, activeColor))(captures),
+  ]
+  return results
+}

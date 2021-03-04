@@ -50,24 +50,28 @@ export const filterByRank = (y) => (origins) => origins.filter(byRank(y))
 export const findByCastling = (piece) => (origins) => origins.find(byCastling(piece))
 export const findByEnPassant = (piece) => (origins) => origins.find(byEnPassant(piece))
 
-const isValidStep = (board) => ({ y, x }) => board[y] && board[y][x] && !board[y][x].name
-const isValidCapture = (board, color) => ({ y, x }) =>
-  board[y] && board[y][x] && board[y][x].name && board[y][x].color !== color
-const isValidMove = (board, color) => ({ y, x }) =>
-  isValidStep(board)({ y, x }) || isValidCapture(board, color)({ y, x })
-
-const validate = (isValid) => (moves) => {
-  const ret = []
-  for (const steps of moves) {
-    for (const step of steps) {
-      if (!isValid(step)) break
-      ret.push(step)
-    }
-  }
-  return ret
-}
-
 export const buildGetMoves = (rules) => (args) => {
+  const isValidStep = (board) => ({ y, x, ...args }) =>
+    board[y] && board[y][x] && !board[y][x].name && { y, x, ...args }
+  const isValidCapture = (board, color) => ({ y, x, ...args }) =>
+    board[y] &&
+    board[y][x] &&
+    board[y][x].name &&
+    board[y][x].color !== color && { y, x, capture: true, ...args }
+  const isValidMove = (board, color) => ({ y, x }) =>
+    isValidStep(board)({ y, x }) || isValidCapture(board, color)({ y, x })
+
+  const validate = (isValid) => (moves) => {
+    const ret = []
+    for (const steps of moves) {
+      for (const step of steps) {
+        if (!isValid(step)) break
+        ret.push(isValid(step))
+      }
+    }
+    return ret
+  }
+
   const {
     y,
     x,

@@ -406,3 +406,9 @@ test('it should flag a pawn as en-passant if it moves of 2 squares at once', () 
   expect(FEN).toEqual('rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1')
   expect(move('c6').FEN).toEqual('rnbqkbnr/pp1ppppp/2p5/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2')
 })
+
+test.skip('it should put the king under check', () => {
+  const { move } = game({ FEN: 'rnbqkbnr/ppp1p1pp/5p2/3p4/3P4/2P5/PP2PPPP/RNBQKBNR w KQkq - 0 3' })
+  const { FEN } = move('Qa4+')
+  expect(FEN).toEqual('rnbqkbnr/ppp1p1pp/5p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR b KQkq - 0 3')
+})

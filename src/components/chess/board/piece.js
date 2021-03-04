@@ -18,13 +18,11 @@ export const Piece = withGame(
     coordinates,
     selected,
     move,
-    game: { activePiece, selectPiece, deselectPiece, moveActivePiece },
+    game: { selectPiece, deselectPiece },
   }) => {
     const handleClick = () => {
-      if (selected) deselectPiece()
-      else if (move) {
-        moveActivePiece(`${activePiece.name}x${coordinates}`)
-      } else selectPiece({ name, color, file, rank })
+      if (selected) stopPropagation(deselectPiece())
+      else if (!move) stopPropagation(selectPiece({ name, color, file, rank }))
     }
     return (
       <Button
@@ -34,7 +32,7 @@ export const Piece = withGame(
         padding={false}
         borders={false}
         aria-label={`${name} ${color} ${coordinates}`}
-        onClick={stopPropagation(handleClick)}
+        onClick={handleClick}
       >
         <img src={assets[color][name]} className="w-full h-full" />
       </Button>

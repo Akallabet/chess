@@ -5,9 +5,9 @@ export const pawn = ({ COLORS, y, x, FEN: { enPassant, activeColor } }) => {
   const steps = [[{ y: activeColor === COLORS.w ? y - 1 : y + 1, x }]]
   if (y === start) steps[0].push({ y: activeColor === COLORS.w ? y - 2 : y + 2, x })
   if (enPassant && enPassant.y === step(y) && enPassant.x === x + 1)
-    steps.push([{ y: step(y), x: x + 1, enPassant: true }])
+    steps.push([{ y: step(y), x: x + 1, enPassant: true, capture: true }])
   if (enPassant && enPassant.y === step(y) && enPassant.x === x - 1)
-    steps.push([{ y: step(y), x: x - 1, enPassant: true }])
+    steps.push([{ y: step(y), x: x - 1, enPassant: true, capture: true }])
 
   const captures = [[{ y: step(y), x: x + 1 }], [{ y: step(y), x: x - 1 }]]
 

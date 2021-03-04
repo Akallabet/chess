@@ -182,10 +182,11 @@ export const game = ({
     const { file, rank } = destination
     const piece = { ...origin, x: files.indexOf(origin.file), y: ranks.indexOf(origin.rank) }
     const buildOrigin = (origin) => `${origin}${file}${rank}`
-    const buildOriginName = ([{ name }]) => buildOrigin(`${name}`)
-    const buildOriginNameAndFile = ([{ name, x }]) => buildOrigin(`${name}${files[x]}`)
-    const buildOriginNameFileAndRank = ([{ name, y, x }]) =>
-      buildOrigin(`${name}${files[x]}${ranks[y]}`)
+    const buildOriginName = ([{ name, capture }]) => buildOrigin(`${name}${capture ? 'x' : ''}`)
+    const buildOriginNameAndFile = ([{ name, x, capture }]) =>
+      buildOrigin(`${name}${files[x]}${capture ? 'x' : ''}`)
+    const buildOriginNameFileAndRank = ([{ name, y, x, capture }]) =>
+      buildOrigin(`${name}${files[x]}${ranks[y]}${capture ? 'x' : ''}`)
     const buildCastlingSAN = ({ castling: { isKingside, isQueenside } }) =>
       (isKingside && '0-0') || (isQueenside && '0-0-0')
     const buildEnPassantSAN = ({ x }) => buildOrigin(`${files[x]}x`)

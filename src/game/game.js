@@ -29,12 +29,15 @@ export const game = ({
   let FEN = helpers.buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || helpers.buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let legalMoves = helpers.generateMoves({ getMoves, COLORS, ranks, files, board, ...FEN })
+  let king = { y: 0, x: 4 }
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
   const updatePiecePlacement = (piecePlacement) => updateFEN({ piecePlacement })
   const changeTurn = () =>
     updateFEN({ activeColor: FEN.activeColor === COLORS.w ? COLORS.b : COLORS.w })
+  // eslint-disable-next-line no-unused-vars
+  const updateKing = ({ activeColor }) => (king = helpers.findPosition(board, NAMES.K, activeColor))
   const incrementFullmove = ({ fullmoveNumber }) =>
     updateFEN({ fullmoveNumber: fullmoveNumber + 1 })
   const updateEnPassant = (enPassant) => updateFEN({ enPassant })
@@ -76,7 +79,12 @@ export const game = ({
     board,
   })
 
-  const afterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove), updateLegalMoves)
+  const afterMove = pipe(
+    changeTurn,
+    check(isWhiteTurn, incrementFullmove),
+    updateLegalMoves,
+    updateKing
+  )
 
   const castling = (args) => {
     const executeCastling = ({ king, rook, destination }) =>

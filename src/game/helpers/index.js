@@ -1,5 +1,6 @@
 import { isTruthy } from '../utils'
 
+export { findPosition } from './board'
 export { buildBoardFromFEN } from './build-board-from-FEN'
 export { buildFENPiecePlacementFromBoard } from './buils-FEN-piece-placement-from-board'
 export { addPieceToBoard } from './add-piece-to-board'

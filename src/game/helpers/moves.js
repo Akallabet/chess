@@ -61,12 +61,15 @@ export const buildGetMoves = (rules) => (args) => {
   const isValidMove = (board, color) => ({ y, x }) =>
     isValidStep(board)({ y, x }) || isValidCapture(board, color)({ y, x })
 
-  const validate = (isValid) => (moves) => {
+  const validate = (isValid, moves) => {
     const ret = []
-    for (const steps of moves) {
-      for (const step of steps) {
-        if (!isValid(step)) break
-        ret.push(isValid(step))
+    for (const [increment, limit = () => true] of moves) {
+      let steps = 1
+      let position = increment({ y, x })
+      while (isValid(position) && limit(steps)) {
+        ret.push(isValid(position))
+        position = increment(position)
+        steps += 1
       }
     }
     return ret
@@ -80,10 +83,11 @@ export const buildGetMoves = (rules) => (args) => {
   } = args
 
   const { moves = [], steps = [], captures = [] } = rules[board[y][x].name](args)
-  const results = [
-    ...validate(isValidMove(board, activeColor))(moves),
-    ...validate(isValidStep(board))(steps),
-    ...validate(isValidCapture(board, activeColor))(captures),
+
+  const ret = [
+    ...validate(isValidMove(board, activeColor), moves),
+    ...validate(isValidStep(board), steps),
+    ...validate(isValidCapture(board, activeColor), captures),
   ]
-  return results
+  return ret
 }

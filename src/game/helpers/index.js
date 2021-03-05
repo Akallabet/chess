@@ -31,3 +31,4 @@ export const isCastlingMove = ({ isCastling }) => isCastling
 export const isKingsideCastlingMove = ({ isKingside }) => isTruthy(isKingside)
 export const isQueensideCastlingMove = ({ isQueenside }) => isTruthy(isQueenside)
 export const isCapture = ({ capture }) => isTruthy(capture)
+export const isCheck = ({ check }) => isTruthy(check)

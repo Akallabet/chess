@@ -7,7 +7,7 @@ import {
 } from './constants'
 
 import * as helpers from './helpers'
-import { check, identity, isDefined, pipe, pipeCond, when } from './utils'
+import { check, identity, isDefined, operation, pipe, pipeCond, when } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -29,15 +29,13 @@ export const game = ({
   let FEN = helpers.buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || helpers.buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let legalMoves = helpers.generateMoves({ getMoves, COLORS, ranks, files, board, ...FEN })
-  let king = { y: 0, x: 4 }
+  let isInCheck = false
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
   const updatePiecePlacement = (piecePlacement) => updateFEN({ piecePlacement })
   const changeTurn = () =>
     updateFEN({ activeColor: FEN.activeColor === COLORS.w ? COLORS.b : COLORS.w })
-  // eslint-disable-next-line no-unused-vars
-  const updateKing = ({ activeColor }) => (king = helpers.findPosition(board, NAMES.K, activeColor))
   const incrementFullmove = ({ fullmoveNumber }) =>
     updateFEN({ fullmoveNumber: fullmoveNumber + 1 })
   const updateEnPassant = (enPassant) => updateFEN({ enPassant })
@@ -45,6 +43,8 @@ export const game = ({
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
     (legalMoves = helpers.generateMoves({ getMoves, COLORS, ranks, files, board, ...FENInfo }))
+  const removeCheck = () => (isInCheck = false)
+  const addCheck = () => (isInCheck = true)
 
   const removeEnPassant = () => updateEnPassant(false)
   const removeCastling = () => updateCastling('-')
@@ -79,12 +79,7 @@ export const game = ({
     board,
   })
 
-  const afterMove = pipe(
-    changeTurn,
-    check(isWhiteTurn, incrementFullmove),
-    updateLegalMoves,
-    updateKing
-  )
+  const afterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
   const castling = (args) => {
     const executeCastling = ({ king, rook, destination }) =>
@@ -189,15 +184,16 @@ export const game = ({
   const getSAN = (origin, destination) => {
     const { file, rank } = destination
     const piece = { ...origin, x: files.indexOf(origin.file), y: ranks.indexOf(origin.rank) }
-    const buildOrigin = (origin) => `${origin}${file}${rank}`
-    const buildOriginName = ([{ name, capture }]) => buildOrigin(`${name}${capture ? 'x' : ''}`)
-    const buildOriginNameAndFile = ([{ name, x, capture }]) =>
-      buildOrigin(`${name}${files[x]}${capture ? 'x' : ''}`)
-    const buildOriginNameFileAndRank = ([{ name, y, x, capture }]) =>
-      buildOrigin(`${name}${files[x]}${ranks[y]}${capture ? 'x' : ''}`)
+    const buildOrigin = (origin, check) => `${origin}${file}${rank}${check ? '+' : ''}`
+    const buildOriginName = ([{ name, capture, check }]) =>
+      buildOrigin(`${name}${capture ? 'x' : ''}`, check)
+    const buildOriginNameAndFile = ([{ name, x, capture, check }]) =>
+      buildOrigin(`${name}${files[x]}${capture ? 'x' : ''}`, check)
+    const buildOriginNameFileAndRank = ([{ name, y, x, capture, check }]) =>
+      buildOrigin(`${name}${files[x]}${ranks[y]}${capture ? 'x' : ''}`, check)
     const buildCastlingSAN = ({ castling: { isKingside, isQueenside } }) =>
       (isKingside && '0-0') || (isQueenside && '0-0-0')
-    const buildEnPassantSAN = ({ x }) => buildOrigin(`${files[x]}x`)
+    const buildEnPassantSAN = ({ x, check }) => buildOrigin(`${files[x]}x`, check)
 
     return pipeCond(
       [
@@ -224,6 +220,7 @@ export const game = ({
     board,
     legalMoves,
     capturedPieces,
+    isInCheck,
     ...FEN,
     ...ret,
   })
@@ -247,6 +244,7 @@ export const game = ({
         [
           helpers.isCapture,
           pipe(
+            operation(check(helpers.isCheck, addCheck, removeCheck)),
             getOrigins,
             check(helpers.isDisambiguous, pipe(helpers.extractOrigin, capture, afterMove))
           ),
@@ -255,6 +253,7 @@ export const game = ({
         [
           identity,
           pipe(
+            operation(check(helpers.isCheck, addCheck, removeCheck)),
             getOrigins,
             check(helpers.isDisambiguous, pipe(helpers.extractOrigin, move, afterMove))
           ),

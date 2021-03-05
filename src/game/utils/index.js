@@ -18,6 +18,10 @@ export const log = (label) => (args) => {
   console.log(label, args)
   return args
 }
+export const operation = (fn) => (args) => {
+  fn(args)
+  return args
+}
 
 export const check = (condition, yes, no = identity) => (input) =>
   condition(input) ? yes(input) : no(input)

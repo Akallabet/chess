@@ -1,4 +1,4 @@
-import { cond, identity, pipeCond } from '.'
+import { flatten, identity, pipeCond } from '.'
 
 test('pipe cond', () => {
   const greaterThan10 = (n) => n > 10
@@ -15,4 +15,20 @@ test('pipe cond', () => {
   expect(threshold(11)).toEqual('first')
   expect(threshold(8)).toEqual('second')
   expect(threshold(4)).toEqual('third')
+})
+
+test.each([
+  [
+    [
+      [1, 2, 3],
+      [4, 5, 6],
+    ],
+    [1, 2, 3, 4, 5, 6],
+  ],
+  [
+    [[[1, 2, 3]], [4, 5, 6]],
+    [1, 2, 3, 4, 5, 6],
+  ],
+])('flatten %o => %o', (input, output) => {
+  expect(flatten(input)).toEqual(output)
 })

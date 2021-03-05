@@ -7,7 +7,7 @@ import {
 } from './constants'
 
 import * as helpers from './helpers'
-import { check, identity, isDefined, operation, pipe, pipeCond, when } from './utils'
+import { ifElse, identity, isDefined, operation, pipe, pipeCond, when } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -20,7 +20,7 @@ export const game = ({
   NAMES = defaultNames,
   rules = defaultRules,
 }) => {
-  const getMoves = helpers.buildGetMoves(rules)
+  const getMoves = helpers.buildGetMoves(rules, NAMES)
   const actions = helpers.createActions({ pieces, ranks, files })
   const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
   const fromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
@@ -28,8 +28,16 @@ export const game = ({
 
   let FEN = helpers.buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || helpers.buildBoardFromFEN({ pieces, COLORS, ...FEN })
-  let legalMoves = helpers.generateMoves({ getMoves, COLORS, ranks, files, board, ...FEN })
   let isInCheck = false
+  let legalMoves = helpers.generateMoves({
+    getMoves,
+    COLORS,
+    ranks,
+    files,
+    board,
+    isInCheck,
+    ...FEN,
+  })
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
@@ -50,15 +58,15 @@ export const game = ({
   const removeCastling = () => updateCastling('-')
   const disallowCastling = pipe(
     helpers.removeCastlingColor,
-    check(isDefined, updateCastling, removeCastling)
+    ifElse(isDefined, updateCastling, removeCastling)
   )
   const disallowKingsideCastling = pipe(
     helpers.removeKingsideCastlingColor,
-    check(isDefined, updateCastling, removeCastling)
+    ifElse(isDefined, updateCastling, removeCastling)
   )
   const disallowQueensideCastling = pipe(
     helpers.removeQueensideCastlingColor,
-    check(isDefined, updateCastling, removeCastling)
+    ifElse(isDefined, updateCastling, removeCastling)
   )
 
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
@@ -79,7 +87,7 @@ export const game = ({
     board,
   })
 
-  const afterMove = pipe(changeTurn, check(isWhiteTurn, incrementFullmove), updateLegalMoves)
+  const afterMove = pipe(changeTurn, ifElse(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
   const castling = (args) => {
     const executeCastling = ({ king, rook, destination }) =>
@@ -142,7 +150,7 @@ export const game = ({
 
   const capture = ({ y, x, destination }) => {
     pipe(
-      check(isEnPassant(destination), helpers.removePieceFromBoard({ y, x: destination.x })),
+      ifElse(isEnPassant(destination), helpers.removePieceFromBoard({ y, x: destination.x })),
       helpers.removePieceFromBoard({ y, x }),
       helpers.addPieceToBoard({ ...board[y][x], ...destination }),
       updateBoard,
@@ -227,35 +235,35 @@ export const game = ({
 
   const ret = {
     getInfo,
-    moves: pipe(fromSAN, check(isValidColor, pipe(getPieceMoves, helpers.highligthMoves), board)),
+    moves: pipe(fromSAN, ifElse(isValidColor, pipe(getPieceMoves, helpers.highligthMoves), board)),
     move: pipe(
       fromSAN,
       pipeCond(
         [
           helpers.isKingsideCastlingMove,
-          check(isKingsideCastlingAvailable, pipe(castling, afterMove)),
+          ifElse(isKingsideCastlingAvailable, pipe(castling, afterMove)),
           identity,
         ],
         [
           helpers.isQueensideCastlingMove,
-          check(isQueensideCastlingAvailable, pipe(castling, afterMove)),
+          ifElse(isQueensideCastlingAvailable, pipe(castling, afterMove)),
           identity,
         ],
         [
           helpers.isCapture,
           pipe(
-            operation(check(helpers.isCheck, addCheck, removeCheck)),
+            operation(ifElse(helpers.isCheck, addCheck, removeCheck)),
             getOrigins,
-            check(helpers.isDisambiguous, pipe(helpers.extractOrigin, capture, afterMove))
+            ifElse(helpers.isDisambiguous, pipe(helpers.extractOrigin, capture, afterMove))
           ),
           identity,
         ],
         [
           identity,
           pipe(
-            operation(check(helpers.isCheck, addCheck, removeCheck)),
+            operation(ifElse(helpers.isCheck, addCheck, removeCheck)),
             getOrigins,
-            check(helpers.isDisambiguous, pipe(helpers.extractOrigin, move, afterMove))
+            ifElse(helpers.isDisambiguous, pipe(helpers.extractOrigin, move, afterMove))
           ),
           identity,
         ]

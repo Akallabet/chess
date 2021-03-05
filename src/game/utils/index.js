@@ -22,6 +22,8 @@ export const operation = (fn) => (args) => {
   fn(args)
   return args
 }
+export const flatten = (arr) =>
+  arr.reduce((ret, res) => [...ret, ...(Array.isArray(...res) ? flatten(res) : res)], [])
 
-export const check = (condition, yes, no = identity) => (input) =>
-  condition(input) ? yes(input) : no(input)
+export const ifElse = (condition, then, otherwise = identity) => (input) =>
+  condition(input) ? then(input) : otherwise(input)

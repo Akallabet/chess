@@ -407,9 +407,12 @@ test('it should flag a pawn as en-passant if it moves of 2 squares at once', () 
   expect(move('c6').FEN).toEqual('rnbqkbnr/pp1ppppp/2p5/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2')
 })
 
-test('it should put the king under check', () => {
+test.skip('it should check the black king', () => {
   const { move } = game({ FEN: 'rnbqkbnr/ppp1p1pp/5p2/3p4/3P4/2P5/PP2PPPP/RNBQKBNR w KQkq - 0 3' })
-  const { FEN, isInCheck } = move('Qa4+')
+  const { FEN, isInCheck, ...firstMove } = move('Qa4+')
   expect(FEN).toEqual('rnbqkbnr/ppp1p1pp/5p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR b KQkq - 0 3')
   expect(isInCheck).toBeTruthy()
+  expect(firstMove.move('Be6').FEN).toEqual(
+    'rnbqkbnr/ppp1p1pp/5p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR b KQkq - 0 3'
+  )
 })

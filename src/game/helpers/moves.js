@@ -1,40 +1,33 @@
-import { pipe } from '../utils'
+import { pipe, flatten } from '../utils'
 
-const createEmptyMoves = ({ ranks, files, ...args }) => {
-  const moves = {}
-  ranks.forEach((rank) => {
-    files.forEach((file) => {
-      moves[`${file}${rank}`] = []
-    })
-  })
-  return { moves, ranks, files, ...args }
-}
-
-const createBoardMoves = ({ getMoves, COLORS, files, ranks, board, moves, ...FEN }) => {
+const getNextMoves = (args) => {
+  const { getMoves, COLORS, board, ...FEN } = args
   const { activeColor } = FEN
-  board
-    .reduce(
-      (pieces, row, y) => [
-        ...pieces,
-        ...row.map(({ name, color }, x) =>
-          name && color === activeColor
-            ? getMoves({ y, x, COLORS, board, FEN }).map((move) => ({
-                ...move,
-                origin: { name, x, y },
-              }))
-            : []
-        ),
-      ],
-      []
-    )
-    .reduce((allMoves, moves) => [...allMoves, ...moves], [])
-    .forEach(({ y, x, origin, ...move }) =>
-      moves[`${files[x]}${ranks[y]}`].push({ ...origin, ...move, destination: { y, x } })
-    )
-  return moves
+  return board.map((row, y) =>
+    row
+      .map((square, x) => ({ ...square, x }))
+      .filter(({ color }) => color === activeColor)
+      .map(({ name, x }) =>
+        getMoves({ y, x, COLORS, board, FEN }).map((move) => ({
+          ...move,
+          origin: { name, x, y },
+        }))
+      )
+  )
 }
 
-export const generateMoves = pipe(createEmptyMoves, createBoardMoves)
+const mapDestinations = (ranks, files) => (nextMoves) =>
+  files.reduce((moves, file, X) => {
+    ranks.forEach((rank, Y) => {
+      moves[`${file}${rank}`] = nextMoves
+        .filter(({ y, x }) => Y === y && X === x)
+        .map(({ y, x, origin, ...move }) => ({ ...origin, ...move, destination: { y, x } }))
+    })
+    return moves
+  }, {})
+
+export const generateMoves = ({ ranks, files, ...args }) =>
+  pipe(getNextMoves, flatten, mapDestinations(ranks, files))(args)
 
 const byName = (name) => (origin) => (name ? origin.name === name : true)
 const byFile = (x) => (origin) => (x ? origin.x === x : true)
@@ -54,9 +47,9 @@ const isWithinBoard = (board, { y, x }) => board[y] && board[y][x]
 const isValidStep = (board) => ({ y, x, ...args }) => !board[y][x].name && { y, x, ...args }
 const isValidCapture = (board, color) => ({ y, x, ...args }) =>
   board[y][x].name && board[y][x].color !== color && { y, x, capture: true, ...args }
-const isValidCheck = (board, color) => ({ y, x, ...args }) =>
+const isValidCheck = (board, color, NAMES) => ({ y, x, ...args }) =>
   isWithinBoard(board, { y, x }) &&
-  board[y][x].name === 'K' &&
+  board[y][x].name === NAMES.K &&
   board[y][x].color !== color && { y, x, check: true, ...args }
 const isValidMove = (board, color) => ({ y, x }) =>
   isValidStep(board)({ y, x }) || isValidCapture(board, color)({ y, x })
@@ -80,7 +73,7 @@ const validate = (board, { y, x }, isValid, moves) => {
   return ret
 }
 
-export const buildGetMoves = (rules) => (args) => {
+export const buildGetMoves = (rules, NAMES) => (args) => {
   const {
     y,
     x,
@@ -89,7 +82,7 @@ export const buildGetMoves = (rules) => (args) => {
   } = args
 
   const validateCheck = (moves) => (position) => {
-    const hasCheck = validate(board, position, isValidCheck(board, activeColor), moves).find(
+    const hasCheck = validate(board, position, isValidCheck(board, activeColor, NAMES), moves).find(
       ({ check }) => check
     )
     return hasCheck ? { ...position, check: true } : position
@@ -99,8 +92,10 @@ export const buildGetMoves = (rules) => (args) => {
 
   const ret = [
     ...validate(board, { y, x }, isValidMove(board, activeColor), moves).map(validateCheck(moves)),
-    ...validate(board, { y, x }, isValidStep(board), steps),
-    ...validate(board, { y, x }, isValidCapture(board, activeColor), captures),
+    ...validate(board, { y, x }, isValidStep(board), steps).map(validateCheck(moves)),
+    ...validate(board, { y, x }, isValidCapture(board, activeColor), captures).map(
+      validateCheck(moves)
+    ),
   ]
   return ret
 }

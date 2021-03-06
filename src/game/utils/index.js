@@ -14,8 +14,8 @@ export const identity = (input) => input
 export const falsy = () => false
 export const isTruthy = (value) => !!value
 export const isFalsy = (value) => !value
-export const log = (label) => (args) => {
-  console.log(label, args)
+export const log = (label, parse = identity) => (args) => {
+  console.log(label, parse(args))
   return args
 }
 export const operation = (fn) => (args) => {

@@ -1,12 +1,9 @@
 import { isTruthy } from '../utils'
 
-export { findPosition } from './board'
+export { findPosition, movePiece, addPieceToBoard, removePieceFromBoard, cleanBoard } from './board'
 export { buildBoardFromFEN } from './build-board-from-FEN'
 export { buildFENPiecePlacementFromBoard } from './buils-FEN-piece-placement-from-board'
-export { addPieceToBoard } from './add-piece-to-board'
 export { highligthMovesToBoard as highligthMoves } from './highlight-moves-to-board'
-export { cleanBoard } from './clean-board'
-export { removePieceFromBoard } from './remove-piece-from-board'
 export { createActions } from './create-actions'
 export {
   generateMoves,
@@ -31,4 +28,4 @@ export const isCastlingMove = ({ isCastling }) => isCastling
 export const isKingsideCastlingMove = ({ isKingside }) => isTruthy(isKingside)
 export const isQueensideCastlingMove = ({ isQueenside }) => isTruthy(isQueenside)
 export const isCapture = ({ capture }) => isTruthy(capture)
-export const isCheck = ({ check }) => isTruthy(check)
+export const isCheck = ({ check }) => () => isTruthy(check)

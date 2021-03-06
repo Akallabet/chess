@@ -7,7 +7,7 @@ import {
 } from './constants'
 
 import * as helpers from './helpers'
-import { ifElse, identity, isDefined, operation, pipe, pipeCond, when } from './utils'
+import { ifElse, identity, isDefined, pipe, pipeCond, when } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -148,22 +148,21 @@ export const game = ({
     y: activeColor === colors.w ? y + 1 : y - 1,
   })
 
-  const capture = ({ y, x, destination }) => {
+  const capture = ({ y, x, destination, ...move }) => {
     pipe(
       ifElse(isEnPassant(destination), helpers.removePieceFromBoard({ y, x: destination.x })),
-      helpers.removePieceFromBoard({ y, x }),
-      helpers.addPieceToBoard({ ...board[y][x], ...destination }),
+      helpers.movePiece(board[y][x], { y, x }, destination),
       updateBoard,
       helpers.buildFENPiecePlacementFromBoard({ pieces, COLORS }),
       updatePiecePlacement,
-      removeEnPassant
+      removeEnPassant,
+      ifElse(helpers.isCheck(move), addCheck, removeCheck)
     )(board)
   }
 
-  const move = ({ y, x, destination }) => {
+  const move = ({ y, x, destination, ...move }) => {
     pipe(
-      helpers.removePieceFromBoard({ y, x }),
-      helpers.addPieceToBoard({ ...board[y][x], ...destination }),
+      helpers.movePiece(board[y][x], { y, x }, destination),
       updateBoard,
       helpers.buildFENPiecePlacementFromBoard({ pieces, COLORS }),
       updatePiecePlacement,
@@ -185,7 +184,8 @@ export const game = ({
           pipe(getEnPassantSquare(destination, COLORS), updateEnPassant),
           identity,
         ]
-      )
+      ),
+      ifElse(helpers.isCheck(move), addCheck, removeCheck)
     )(board)
   }
 
@@ -252,7 +252,6 @@ export const game = ({
         [
           helpers.isCapture,
           pipe(
-            operation(ifElse(helpers.isCheck, addCheck, removeCheck)),
             getOrigins,
             ifElse(helpers.isDisambiguous, pipe(helpers.extractOrigin, capture, afterMove))
           ),
@@ -261,7 +260,6 @@ export const game = ({
         [
           identity,
           pipe(
-            operation(ifElse(helpers.isCheck, addCheck, removeCheck)),
             getOrigins,
             ifElse(helpers.isDisambiguous, pipe(helpers.extractOrigin, move, afterMove))
           ),

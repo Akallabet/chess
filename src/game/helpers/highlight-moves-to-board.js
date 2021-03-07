@@ -1,4 +1,4 @@
-export const highligthMovesToBoard = ({ moves, board }) =>
+export const highligthMovesToBoard = (board) => (moves) =>
   board.map((row, y) =>
     row
       .map(({ meta = {}, ...square }, x) => {

@@ -76,27 +76,16 @@ export const game = ({
   const isCastlingAvailable = () => isKingsideCastlingAvailable() || isQueensideCastlingAvailable()
   const isWhiteTurn = ({ activeColor }) => activeColor === COLORS.w
 
-  const getOrigins = ({ name, originY, originX, y, x }) =>
-    pipe(
-      helpers.filterByName(name),
-      helpers.filterByFile(originX),
-      helpers.filterByRank(originY)
-    )(legalMoves[`${files[x]}${ranks[y]}`])
+  const getOrigins = (args) => helpers.getOrigins(files, ranks, legalMoves)(args)
 
-  const getPieceMoves = ({ x, y }) => {
-    return {
-      moves: Object.keys(legalMoves)
-        .reduce(
-          (moves, dest) => [
-            ...moves,
-            ...legalMoves[dest].filter((origin) => y === origin.y && x === origin.x),
-          ],
-          []
-        )
-        .map(({ destination }) => destination),
-      board,
-    }
-  }
+  const highligthMoves = (origin) =>
+    pipe(
+      ifElse(
+        isValidColor,
+        pipe(helpers.getPieceMoves(legalMoves), helpers.highligthMoves(board)),
+        () => board
+      )
+    )(origin)
 
   const afterMove = pipe(changeTurn, ifElse(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
@@ -246,10 +235,7 @@ export const game = ({
 
   const ret = {
     getInfo,
-    moves: pipe(
-      fromSAN,
-      ifElse(isValidColor, pipe(getPieceMoves, helpers.highligthMoves), () => board)
-    ),
+    moves: pipe(fromSAN, highligthMoves),
     move: pipe(
       fromSAN,
       pipeCond(

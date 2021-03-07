@@ -7,6 +7,8 @@ export { highligthMovesToBoard as highligthMoves } from './highlight-moves-to-bo
 export { createActions } from './create-actions'
 export {
   generateLegalMoves,
+  getPieceMoves,
+  getOrigins,
   filterByFile,
   filterByName,
   filterByRank,

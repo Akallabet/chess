@@ -1,3 +1,4 @@
+import { pipe } from '../../utils'
 const byName = (name) => (origin) => (name ? origin.name === name : true)
 const byFile = (x) => (origin) => (x ? origin.x === x : true)
 const byRank = (y) => (origin) => (y ? origin.y === y : true)
@@ -13,3 +14,11 @@ export const findByCastling = (piece) => (origins) => origins.find(byCastling(pi
 export const findByEnPassant = (piece) => (origins) => origins.find(byEnPassant(piece))
 
 export { generateLegalMoves } from './generate-legal-moves'
+export { getPieceMoves } from './get-piece-moves'
+
+export const getOrigins = (files, ranks, legalMoves) => ({ name, originY, originX, y, x }) =>
+  pipe(
+    filterByName(name),
+    filterByFile(originX),
+    filterByRank(originY)
+  )(legalMoves[`${files[x]}${ranks[y]}`])

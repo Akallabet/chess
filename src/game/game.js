@@ -7,7 +7,7 @@ import {
 } from './constants'
 
 import * as helpers from './helpers'
-import { ifElse, identity, isDefined, pipe, pipeCond, when } from './utils'
+import { ifElse, identity, isDefined, pipe, pipeCond, when, noop } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -29,9 +29,10 @@ export const game = ({
   let FEN = helpers.buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || helpers.buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let isInCheck = false
-  let legalMoves = helpers.generateMoves({
+  let legalMoves = helpers.generateLegalMoves({
     getMoves,
     COLORS,
+    NAMES,
     ranks,
     files,
     board,
@@ -50,7 +51,15 @@ export const game = ({
   const updateCastling = (castling) => updateFEN({ castling })
   const updateBoard = (newBoard) => (board = newBoard)
   const updateLegalMoves = ({ ...FENInfo }) =>
-    (legalMoves = helpers.generateMoves({ getMoves, COLORS, ranks, files, board, ...FENInfo }))
+    (legalMoves = helpers.generateLegalMoves({
+      getMoves,
+      COLORS,
+      NAMES,
+      ranks,
+      files,
+      board,
+      ...FENInfo,
+    }))
   const removeCheck = () => (isInCheck = false)
   const addCheck = () => (isInCheck = true)
 
@@ -235,7 +244,10 @@ export const game = ({
 
   const ret = {
     getInfo,
-    moves: pipe(fromSAN, ifElse(isValidColor, pipe(getPieceMoves, helpers.highligthMoves), board)),
+    moves: pipe(
+      fromSAN,
+      ifElse(isValidColor, pipe(getPieceMoves, helpers.highligthMoves), () => board)
+    ),
     move: pipe(
       fromSAN,
       pipeCond(

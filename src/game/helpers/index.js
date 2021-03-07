@@ -6,7 +6,7 @@ export { buildFENPiecePlacementFromBoard } from './buils-FEN-piece-placement-fro
 export { highligthMovesToBoard as highligthMoves } from './highlight-moves-to-board'
 export { createActions } from './create-actions'
 export {
-  generateMoves,
+  generateLegalMoves,
   filterByFile,
   filterByName,
   filterByRank,

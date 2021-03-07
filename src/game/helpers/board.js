@@ -32,5 +32,5 @@ export const removePieceFromBoard = ({ y, x }) => (board) => [
   ...board.slice(y + 1),
 ]
 
-export const movePiece = (piece, origin, destination) =>
+export const movePiece = (piece = { name: '', color: '', y: 0, x: 0 }, origin, destination) =>
   pipe(cleanBoard, removePieceFromBoard(origin), addPieceToBoard({ ...piece, ...destination }))

@@ -12,5 +12,5 @@ export const filterByRank = (y) => (origins) => origins.filter(byRank(y))
 export const findByCastling = (piece) => (origins) => origins.find(byCastling(piece))
 export const findByEnPassant = (piece) => (origins) => origins.find(byEnPassant(piece))
 
-export { generateMoves } from './generate-moves'
+export { generateLegalMoves } from './generate-legal-moves'
 export { buildGetMoves } from './moves'

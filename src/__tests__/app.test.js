@@ -74,6 +74,17 @@ test('Should deselect a piece and select another one by clicking over it', async
   expect(queryByLabelText('P w d2')).toBeNull()
 })
 
+test('Should not select a piece of the wrong color', async () => {
+  const { getByTestId, getByLabelText, queryByLabelText } = render(
+    <App FEN="8/2p5/8/8/8/8/2PP4/8 w KQkq - 0 1" />
+  )
+  fireEvent.click(getByLabelText('P b c7'))
+  fireEvent.click(getByTestId('c6'))
+
+  expect(getByLabelText('P b c7')).toBeDefined()
+  expect(queryByLabelText('P b c6')).toBeNull()
+})
+
 test('Should capture a pawn', async () => {
   const { getByTestId, getByLabelText, queryByLabelText } = render(
     <App FEN="8/2p5/8/8/8/8/1P6/8 b KQkq - 0 1" />

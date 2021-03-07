@@ -12,7 +12,6 @@ export {
   filterByRank,
   findByCastling,
   findByEnPassant,
-  buildGetMoves,
 } from './moves'
 export {
   buildFENObject,

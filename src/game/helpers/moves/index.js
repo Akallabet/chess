@@ -13,4 +13,3 @@ export const findByCastling = (piece) => (origins) => origins.find(byCastling(pi
 export const findByEnPassant = (piece) => (origins) => origins.find(byEnPassant(piece))
 
 export { generateLegalMoves } from './generate-legal-moves'
-export { buildGetMoves } from './moves'

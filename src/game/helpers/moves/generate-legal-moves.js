@@ -1,8 +1,9 @@
-import { pipe, flatten, log } from '../../utils'
+import { pipe, flatten } from '../../utils'
 import { cleanBoard, findPosition, movePiece } from '../board'
+import { getMoves } from './moves'
 
 const getLegalMoves = (args) => {
-  const { getMoves, COLORS, board, ...FEN } = args
+  const { rules, COLORS, NAMES, board, ...FEN } = args
   const { activeColor } = FEN
   return flatten(
     board.map((row, y) =>
@@ -10,7 +11,7 @@ const getLegalMoves = (args) => {
         .map((square, x) => ({ ...square, x }))
         .filter(({ color }) => color === activeColor)
         .map(({ name, x }) =>
-          getMoves({ y, x, COLORS, board, FEN }).map((move) => ({
+          getMoves(rules, NAMES, { y, x, COLORS, board, FEN }).map((move) => ({
             ...move,
             origin: { name, x, y },
           }))
@@ -31,33 +32,28 @@ const mapDestinations = (ranks, files) => (legalMoves) =>
     return moves
   }, {})
 
-const filterLegalMoves = (args) => (moves) => {
-  const { board, COLORS, NAMES, activeColor } = args
-  // const color = activeColor === COLORS.w ? COLORS.b : COLORS.w
-  console.log(moves)
-  for (const [[y, x], origins] of moves) {
-    const destination = { y, x }
-
-    origins.forEach(({ _destination, ...origin }) => {
-      // console.log(origin)
-      const newBoard = pipe(
-        cleanBoard,
-        movePiece(board[origin.y][origin.x], origin, destination)
-      )(board)
-      const legalMoves = getLegalMoves({
-        ...args,
-        board: newBoard,
-        activeColor: activeColor === COLORS.w ? COLORS.b : COLORS.w,
-      })
-      const king = findPosition(newBoard, NAMES.K, activeColor)
-      // console.log(king)
-      // console.log(legalMoves.keys())
+const filterLegalMoves = ({ board, COLORS, NAMES, activeColor, ...args }) => (moves) =>
+  new Map(
+    Array.from(moves).map(([[y, x], origins]) => {
+      const destination = { y: Number(y), x: Number(x) }
+      return [
+        `${y}${x}`,
+        origins.filter(({ _destination, ...origin }) => {
+          const piece = { ...board[origin.y][origin.x] }
+          const newBoard = pipe(cleanBoard, movePiece(piece, origin, destination))(board)
+          const legalMoves = getLegalMoves({
+            ...args,
+            COLORS,
+            NAMES,
+            board: newBoard,
+            activeColor: activeColor === COLORS.w ? COLORS.b : COLORS.w,
+          })
+          const king = findPosition(newBoard, NAMES.K, activeColor)
+          return king ? !legalMoves.get(`${king.y}${king.x}`) : true
+        }),
+      ]
     })
-    // console.log([y, x], origins)
-  }
-  // console.log(moves)
-  return moves
-}
+  )
 
 export const generateLegalMoves = ({ ranks, files, ...args }) =>
-  pipe(getLegalMoves, /*filterLegalMoves(args),*/ mapDestinations(ranks, files))(args)
+  pipe(getLegalMoves, filterLegalMoves(args), mapDestinations(ranks, files))(args)

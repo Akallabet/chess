@@ -7,7 +7,7 @@ import {
 } from './constants'
 
 import * as helpers from './helpers'
-import { ifElse, identity, isDefined, pipe, pipeCond, when, noop } from './utils'
+import { ifElse, identity, isDefined, pipe, pipeCond, when } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -20,8 +20,17 @@ export const game = ({
   NAMES = defaultNames,
   rules = defaultRules,
 }) => {
-  const getMoves = helpers.buildGetMoves(rules, NAMES)
   const actions = helpers.createActions({ pieces, ranks, files })
+  const generateLegalMoves = (FEN) =>
+    (legalMoves = helpers.generateLegalMoves({
+      rules,
+      COLORS,
+      NAMES,
+      ranks,
+      files,
+      board,
+      ...FEN,
+    }))
   const matchNotation = (notation) => ([regexp]) => new RegExp(regexp, 'g').test(notation)
   const fromSAN = (notation) => actions.find(matchNotation(notation))[1](notation)
   const toSAN = ({ y, x }) => `${files[x]}${ranks[y]}`
@@ -29,16 +38,7 @@ export const game = ({
   let FEN = helpers.buildFENObject(initialFEN)(fromSAN)
   let board = initialBoard || helpers.buildBoardFromFEN({ pieces, COLORS, ...FEN })
   let isInCheck = false
-  let legalMoves = helpers.generateLegalMoves({
-    getMoves,
-    COLORS,
-    NAMES,
-    ranks,
-    files,
-    board,
-    isInCheck,
-    ...FEN,
-  })
+  let legalMoves = generateLegalMoves(FEN)
   const capturedPieces = initialCapturedPieces || []
 
   const updateFEN = (parts) => (FEN = { ...FEN, ...parts })
@@ -50,16 +50,7 @@ export const game = ({
   const updateEnPassant = (enPassant) => updateFEN({ enPassant })
   const updateCastling = (castling) => updateFEN({ castling })
   const updateBoard = (newBoard) => (board = newBoard)
-  const updateLegalMoves = ({ ...FENInfo }) =>
-    (legalMoves = helpers.generateLegalMoves({
-      getMoves,
-      COLORS,
-      NAMES,
-      ranks,
-      files,
-      board,
-      ...FENInfo,
-    }))
+  const updateLegalMoves = (args) => (legalMoves = generateLegalMoves(args))
   const removeCheck = () => (isInCheck = false)
   const addCheck = () => (isInCheck = true)
 
@@ -78,6 +69,7 @@ export const game = ({
     ifElse(isDefined, updateCastling, removeCastling)
   )
 
+  const isLegalMove = ({ y, x }) => legalMoves[`${files[x]}${ranks[y]}`].length
   const isValidColor = ({ y, x }) => board[y][x].color === FEN.activeColor
   const isKingsideCastlingAvailable = () => FEN.castling[FEN.activeColor].isKingside
   const isQueensideCastlingAvailable = () => FEN.castling[FEN.activeColor].isQueenside
@@ -91,10 +83,20 @@ export const game = ({
       helpers.filterByRank(originY)
     )(legalMoves[`${files[x]}${ranks[y]}`])
 
-  const getPieceMoves = ({ x, y }) => ({
-    moves: getMoves({ y, x, board, COLORS, FEN }),
-    board,
-  })
+  const getPieceMoves = ({ x, y }) => {
+    return {
+      moves: Object.keys(legalMoves)
+        .reduce(
+          (moves, dest) => [
+            ...moves,
+            ...legalMoves[dest].filter((origin) => y === origin.y && x === origin.x),
+          ],
+          []
+        )
+        .map(({ destination }) => destination),
+      board,
+    }
+  }
 
   const afterMove = pipe(changeTurn, ifElse(isWhiteTurn, incrementFullmove), updateLegalMoves)
 
@@ -262,7 +264,7 @@ export const game = ({
           identity,
         ],
         [
-          helpers.isCapture,
+          when(helpers.isCapture, isLegalMove),
           pipe(
             getOrigins,
             ifElse(helpers.isDisambiguous, pipe(helpers.extractOrigin, capture, afterMove))
@@ -270,7 +272,7 @@ export const game = ({
           identity,
         ],
         [
-          identity,
+          isLegalMove,
           pipe(
             getOrigins,
             ifElse(helpers.isDisambiguous, pipe(helpers.extractOrigin, move, afterMove))

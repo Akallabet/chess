@@ -28,7 +28,7 @@ const validate = (board, { y, x }, isValid, moves) => {
   return ret
 }
 
-export const buildGetMoves = (rules, NAMES) => (args) => {
+export const getMoves = (rules, NAMES, args) => {
   const {
     y,
     x,

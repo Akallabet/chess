@@ -414,12 +414,17 @@ test('it should check the black king', () => {
   expect(isInCheck).toBeTruthy()
 })
 
-test.skip('it should only move pieces that remove check', () => {
-  const { isInCheck, move } = game({
+test('it should only move pieces that remove check', () => {
+  const { move } = game({
     FEN: 'rnbqkbnr/ppp1p1pp/5p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR b KQkq - 0 3',
   })
-  expect(isInCheck).toBeTruthy()
   expect(move('Be6').FEN).toEqual(
     'rnbqkbnr/ppp1p1pp/5p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR b KQkq - 0 3'
+  )
+  expect(move('Ke7').FEN).toEqual(
+    'rnbqkbnr/ppp1p1pp/5p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR b KQkq - 0 3'
+  )
+  expect(move('Nc6').FEN).toEqual(
+    'r1bqkbnr/ppp1p1pp/2n2p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR w KQkq - 0 4'
   )
 })

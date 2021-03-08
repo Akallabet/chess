@@ -428,3 +428,10 @@ test('it should only move pieces that remove check', () => {
     'r1bqkbnr/ppp1p1pp/2n2p2/3p4/Q2P4/2P5/PP2PPPP/RNB1KBNR w KQkq - 0 4'
   )
 })
+
+test('it should promote the pawn to queen', () => {
+  const { move } = game({
+    FEN: '8/2P5/8/8/8/8/8/8 w KQkq - 0 1',
+  })
+  expect(move('c8Q').FEN).toEqual('2Q5/8/8/8/8/8/8/8 b KQkq - 0 1')
+})

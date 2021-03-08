@@ -11,13 +11,31 @@ const topRight = ({ y, x }) => ({ y: y - 1, x: x + 1 })
 const bottomRight = ({ y, x }) => ({ y: y + 1, x: x + 1 })
 const bottomLeft = ({ y, x }) => ({ y: y + 1, x: x - 1 })
 
-export const pawn = ({ COLORS, y, x, FEN: { enPassant, activeColor } }) => {
-  const start = activeColor === COLORS.w ? 6 : 1
+export const pawn = ({ COLORS, NAMES, y, x, FEN: { enPassant, activeColor } }) => {
+  const startingSquare = activeColor === COLORS.w ? 6 : 1
+  const promotionRow = activeColor === COLORS.w ? 1 : 6
+
   const step = (row) => (activeColor === COLORS.w ? row - 1 : row + 1)
 
-  const limit = y === start ? twoSquares : oneSquare
+  const limit = y === startingSquare ? twoSquares : oneSquare
 
   const steps = [[activeColor === COLORS.w ? top : bottom, limit]]
+  const promotions = []
+
+  if (y === promotionRow) {
+    promotions.push([
+      ({ y, x }) => ({ x, y: activeColor === COLORS.w ? y - 1 : y + 1, promotion: NAMES.Q }),
+    ])
+    promotions.push([
+      ({ y, x }) => ({ x, y: activeColor === COLORS.w ? y - 1 : y + 1, promotion: NAMES.R }),
+    ])
+    promotions.push([
+      ({ y, x }) => ({ x, y: activeColor === COLORS.w ? y - 1 : y + 1, promotion: NAMES.B }),
+    ])
+    promotions.push([
+      ({ y, x }) => ({ x, y: activeColor === COLORS.w ? y - 1 : y + 1, promotion: NAMES.N }),
+    ])
+  }
 
   if (enPassant && enPassant.y === step(y) && enPassant.x === x + 1)
     steps.push([
@@ -30,7 +48,7 @@ export const pawn = ({ COLORS, y, x, FEN: { enPassant, activeColor } }) => {
       oneSquare,
     ])
   return {
-    steps,
+    steps: promotions.length ? promotions : steps,
     captures: [
       [activeColor === COLORS.w ? topRight : bottomRight, oneSquare],
       [activeColor === COLORS.w ? topLeft : bottomLeft, oneSquare],

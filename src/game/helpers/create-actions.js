@@ -9,6 +9,16 @@ export const createActions = ({ pieces, ranks, files }) => [
     }),
   ],
   [
+    `^[${files.join('')}]{1}[${ranks.join('')}]{1}[${Object.values(pieces)}]{1}[+]*$`,
+    ([file, rank, promotion, check]) => ({
+      name: pieces.P,
+      y: ranks.indexOf(rank),
+      x: files.indexOf(file),
+      promotion,
+      check,
+    }),
+  ],
+  [
     `^[${Object.values(pieces)}]{1}[${files.join('')}]{1}[${ranks.join('')}]{1}[+]*$`,
     ([name, file, rank, check]) => ({
       name,

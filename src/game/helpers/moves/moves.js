@@ -43,7 +43,7 @@ export const getMoves = (rules, NAMES, args) => {
     return hasCheck ? { ...position, check: true } : position
   }
 
-  const { moves = [], steps = [], captures = [] } = rules[board[y][x].name](args)
+  const { moves = [], steps = [], captures = [] } = rules[board[y][x].name]({ ...args, NAMES })
 
   const ret = [
     ...validate(board, { y, x }, isValidMove(board, activeColor), moves).map(validateCheck(moves)),

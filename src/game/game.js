@@ -7,7 +7,7 @@ import {
 } from './constants'
 
 import * as helpers from './helpers'
-import { ifElse, identity, isDefined, pipe, pipeCond, when } from './utils'
+import { ifElse, identity, isDefined, pipe, pipeCond, when, isTruthy } from './utils'
 
 export const game = ({
   FEN: initialFEN,
@@ -160,9 +160,17 @@ export const game = ({
     )(board)
   }
 
-  const move = ({ y, x, destination, ...move }) => {
+  // const isPromotion = (promotion) => () => isTruthy(promotion)
+
+  const move = ({ y, x, destination, promotion, ...move }) => {
+    // console.log('is promotion', promotion)
     pipe(
       helpers.movePiece(board[y][x], { y, x }, destination),
+      ifElse(
+        () => isTruthy(promotion),
+        helpers.addPieceToBoard({ name: promotion, color: FEN.activeColor, ...destination }),
+        identity
+      ),
       updateBoard,
       helpers.buildFENPiecePlacementFromBoard({ pieces, COLORS }),
       updatePiecePlacement,

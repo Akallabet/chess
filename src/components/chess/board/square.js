@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Piece } from './piece'
+import { BoardPiece } from './board-piece'
 import { withGame } from '../game'
 import { bool, func, node, shape, string } from 'prop-types'
 
@@ -12,12 +12,12 @@ export const Square = withGame(
     rank,
     file,
     children,
-    game: { getSAN, activePiece, moveActivePiece, openPromotionModal },
+    game: { getSAN, activePiece, moveActivePiece, setPromotionPieces },
   }) => {
     const handleMove = () => {
       const SAN = getSAN(activePiece, { rank, file })
       if (Array.isArray(SAN)) {
-        openPromotionModal(SAN)
+        setPromotionPieces(SAN)
       } else {
         moveActivePiece(SAN)
       }
@@ -37,7 +37,7 @@ export const Square = withGame(
       >
         {children}
         {name ? (
-          <Piece
+          <BoardPiece
             name={name}
             color={color}
             file={file}

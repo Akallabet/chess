@@ -1,43 +1,20 @@
-import { bool, func, string } from 'prop-types'
-import { withGame } from '../game'
+import { func, string } from 'prop-types'
 import { Button } from '../../button'
 
 import assets from './assets'
 
-const stopPropagation = (fn) => (e) => {
-  e.stopPropagation()
-  fn()
-}
-
-export const Piece = withGame(
-  ({
-    name,
-    color,
-    file,
-    rank,
-    coordinates,
-    selected,
-    move,
-    game: { selectPiece, deselectPiece },
-  }) => {
-    const handleClick = () => {
-      if (selected) stopPropagation(deselectPiece())
-      else if (!move) stopPropagation(selectPiece({ name, color, file, rank }))
-    }
-    return (
-      <Button
-        fullWidth
-        fullHeight
-        backGround={false}
-        padding={false}
-        borders={false}
-        aria-label={`${name} ${color} ${coordinates}`}
-        onClick={handleClick}
-      >
-        <img src={assets[color][name]} className="w-full h-full" />
-      </Button>
-    )
-  }
+export const Piece = ({ name, color, label, onClick }) => (
+  <Button
+    fullWidth
+    fullHeight
+    backGround={false}
+    padding={false}
+    borders={false}
+    aria-label={label}
+    onClick={onClick}
+  >
+    <img src={assets[color][name]} className="w-full h-full" />
+  </Button>
 )
 
 Piece.displayName = 'Piece'
@@ -45,16 +22,6 @@ Piece.displayName = 'Piece'
 Piece.propTypes = {
   name: string.isRequired,
   color: string.isRequired,
-  file: string.isRequired,
-  rank: string.isRequired,
-  coordinates: string.isRequired,
-  selected: bool.isRequired,
-  move: bool.isRequired,
-  selectPiece: func,
-  deselectPiece: func,
-}
-
-Piece.defaultProps = {
-  selected: false,
-  move: false,
+  label: string.isRequired,
+  onClick: func.isRequired,
 }

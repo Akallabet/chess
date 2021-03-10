@@ -222,10 +222,17 @@ test('it should capture a pawn as en-passant', () => {
 })
 
 test('it should promote a pawn', () => {
-  const { getByTestId, getByLabelText, getByText } = render(
+  const { getByTestId, getByLabelText, getByText, queryByText } = render(
     <App FEN="8/2P5/8/8/8/8/8/8 w KQkq - 0 1" />
   )
   fireEvent.click(getByLabelText('P w c7'))
   fireEvent.click(getByTestId('c8'))
   expect(getByText(/Promote to/i)).toBeDefined()
+  expect(getByLabelText(/Q w promotion/i)).toBeDefined()
+  expect(getByLabelText(/R w promotion/i)).toBeDefined()
+  expect(getByLabelText(/B w promotion/i)).toBeDefined()
+  expect(getByLabelText(/N w promotion/i)).toBeDefined()
+  fireEvent.click(getByLabelText(/Q w promotion/i))
+  expect(queryByText(/Promote to/i)).toBeNull()
+  // fireEvent.click(getByLabelText('Q w c8'))
 })

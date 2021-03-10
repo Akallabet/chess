@@ -1,10 +1,13 @@
 /* eslint-disable no-undef */
+const colors = require('tailwindcss/colors')
 
 module.exports = {
   purge: ['./src/**/*.js'],
   darkMode: false,
   theme: {
     colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
       primary: {
         light: '#f0d9b5',
         DEFAULT: '#f0d9b5',
@@ -15,6 +18,8 @@ module.exports = {
         DEFAULT: '#b58863',
         dark: '#81756b',
       },
+      gray: colors.gray,
+      white: colors.white,
     },
     extend: {
       maxWidth: {

@@ -15,13 +15,22 @@ export const useGame = ({ onMove, defaultInitialData }) => {
   const { board, activeColor, FEN, ranks, files, getSAN } = info
 
   const [activePiece, setActivePiece] = useState()
+  const [promotionPieces, setPromotionPieces] = useState()
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false)
-  // const openModal = setIsModalOpen(true)
-  const closeModal = () => setIsPromotionModalOpen(false)
+  const openPromotionModal = () => setIsPromotionModalOpen(true)
+  const closePromotionModal = () => setIsPromotionModalOpen(false)
 
   useEffect(() => {
     setInfo(getInfo())
   }, [getInfo])
+
+  useEffect(() => {
+    if (promotionPieces && promotionPieces.length) openPromotionModal(true)
+  }, [promotionPieces])
+
+  useEffect(() => {
+    if (!isPromotionModalOpen) setPromotionPieces([])
+  }, [isPromotionModalOpen])
 
   useStorage({ board, activePiece, FEN })
 
@@ -33,6 +42,7 @@ export const useGame = ({ onMove, defaultInitialData }) => {
     getSAN,
     files,
     isPromotionModalOpen,
+    promotionPieces,
     selectPiece: (piece) => {
       const { file, rank } = piece
       setActivePiece(piece)
@@ -49,9 +59,7 @@ export const useGame = ({ onMove, defaultInitialData }) => {
     reset: () => {
       resetGame()
     },
-    openPromotionModal: (pieces) => {
-      setIsPromotionModalOpen(pieces)
-    },
-    closeModal,
+    setPromotionPieces,
+    closePromotionModal,
   }
 }

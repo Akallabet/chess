@@ -5,6 +5,7 @@ import { useSounds } from './sounds/use-sounds'
 import { Box } from '../box'
 import { string } from 'prop-types'
 import { Logs } from './logs'
+import { PromotionModal } from './board/promotion-modal'
 
 export const Chess = ({ FEN }) => {
   const { playMove } = useSounds({ hasSound: true })
@@ -16,6 +17,7 @@ export const Chess = ({ FEN }) => {
         </Box>
         <Logs />
         <Controls />
+        <PromotionModal />
       </GameProvider>
     </Box>
   )

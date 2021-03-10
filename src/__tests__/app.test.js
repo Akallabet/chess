@@ -220,3 +220,12 @@ test('it should capture a pawn as en-passant', () => {
   expect(queryByLabelText('P w c4')).toBeNull()
   expect(queryByLabelText('P b c5')).toBeNull()
 })
+
+test('it should promote a pawn', () => {
+  const { getByTestId, getByLabelText, getByText } = render(
+    <App FEN="8/2P5/8/8/8/8/8/8 w KQkq - 0 1" />
+  )
+  fireEvent.click(getByLabelText('P w c7'))
+  fireEvent.click(getByTestId('c8'))
+  expect(getByText(/Promote to/i)).toBeDefined()
+})

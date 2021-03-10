@@ -213,6 +213,13 @@ export const game = ({
 
     return pipeCond(
       [
+        () =>
+          ranks.indexOf(destination.rank) ===
+            (FEN.activeColor === COLORS.w ? 0 : ranks.length - 1) && origin.name === NAMES.P,
+        (moves) => moves.filter(({ name }) => name === NAMES.P),
+        identity,
+      ],
+      [
         helpers.findByEnPassant(piece),
         pipe(helpers.findByEnPassant(piece), buildEnPassantSAN),
         identity,

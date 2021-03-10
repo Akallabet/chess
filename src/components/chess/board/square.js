@@ -12,11 +12,15 @@ export const Square = withGame(
     rank,
     file,
     children,
-    game: { getSAN, activePiece, moveActivePiece },
+    game: { getSAN, activePiece, moveActivePiece, openPromotionModal },
   }) => {
     const handleMove = () => {
       const SAN = getSAN(activePiece, { rank, file })
-      moveActivePiece(SAN)
+      if (Array.isArray(SAN)) {
+        openPromotionModal(SAN)
+      } else {
+        moveActivePiece(SAN)
+      }
     }
     const highlight = selected || move
     const classes = clsx('relative', 'h-full', 'w-1/8', {

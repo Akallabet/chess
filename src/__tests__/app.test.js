@@ -234,5 +234,5 @@ test('it should promote a pawn', () => {
   expect(getByLabelText(/N w promotion/i)).toBeDefined()
   fireEvent.click(getByLabelText(/Q w promotion/i))
   expect(queryByText(/Promote to/i)).toBeNull()
-  // fireEvent.click(getByLabelText('Q w c8'))
+  fireEvent.click(getByLabelText('Q w c8'))
 })

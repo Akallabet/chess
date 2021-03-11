@@ -29,7 +29,7 @@ export const useGame = ({ onMove, defaultInitialData }) => {
   }, [promotionPieces])
 
   useEffect(() => {
-    if (!isPromotionModalOpen) setPromotionPieces([])
+    if (!isPromotionModalOpen) setPromotionPieces()
   }, [isPromotionModalOpen])
 
   useStorage({ board, activePiece, FEN })

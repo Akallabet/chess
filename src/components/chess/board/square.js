@@ -15,11 +15,11 @@ export const Square = withGame(
     game: { getSAN, activePiece, moveActivePiece, setPromotionPieces },
   }) => {
     const handleMove = () => {
-      const SAN = getSAN(activePiece, { rank, file })
-      if (Array.isArray(SAN)) {
-        setPromotionPieces(SAN)
+      const move = getSAN(activePiece, { rank, file })
+      if (Array.isArray(move)) {
+        setPromotionPieces([move, (SAN) => moveActivePiece(SAN)])
       } else {
-        moveActivePiece(SAN)
+        moveActivePiece(move)
       }
     }
     const highlight = selected || move

@@ -210,13 +210,17 @@ export const game = ({
     const buildCastlingSAN = ({ castling: { isKingside, isQueenside } }) =>
       (isKingside && '0-0') || (isQueenside && '0-0-0')
     const buildEnPassantSAN = ({ x, check }) => buildOrigin(`${files[x]}x`, check)
+    const buildPromotion = ({ promotion, check }) => `${file}${rank}${check ? '+' : ''}${promotion}`
 
     return pipeCond(
       [
         () =>
           ranks.indexOf(destination.rank) ===
             (FEN.activeColor === COLORS.w ? 0 : ranks.length - 1) && origin.name === NAMES.P,
-        (moves) => moves.filter(({ name }) => name === NAMES.P),
+        (moves) =>
+          moves
+            .filter(({ name }) => name === NAMES.P)
+            .map((info) => ({ ...info, SAN: buildPromotion(info) })),
         identity,
       ],
       [

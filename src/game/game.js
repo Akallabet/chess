@@ -160,10 +160,7 @@ export const game = ({
     )(board)
   }
 
-  // const isPromotion = (promotion) => () => isTruthy(promotion)
-
   const move = ({ y, x, destination, promotion, ...move }) => {
-    // console.log('is promotion', promotion)
     pipe(
       helpers.movePiece(board[y][x], { y, x }, destination),
       ifElse(

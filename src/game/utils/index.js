@@ -14,6 +14,7 @@ export const identity = (input) => input
 export const falsy = () => false
 export const isTruthy = (value) => !!value
 export const isFalsy = (value) => !value
+export const isNumber = (value) => !isNaN(value)
 export const log = (label, parse = identity) => (args) => {
   console.log(label, parse(args))
   return args

@@ -1,7 +1,7 @@
-import { identity, ifElse, isTruthy, pipe } from '../../utils'
+import { identity, ifElse, isNumber, isTruthy, pipe } from '../../utils'
 const byName = (name) => (origin) => (name ? origin.name === name : true)
-const byFile = (x) => (origin) => (x ? origin.x === x : true)
-const byRank = (y) => (origin) => (y ? origin.y === y : true)
+const byFile = (x) => (origin) => origin.x === x
+const byRank = (y) => (origin) => origin.y === y
 const byCastling = ({ name, x, y }) => (origin) =>
   origin.castling && name === origin.name && y === origin.y && x === origin.x
 const byEnPassant = ({ name, x, y }) => (origin) =>
@@ -27,7 +27,7 @@ export const getOrigins = (files, ranks, legalMoves) => ({
 }) =>
   pipe(
     filterByName(name),
-    filterByFile(originX),
-    filterByRank(originY),
+    ifElse(() => isNumber(originX), filterByFile(originX), identity),
+    ifElse(() => isNumber(originY), filterByRank(originY), identity),
     ifElse(() => isTruthy(promotion), filterByPromotion(promotion), identity)
   )(legalMoves[`${files[x]}${ranks[y]}`])

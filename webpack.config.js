@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
-module.exports = {
+const config = {
   entry: path.resolve(__dirname, './src/index.js'),
   output: {
     path: path.resolve(__dirname, 'public'),
@@ -51,11 +51,15 @@ module.exports = {
       },
     ],
   },
-  devtool: 'source-map',
   devServer: {
     contentBase: path.join(__dirname, 'public'),
     compress: true,
     hot: true,
     port: 8000,
   },
+}
+
+module.exports = (env, argv) => {
+  if (argv.mode === 'development') config.devtool = 'source-map'
+  return config
 }

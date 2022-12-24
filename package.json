@@ -1,0 +1,22 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Akallabet/chess.git"
+  },
+  "keywords": [
+    "chess"
+  ],
+  "author": "Graziano Statello",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Akallabet/chess/issues"
+  },
+  "homepage": "https://github.com/Akallabet/chess#readme"
+}

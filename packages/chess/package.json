@@ -1,0 +1,18 @@
+{
+  "name": "@chess/chess",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "tap"
+  },
+  "devDependencies": {
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "prettier": "^2.8.1",
+    "ramda": "^0.28.0",
+    "tap": "^16.3.2"
+  }
+}

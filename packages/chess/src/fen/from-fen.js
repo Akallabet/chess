@@ -6,8 +6,10 @@ const addEmptyCells = n => {
   for (let i = 0; i < Number(n); i++) {
     cells.push(emptyCell);
   }
+  console.log();
   return cells;
 };
+
 export const rowFromFEN = R.pipe(
   R.split(''),
   R.map(R.ifElse(isNaN, R.identity, addEmptyCells)),

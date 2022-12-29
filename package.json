@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "scripts": {
+    "test": "npm test --workspace=@chess/chess"
+  },
   "workspaces": [
     "./packages/*"
   ],

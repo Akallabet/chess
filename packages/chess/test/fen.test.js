@@ -1,7 +1,7 @@
 import t from 'tap';
 import { fromFEN, rowFromFEN } from '../src/fen/from-fen.js';
 
-const emptyRow = ['', '', '', '', '', '', '', ''];
+const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}];
 const emptyBoard = [
   emptyRow,
   emptyRow,
@@ -33,7 +33,16 @@ t.test('Create board rows from piece placement', t => {
     t.end();
   });
   t.test('Row with two pawns', t => {
-    t.same(rowFromFEN('2pp4'), ['', '', 'p', 'p', '', '', '', '']);
+    t.same(rowFromFEN('2pp4'), [
+      {},
+      {},
+      { piece: 'p' },
+      { piece: 'p' },
+      {},
+      {},
+      {},
+      {},
+    ]);
     t.end();
   });
   t.end();

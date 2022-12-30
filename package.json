@@ -2,10 +2,10 @@
   "name": "chess",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "npm test --workspace=@chess/chess"
+    "test": "npm test --workspace=@chess/chess",
+    "chessboard:build": "npm run build --workspace=@chess/chessboard",
+    "dev": "npm run dev --workspace=@chess/chessboard"
   },
   "workspaces": [
     "./packages/*"

@@ -545,10 +545,6 @@ video {
   flex-direction: column;
 }
 
-.border-2 {
-  border-width: 2px;
-}
-
 .bg-secondary {
   --tw-bg-opacity: 1;
   background-color: rgb(181 136 99 / var(--tw-bg-opacity));

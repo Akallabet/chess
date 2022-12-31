@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import Bishop from './bishop';
+import King from './king';
 import Knight from './knight';
 import Pawn from './pawn';
 import Rook from './rook';
@@ -22,7 +23,7 @@ const Pieces: MapOfComponents = {
   b: Bishop,
   r: Rook,
   n: Knight,
-  k: Bishop,
+  k: King,
   q: Bishop,
 };
 

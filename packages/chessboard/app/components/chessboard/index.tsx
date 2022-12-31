@@ -50,8 +50,10 @@ export const ChessBoard = ({ board }: { board: Square[][] }) => (
             (isEven(i) && isEven(j)) || (isOdd(i) && isOdd(j));
           const bg = isWhiteSquare ? 'bg-primary' : 'bg-secondary';
           return (
-            <div key={j} className="h-full w-1/8">
-              <div className={`${bg} h-full`}>
+            <div key={j} className="h-full w-1/8 ">
+              <div
+                className={`${bg} h-full w-full flex items-center justify-center`}
+              >
                 {piece && (
                   <Piece
                     piece={piece}

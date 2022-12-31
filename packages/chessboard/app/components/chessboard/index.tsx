@@ -42,7 +42,7 @@ const Piece = ({
 };
 
 export const ChessBoard = ({ board }: { board: Square[][] }) => (
-  <div className="border-1 border-black flex flex-col w-full h-full-w sm:w-452 sm:h-452">
+  <div className="border-1 border-black flex flex-col w-full h-full-w sm:w-452 sm:h-452 mx-auto">
     {board.map((row, i) => (
       <div key={i} className="flex flex-row w-full h-1/8">
         {row.map(({ piece }, j) => {

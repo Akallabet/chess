@@ -42,9 +42,9 @@ const Piece = ({
 };
 
 export const ChessBoard = ({ board }: { board: Square[][] }) => (
-  <div className="border-1 border-black flex flex-col w-full h-full-w sm:w-452 sm:h-452 mx-auto">
+  <div className="border-1 h-full-w sm:w-452 sm:h-452 mx-auto flex w-full flex-col border-black">
     {board.map((row, i) => (
-      <div key={i} className="flex flex-row w-full h-1/8">
+      <div key={i} className="h-1/8 flex w-full flex-row">
         {row.map(({ piece }, j) => {
           const isWhiteSquare =
             (isEven(i) && isEven(j)) || (isOdd(i) && isOdd(j));
@@ -52,12 +52,12 @@ export const ChessBoard = ({ board }: { board: Square[][] }) => (
           return (
             <div
               key={j}
-              className={`h-full w-1/8 ${
+              className={`w-1/8 h-full ${
                 piece ? 'cursor-pointer' : 'cursor-auto'
               }`}
             >
               <div
-                className={`${bg} h-full w-full flex items-center justify-center`}
+                className={`${bg} flex h-full w-full items-center justify-center`}
               >
                 {piece && (
                   <Piece

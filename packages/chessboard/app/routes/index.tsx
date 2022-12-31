@@ -1,11 +1,16 @@
-import { Links, LiveReload } from '@remix-run/react';
-import type { LinksFunction } from '@remix-run/node';
-import styles from './tailwind.css';
+import type { LoaderArgs } from '@remix-run/node';
 import { useState } from 'react';
 import { start } from '@chess/chess';
 import { ChessBoard } from '../components/chessboard';
+import { useLoaderData } from '@remix-run/react';
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }];
+export const loader = ({ request }: LoaderArgs) => {
+  const url = new URL(request.url);
+  const FEN =
+    url.searchParams.get('FEN') ||
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  return FEN;
+};
 
 const useGame = (FEN: string) => {
   const [game] = useState(start(FEN));
@@ -13,8 +18,7 @@ const useGame = (FEN: string) => {
 };
 
 export default function App() {
-  const { board } = useGame(
-    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-  );
+  const FEN = useLoaderData<typeof loader>();
+  const { board } = useGame(FEN);
   return <div className="">{board && <ChessBoard board={board} />}</div>;
 }

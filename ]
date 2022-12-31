@@ -1,9 +1,9 @@
-import { PieceProps } from './piece';
+import { Piece } from "./piece";
 
 export default function Bishop({
   fill = '#000000',
   stroke = '#ffffff',
-}: PieceProps) {
+}: Piece) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

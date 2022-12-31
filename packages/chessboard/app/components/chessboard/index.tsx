@@ -3,6 +3,7 @@ import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
 import Pawn from './pawn';
+import Queen from './queen';
 import Rook from './rook';
 
 interface Square {
@@ -24,7 +25,7 @@ const Pieces: MapOfComponents = {
   r: Rook,
   n: Knight,
   k: King,
-  q: Bishop,
+  q: Queen,
 };
 
 const Piece = ({

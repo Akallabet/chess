@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import Bishop from './bishop';
 import Pawn from './pawn';
+import Rook from './rook';
 
 interface Square {
   piece: string;
@@ -18,7 +19,7 @@ type MapOfComponents = {
 const Pieces: MapOfComponents = {
   p: Pawn,
   b: Bishop,
-  r: Bishop,
+  r: Rook,
   n: Bishop,
   k: Bishop,
   q: Bishop,

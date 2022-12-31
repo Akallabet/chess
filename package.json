@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "npm test --workspace=@chess/chess",
-    "chessboard:build": "npm run build --workspace=@chess/chessboard",
+    "build": "npm run build --workspace=@chess/chessboard",
     "dev": "npm run dev --workspace=@chess/chessboard"
   },
   "workspaces": [

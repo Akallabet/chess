@@ -1,6 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { useState } from 'react';
-import { start } from '@chess/chess';
+import chess from '@chess/chess';
 import { ChessBoard } from '../components/chessboard';
 import { useLoaderData } from '@remix-run/react';
 import { FENForm } from '~/components/fen';
@@ -14,7 +14,7 @@ export const loader = ({ request }: LoaderArgs) => {
 };
 
 const useGame = (FEN: string) => {
-  const [game] = useState(start(FEN));
+  const [game] = useState(chess.start(FEN));
   return game;
 };
 

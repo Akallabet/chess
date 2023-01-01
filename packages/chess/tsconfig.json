@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["es2020"],
+    "module": "es2020",
+    "noEmit": true,
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["./test/types/*.test-d.ts"],
+  "include": [".src/*.d.ts"]
+}

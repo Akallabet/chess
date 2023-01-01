@@ -1,14 +1,11 @@
 import * as R from 'ramda';
+import type { ChessBoardType } from '@chess/chess';
 import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
 import Pawn from './pawn';
 import Queen from './queen';
 import Rook from './rook';
-
-interface Square {
-  piece: string;
-}
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
@@ -41,10 +38,10 @@ const Piece = ({
   return <Component fill={fill} stroke={stroke} />;
 };
 
-export const ChessBoard = ({ board }: { board: Square[][] }) => (
-  <div className="border-1 h-full-w sm:w-452 sm:h-452 mx-auto flex w-full flex-col border-black">
+export const ChessBoard = ({ board }: { board: ChessBoardType }) => (
+  <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
-      <div key={i} className="h-1/8 flex w-full flex-row">
+      <div key={i} className="flex h-1/8 w-full flex-row">
         {row.map(({ piece }, j) => {
           const isWhiteSquare =
             (isEven(i) && isEven(j)) || (isOdd(i) && isOdd(j));
@@ -52,7 +49,7 @@ export const ChessBoard = ({ board }: { board: Square[][] }) => (
           return (
             <div
               key={j}
-              className={`w-1/8 h-full ${
+              className={`h-full w-1/8 ${
                 piece ? 'cursor-pointer' : 'cursor-auto'
               }`}
             >

@@ -3,7 +3,7 @@ import * as R from 'ramda';
 export const emptyCell = {};
 const addEmptyCells = n => {
   const cells = [];
-  for (let i = 0; i < Number(n); i++) {
+  for (let i = 0; i < n; i++) {
     cells.push(emptyCell);
   }
   return cells;
@@ -13,7 +13,9 @@ const addCell = piece => ({ piece });
 
 export const rowFromFEN = R.pipe(
   R.split(''),
-  R.map(R.ifElse(isNaN, addCell, addEmptyCells)),
+  R.map(
+    R.ifElse(R.pipe(Number, isNaN), addCell, R.pipe(Number, addEmptyCells))
+  ),
   R.flatten
 );
 

@@ -4,9 +4,12 @@ module.exports = {
   // When running locally in development mode, we use the built in remix
   // server. This does not understand the vercel lambda module format,
   // so we default back to the standard build output.
-  server: process.env.NODE_ENV === 'development' ? undefined : './server.js',
-  serverDependenciesToBundle: ['@chess/chess'],
+  server:
+    !process.env.VERCEL || process.env.NODE_ENV === 'development'
+      ? undefined
+      : './server.js',
   ignoredRouteFiles: ['**/.*'],
+  serverDependenciesToBundle: ['@chess/chess'],
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "api/index.js",

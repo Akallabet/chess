@@ -1,32 +1,30 @@
-export default function Index() {
+import type { LoaderArgs } from '@remix-run/node';
+import { ChessBoard } from '../components/chessboard';
+import { useLoaderData } from '@remix-run/react';
+import { FENForm } from '../components/fen';
+import { useGame } from '../use-game';
+
+export const loader = ({ request }: LoaderArgs) => {
+  const url = new URL(request.url);
+  const FEN =
+    url.searchParams.get('fen') ||
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  return FEN;
+};
+
+export default function App() {
+  const FEN = useLoaderData<typeof loader>();
+  const { board, getMoves } = useGame(FEN);
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+    <div>
+      <div className="my-5" />
+      <div className="mx-auto">
+        {board && <ChessBoard board={board} onSelect={getMoves} />}
+      </div>
+      <div className="my-5" />
+      <div className="mx-auto max-w-md">
+        <FENForm />
+      </div>
     </div>
   );
 }

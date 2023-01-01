@@ -1,34 +1,32 @@
-import type { LoaderArgs } from '@remix-run/node';
-import { useState } from 'react';
-import chess from '@chess/chess';
-import { ChessBoard } from '../components/chessboard';
-import { useLoaderData } from '@remix-run/react';
-import { FENForm } from '~/components/fen';
-
-export const loader = ({ request }: LoaderArgs) => {
-  const url = new URL(request.url);
-  const FEN =
-    url.searchParams.get('fen') ||
-    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-  return FEN;
-};
-
-const useGame = (FEN: string) => {
-  const [game] = useState(chess.start(FEN));
-  return game;
-};
-
-export default function App() {
-  const FEN = useLoaderData<typeof loader>();
-  const { board } = useGame(FEN);
+export default function Index() {
   return (
-    <div>
-      <div className="my-5" />
-      <div className="mx-auto">{board && <ChessBoard board={board} />}</div>
-      <div className="my-5" />
-      <div className="mx-auto max-w-md">
-        <FENForm />
-      </div>
+    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
+      <h1>Welcome to Remix</h1>
+      <ul>
+        <li>
+          <a
+            target="_blank"
+            href="https://remix.run/tutorials/blog"
+            rel="noreferrer"
+          >
+            15m Quickstart Blog Tutorial
+          </a>
+        </li>
+        <li>
+          <a
+            target="_blank"
+            href="https://remix.run/tutorials/jokes"
+            rel="noreferrer"
+          >
+            Deep Dive Jokes App Tutorial
+          </a>
+        </li>
+        <li>
+          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
+            Remix Docs
+          </a>
+        </li>
+      </ul>
     </div>
   );
 }

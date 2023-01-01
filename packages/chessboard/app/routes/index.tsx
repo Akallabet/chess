@@ -1,9 +1,8 @@
 import type { LoaderArgs } from '@remix-run/node';
-import { useState } from 'react';
-import { start } from '@chess/chess';
 import { ChessBoard } from '../components/chessboard';
 import { useLoaderData } from '@remix-run/react';
-import { FENForm } from '~/components/fen';
+import { FENForm } from '../components/fen';
+import { useGame } from '../use-game';
 
 export const loader = ({ request }: LoaderArgs) => {
   const url = new URL(request.url);
@@ -13,18 +12,15 @@ export const loader = ({ request }: LoaderArgs) => {
   return FEN;
 };
 
-const useGame = (FEN: string) => {
-  const [game] = useState(start(FEN));
-  return game;
-};
-
 export default function App() {
   const FEN = useLoaderData<typeof loader>();
-  const { board } = useGame(FEN);
+  const { board, getMoves } = useGame(FEN);
   return (
     <div>
       <div className="my-5" />
-      <div className="mx-auto">{board && <ChessBoard board={board} />}</div>
+      <div className="mx-auto">
+        {board && <ChessBoard board={board} onSelect={getMoves} />}
+      </div>
       <div className="my-5" />
       <div className="mx-auto max-w-md">
         <FENForm />

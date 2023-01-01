@@ -1,0 +1,14 @@
+
+node_modules
+
+/packages/**/.cache
+/packages/**/.env
+/packages/**/.vercel
+/packages/**/.output
+
+/packages/**/build/
+/packages/**/public/build
+/packages/**/api/index.js
+/packages/**/api/index.js.map
+
+.nyc_output/

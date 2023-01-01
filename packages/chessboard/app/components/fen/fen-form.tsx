@@ -14,7 +14,7 @@ export const FENForm = () => {
       <p>
         <button
           type="submit"
-          className="rounded bg-blue-500 py-2 px-4 text-black hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+          className="bg-blue-500 hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300 text-black rounded px-4 py-2  "
         >
           GO
         </button>

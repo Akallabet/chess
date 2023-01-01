@@ -1,4 +1,4 @@
-import { PieceProps } from './piece';
+import type { PieceProps } from './piece';
 
 export default function Queen({ fill, stroke }: PieceProps) {
   return (

@@ -1,3 +1,5 @@
+import type { PieceProps } from './piece';
+
 export default function Rook({ fill }: PieceProps) {
   return (
     <svg

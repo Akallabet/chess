@@ -1,4 +1,4 @@
-import { PieceProps } from './piece';
+import type { PieceProps } from './piece';
 
 export default function Bishop({
   fill = '#000000',

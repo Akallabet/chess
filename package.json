@@ -5,7 +5,13 @@
   "scripts": {
     "test": "npm test --workspace=@chess/chess",
     "build": "npm run build --workspace=@chess/chessboard",
-    "dev": "npm run dev --workspace=@chess/chessboard"
+    "dev": "npm run dev --workspace=@chess/chessboard",
+    "linting": "eslint .",
+    "linting:fix": "npm run linting -- --fix",
+    "prettier": "prettier --ignore-path ./.eslintignore ./**/*.{js,json}",
+    "format:check": "npm run prettier -- --check",
+    "format:write": "npm run prettier -- --write",
+    "postinstall": "husky install"
   },
   "workspaces": [
     "./packages/*"
@@ -27,7 +33,17 @@
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
-    "prettier": "^2.8.1",
-    "prettier-plugin-tailwindcss": "^0.2.1"
+    "husky": "^8.0.2",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.1"
+  },
+  "lint-staged": {
+    "*.(html|json|md|yaml|yml|graphql|css|scss)": [
+      "prettier --write"
+    ],
+    "*.js": [
+      "npm run linting:fix",
+      "npm run format:write"
+    ]
   }
 }

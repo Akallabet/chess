@@ -11,7 +11,7 @@ import type { getMovesGameFn } from '../../use-game';
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
 
-const isWhitePiece = R.test(/[rnbqkp]/);
+const isWhitePiece = R.test(/[PRBNQK]/);
 
 type MapOfComponents = {
   [key: string]: React.FC<any>;

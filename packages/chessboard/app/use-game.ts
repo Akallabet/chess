@@ -13,9 +13,6 @@ export const useGame = (FEN: string) => {
   return {
     board,
     getMoves: ({ piece, x, y }: getMovesGameFn) =>
-      chess.getMoves(
-        `${piece}${chess.files[y - 1]}${chess.ranks[x - 1]}`,
-        game
-      ),
+      chess.getMoves(`${piece}${chess.files[y]}${chess.ranks[x]}`, game),
   };
 };

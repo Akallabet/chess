@@ -7,6 +7,7 @@ export default function Queen({ fill, stroke }: PieceProps) {
       version="1.1"
       width="45"
       height="45"
+      name="queen"
     >
       <g
         style={{
@@ -99,7 +100,6 @@ export default function Queen({ fill, stroke }: PieceProps) {
               d="M 12,33.5 C 18,32.5 27,32.5 33,33.5"
               style={{ fill: 'none' }}
             />
-            <div />
           </>
         )}
       </g>

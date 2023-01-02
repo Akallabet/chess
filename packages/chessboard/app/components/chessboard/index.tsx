@@ -62,10 +62,7 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
               className={`h-full w-1/8 ${
                 piece ? 'cursor-pointer' : 'cursor-auto'
               }`}
-              onClick={() => {
-                console.log('lalalallala');
-                onSelect({ piece, x: i, y: j });
-              }}
+              onClick={() => onSelect({ piece, x: i, y: j })}
             >
               <div
                 className={`${bg} flex h-full w-full items-center justify-center`}

@@ -12,9 +12,10 @@ export const useGame = (FEN: string) => {
   const { board } = game;
   return {
     board,
-    getMoves: ({ piece, x, y }: getMovesGameFn) => {
-      console.log('getmoves', piece, x, y);
-      return chess.getMoves(`${piece}${chess.ranks[x]}${chess.files[y]}`, game);
-    },
+    getMoves: ({ piece, x, y }: getMovesGameFn) =>
+      chess.getMoves(
+        `${piece}${chess.files[y - 1]}${chess.ranks[x - 1]}`,
+        game
+      ),
   };
 };

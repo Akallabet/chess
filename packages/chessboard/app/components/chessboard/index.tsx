@@ -47,11 +47,7 @@ type ChessBoardProps = {
 export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
   <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
-      <div
-        key={i}
-        className="flex h-1/8 w-full flex-row"
-        onClick={() => console.log('lalalalal')}
-      >
+      <div key={i} className="flex h-1/8 w-full flex-row">
         {row.map(({ piece }, j) => {
           const isWhiteSquare =
             (isEven(i) && isEven(j)) || (isOdd(i) && isOdd(j));

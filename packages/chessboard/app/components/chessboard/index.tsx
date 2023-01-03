@@ -58,17 +58,19 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
               className={`h-full w-1/8 ${
                 piece ? 'cursor-pointer' : 'cursor-auto'
               }`}
-              onClick={() => onSelect({ piece, x: i, y: j })}
             >
-              <div
-                className={`${bg} flex h-full w-full items-center justify-center`}
-              >
+              <div className={`${bg} h-full w-full`}>
                 {piece && (
-                  <Piece
-                    piece={piece}
-                    fill={isWhitePiece(piece) ? '#ffffff' : '#000000'}
-                    stroke={isWhitePiece(piece) ? '#000000' : '#ffffff'}
-                  />
+                  <div
+                    className="flex h-full w-full items-center justify-center"
+                    onClick={() => onSelect({ piece, x: i, y: j })}
+                  >
+                    <Piece
+                      piece={piece}
+                      fill={isWhitePiece(piece) ? '#ffffff' : '#000000'}
+                      stroke={isWhitePiece(piece) ? '#000000' : '#ffffff'}
+                    />
+                  </div>
                 )}
               </div>
             </div>

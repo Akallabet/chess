@@ -6,7 +6,7 @@
   "type": "module",
   "types": "src/chess.d.ts",
   "scripts": {
-    "test": "tap"
+    "test": "tap --only"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.47.1",

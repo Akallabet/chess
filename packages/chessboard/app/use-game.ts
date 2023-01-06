@@ -8,12 +8,14 @@ export type getMovesGameFn = {
 };
 
 export const useGame = (FEN: string) => {
-  const [game] = useState(chess.start(FEN));
+  const [game, setGame] = useState(chess.start(FEN));
   const { board } = game;
   return {
     board,
     getMoves: ({ piece, x, y }: getMovesGameFn) => {
-      chess.getMoves(`${piece}${chess.files[y]}${chess.ranks[x]}`, game);
+      setGame(
+        chess.getMoves(`${piece}${chess.files[y]}${chess.ranks[x]}`, game)
+      );
     },
   };
 };

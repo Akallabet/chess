@@ -31,9 +31,9 @@ t.test('Get moves', t => {
     t.end();
   });
   t.test('Chessboard position', t => {
-    t.same(getMoves('pe6', { board }), { board });
-    t.same(getMoves('Pb8', { board }), { board });
-    t.same(getMoves('nh8', { board }), { board });
+    t.notHas(getMoves('pe6', { board }), 'error');
+    t.notHas(getMoves('Pb8', { board }), 'error');
+    t.notHas(getMoves('nh8', { board }), 'error');
     t.end();
   });
   t.test('Pawn moves', t => {
@@ -47,7 +47,7 @@ t.test('Get moves', t => {
       row,
       row,
     ];
-    t.same(getMoves({ piece: 'p', x: 1, y: 2 }, { board }), {
+    t.same(getMoves({ piece: 'p', x: 4, y: 1 }, { board }), {
       board: boardMoves,
     });
     t.end();

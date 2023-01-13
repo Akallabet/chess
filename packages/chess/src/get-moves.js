@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
 import { files, ranks } from './constants.js';
+import { moves } from './moves/moves.js';
 
 const isPiece = piece => new RegExp(/[pnbrqkPNBRQK]+/).test(piece);
 const isChessboardPos = pos =>
@@ -24,9 +25,9 @@ export const fromChessBoardToCoordinares = pos => {
     y: ranks.indexOf(Number(rank)),
   };
 };
-const calcMoves = ({ piece, x, y }, { board }) => {
+const calcMoves = ({ piece, x, y }, { board, ...rest }) => {
   console.log({ piece, x, y });
-  return { board };
+  return { board: moves[piece]({ x, y }, { board }), ...rest };
 };
 
 export const getMoves = R.curry((pos, game) => {

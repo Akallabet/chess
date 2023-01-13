@@ -24,7 +24,7 @@ t.test('Get moves', t => {
   t.test('wrong format', t => {
     t.same(getMoves('', { board }), { error: 'WRONG_FORMAT', board });
     t.same(getMoves('Pb', { board }), { error: 'WRONG_FORMAT', board });
-    t.same(getMoves({ piece: 'p', x: 1, y: 0 }, { board }), {
+    t.same(getMoves({ piece: 'p', x: 1, y: 9 }, { board }), {
       error: 'WRONG_FORMAT',
       board,
     });

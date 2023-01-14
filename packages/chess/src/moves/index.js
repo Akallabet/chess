@@ -1,1 +1,1 @@
-export { moves } from './moves.js';
+export { movesMap } from './moves.js';

@@ -38,7 +38,7 @@ t.test('Get moves', t => {
     t.end();
   });
   t.test('Pawn moves', t => {
-    t.plan(2);
+    t.plan(3);
     t.test('Black pawn - rank 7', t => {
       t.same(
         getMoves(
@@ -67,6 +67,26 @@ t.test('Get moves', t => {
           board: getBoard([
             { coord: { x: 4, y: 2 }, cell: { piece: 'p' } },
             { coord: { x: 4, y: 3 }, cell: { move: true } },
+          ]),
+        }
+      );
+      t.end();
+    });
+    t.test('Black pawn - other piece in front', t => {
+      t.same(
+        getMoves(
+          { piece: 'p', x: 4, y: 1 },
+          {
+            board: getBoard([
+              { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
+              { coord: { x: 4, y: 2 }, cell: { piece: 'p' } },
+            ]),
+          }
+        ),
+        {
+          board: getBoard([
+            { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
+            { coord: { x: 4, y: 2 }, cell: { piece: 'p' } },
           ]),
         }
       );

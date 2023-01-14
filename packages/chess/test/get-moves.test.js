@@ -39,7 +39,7 @@ t.test('Get moves', t => {
   });
   t.test('Pawn moves', t => {
     t.plan(2);
-    t.test('White pawn - starting position', t => {
+    t.test('Black pawn - rank 7', t => {
       t.same(
         getMoves(
           { piece: 'p', x: 4, y: 1 },
@@ -55,7 +55,7 @@ t.test('Get moves', t => {
       );
       t.end();
     });
-    t.test('White pawn - any other position', t => {
+    t.test('Black pawn - after rank 7', t => {
       t.same(
         getMoves(
           { piece: 'p', x: 4, y: 2 },

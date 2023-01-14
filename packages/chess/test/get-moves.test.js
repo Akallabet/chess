@@ -1,5 +1,6 @@
 import t from 'tap';
 import { fromChessBoardToCoordinares, getMoves } from '../src/get-moves.js';
+import { getBoard } from './utils/index.js';
 
 const cell = {};
 const row = [cell, cell, cell, cell, cell, cell, cell, cell];
@@ -37,19 +38,39 @@ t.test('Get moves', t => {
     t.end();
   });
   t.test('Pawn moves', t => {
-    const boardMoves = [
-      row,
-      [cell, cell, cell, cell, { piece: 'p' }, cell, cell, cell],
-      [cell, cell, cell, cell, { move: true }, cell, cell, cell],
-      [cell, cell, cell, cell, { move: true }, cell, cell, cell],
-      row,
-      row,
-      row,
-      row,
-    ];
-    t.same(getMoves({ piece: 'p', x: 4, y: 1 }, { board }), {
-      board: boardMoves,
+    t.plan(2);
+    t.test('White pawn - starting position', t => {
+      t.same(
+        getMoves(
+          { piece: 'p', x: 4, y: 1 },
+          { board: getBoard([{ coord: { x: 4, y: 1 }, cell: { piece: 'p' } }]) }
+        ),
+        {
+          board: getBoard([
+            { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
+            { coord: { x: 4, y: 2 }, cell: { move: true } },
+            { coord: { x: 4, y: 3 }, cell: { move: true } },
+          ]),
+        }
+      );
+      t.end();
     });
-    t.end();
+    t.test('White pawn - any other position', t => {
+      t.same(
+        getMoves(
+          { piece: 'p', x: 4, y: 2 },
+          {
+            board: getBoard([{ coord: { x: 4, y: 2 }, cell: { piece: 'p' } }]),
+          }
+        ),
+        {
+          board: getBoard([
+            { coord: { x: 4, y: 2 }, cell: { piece: 'p' } },
+            { coord: { x: 4, y: 3 }, cell: { move: true } },
+          ]),
+        }
+      );
+      t.end();
+    });
   });
 });

@@ -26,7 +26,6 @@ export const fromChessBoardToCoordinares = pos => {
   };
 };
 const calcMoves = ({ piece, x, y }, { board, ...rest }) => {
-  console.log({ piece, x, y });
   return { board: moves[piece]({ x, y }, { board }), ...rest };
 };
 

@@ -1,12 +1,3 @@
-import { fromFEN, isFEN } from './fen/index.js';
+import { fromFEN } from './fen/index.js';
 
-const startWithFEN = (FEN = '') => {
-  const { piecePlacement } = fromFEN(FEN);
-  return {
-    board: piecePlacement,
-  };
-};
-
-export const start = (config = '') => {
-  if (isFEN(config)) return startWithFEN(config);
-};
+export const start = ({ FEN }) => fromFEN(FEN);

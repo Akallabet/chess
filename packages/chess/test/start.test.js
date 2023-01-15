@@ -25,7 +25,7 @@ const emptyBoard = [
 ];
 
 t.test('Start', t => {
-  const { board } = start('8/8/8/8/8/8/8/8 w KQkq - 0 1');
+  const { board } = start({ FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1' });
   t.same(board, emptyBoard);
   t.end();
 });

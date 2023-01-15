@@ -31,7 +31,8 @@ export const fromFEN = FEN => {
     fullMoves,
   ] = R.split(' ', FEN);
   return {
-    piecePlacement: boardFromFEN(piecePlacement),
+    FEN,
+    board: boardFromFEN(piecePlacement),
     activeColor,
     castlingRights: castlingRights === '-' ? [] : R.split('', castlingRights),
     enPassant: enPassant === '-' ? false : enPassant,

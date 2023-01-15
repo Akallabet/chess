@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
 import { files, ranks } from './constants.js';
 import { movesMap } from './moves/index.js';
+import { fromFEN } from './fen/index.js';
 
 const isPiece = piece => new RegExp(/[pnbrqkPNBRQK]+/).test(piece);
 const isChessboardPos = pos =>
@@ -17,7 +18,7 @@ const isCoords = pos =>
   R.gte(pos.y, 0) &&
   R.lte(pos.y, 7);
 
-export const fromChessBoardToCoordinares = pos => {
+export const fromChessBoardToCoordinates = pos => {
   const [piece, file, rank] = R.split('', pos);
   return {
     piece,
@@ -29,13 +30,13 @@ const calcMoves = ({ piece, x, y }, { board, ...rest }) => {
   return { board: movesMap[piece]({ x, y }, { board }), ...rest };
 };
 
-export const getMoves = R.curry((pos, game) => {
+export const getMoves = R.curry((pos, state) => {
   if (isChessboardPos(pos)) {
-    return getMoves(fromChessBoardToCoordinares(pos), game);
+    return getMoves(fromChessBoardToCoordinates(pos), state);
   }
-  if (isCoords(pos)) return calcMoves(pos, game);
+  if (isCoords(pos)) return calcMoves(pos, fromFEN(R.prop('FEN', state)));
   return {
     error: errorCodes.wrongFormat,
-    ...game,
+    ...state,
   };
 });

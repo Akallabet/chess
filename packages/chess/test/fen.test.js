@@ -14,9 +14,11 @@ const emptyBoard = [
 ];
 
 t.test('Return object from FEN string', t => {
-  const FENObj = fromFEN('8/8/8/8/8/8/8/8 w KQkq - 0 1');
+  const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
+  const FENObj = fromFEN(FEN);
   t.same(FENObj, {
-    piecePlacement: emptyBoard,
+    FEN,
+    board: emptyBoard,
     activeColor: 'w',
     castlingRights: ['K', 'Q', 'k', 'q'],
     enPassant: false,

@@ -17,7 +17,7 @@ export const getBoard = (items = []) =>
           );
           return item ? item.cell : { ...cell };
         },
-        { ...row }
+        [...row]
       ),
     board
   );

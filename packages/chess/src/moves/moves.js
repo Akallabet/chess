@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import { rotate } from '../utils/index.js';
 const mapI = R.addIndex(R.map);
 
 const isWhitePiece = piece => new RegExp(/[PNBRQK]+/).test(piece);
@@ -82,21 +83,25 @@ const mapMovesToBoard = R.curry((moves, board) =>
 );
 
 const pieceMovesList = {
-  p: (coord = { x: 0, y: 0 }, state) => {
+  p: R.curry((coord, state) => {
     const moves = [
       ...calcPawnMoves(coord, state),
       ...calcPawnCaptures(coord, state),
     ];
     return mapMovesToBoard(moves, state.board);
-  },
-  n: ({ x, y }, { board }) => {
-    console.log(y, x);
+  }),
+  n: (coord, { board }) => {
+    console.log(coord);
     return board;
   },
-  P: ({ x, y }, { board }) => {
-    console.log(y, x);
-    return board;
-  },
+  P: R.curry((coord, { board }) =>
+    R.pipe(
+      rotate,
+      board => ({ board }),
+      pieceMovesList.p({ x: 7 - coord.x, y: 7 - coord.y }),
+      rotate
+    )(board)
+  ),
 };
 export const getPieceMoves = (piece, coord, state) =>
   pieceMovesList[piece](coord, state);

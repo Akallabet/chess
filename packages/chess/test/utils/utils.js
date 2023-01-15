@@ -1,23 +1,19 @@
-import * as R from 'ramda';
+import t from 'tap';
+import { rotate } from '../../src/utils/index.js';
 
-const mapI = R.addIndex(R.map);
-
-const cell = {};
-const row = [cell, cell, cell, cell, cell, cell, cell, cell];
-const board = [row, row, row, row, row, row, row, row];
-
-export const getBoard = (items = []) =>
-  mapI(
-    (row, y) =>
-      mapI(
-        (cell, x) => {
-          const item = R.find(
-            ({ coord }) => coord.y === y && coord.x === x,
-            items
-          );
-          return item ? item.cell : { ...cell };
-        },
-        [...row]
-      ),
-    board
-  );
+t.test('Rotate an 4 x 4 matrix', t => {
+  const matrix = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 10, 11, 12],
+    [13, 14, 15, 16],
+  ];
+  const rotated = [
+    [16, 15, 14, 13],
+    [12, 11, 10, 9],
+    [8, 7, 6, 5],
+    [4, 3, 2, 1],
+  ];
+  t.same(rotate(matrix), rotated);
+  t.end();
+});

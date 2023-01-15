@@ -81,7 +81,7 @@ const mapMovesToBoard = R.curry((moves, board) =>
   )
 );
 
-export const movesMap = {
+const pieceMovesList = {
   p: (coord = { x: 0, y: 0 }, state) => {
     const moves = [
       ...calcPawnMoves(coord, state),
@@ -98,3 +98,5 @@ export const movesMap = {
     return board;
   },
 };
+export const getPieceMoves = (piece, coord, state) =>
+  pieceMovesList[piece](coord, state);

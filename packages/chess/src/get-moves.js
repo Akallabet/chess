@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
 import { files, ranks } from './constants.js';
-import { movesMap } from './moves/index.js';
+import { getPieceMoves } from './moves/index.js';
 import { fromFEN } from './fen/index.js';
 
 const isPiece = piece => new RegExp(/[pnbrqkPNBRQK]+/).test(piece);
@@ -27,7 +27,7 @@ export const fromChessBoardToCoordinates = pos => {
   };
 };
 const calcMoves = ({ piece, x, y }, { board, ...rest }) => {
-  return { board: movesMap[piece]({ x, y }, { board }), ...rest };
+  return { board: getPieceMoves(piece, { x, y }, { board }), ...rest };
 };
 
 export const getMoves = R.curry((pos, state) => {

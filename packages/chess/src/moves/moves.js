@@ -70,6 +70,42 @@ const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   return R.map(coord => ({ coord, addFlag: addCaptureFlag }), captures);
 });
 
+const calcPieceMoves = (
+  patterns = [],
+  limit,
+  coord = { x: 0, y: 0 },
+  state,
+  moves = []
+) => {
+  if (patterns.length === 0) return moves;
+  const { board } = state;
+  const pattern = R.head(patterns);
+  let count = 0;
+  let isValid = true;
+  while (isValid) {
+    if (limit(count)) break;
+    const lastMove = R.last(moves) || { coord };
+    const currentMove = pattern(lastMove.coord);
+    const row = board[currentMove.y];
+    if (!row) {
+      isValid = false;
+      break;
+    }
+    const cell = board[currentMove.y][currentMove.x];
+
+    if (!cell) {
+      isValid = false;
+      break;
+    }
+    if (cell.piece) {
+      isValid = false;
+      break;
+    }
+    moves.push({ coord: currentMove, addFlag: addMoveFlag });
+  }
+  return calcPieceMoves(R.slice(1, Infinity, patterns), coord, state, moves);
+};
+
 const mapMovesToBoard = R.curry((moves, board) =>
   mapI(
     (row, y) =>
@@ -93,9 +129,17 @@ const pieceMovesList = {
     ];
     return mapMovesToBoard(moves, state.board);
   }),
-  n: (coord, { board }) => {
-    console.log(coord);
-    return board;
+  n: (coord, state) => {
+    const moves = calcPieceMoves(
+      [({ x, y }) => ({ x: x + 3, y: y + 1 })],
+      count => count > 1,
+      coord,
+      state
+    );
+    return mapMovesToBoard(
+      [{ coord, addFlag: addSelectedFlag }, ...moves],
+      state.board
+    );
   },
   P: R.curry((coord, { board }) =>
     R.pipe(

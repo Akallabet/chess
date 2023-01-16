@@ -114,3 +114,13 @@ t.test('Select pawn on file h', t => {
   );
   t.end();
 });
+t.test('Select knight', t => {
+  t.same(
+    getMoves(
+      { piece: 'n', x: 4, y: 3 },
+      { FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' }
+    ).board,
+    getBoard([{ coord: { x: 4, y: 3 }, cell: { piece: 'n', selected: true } }])
+  );
+  t.end();
+});

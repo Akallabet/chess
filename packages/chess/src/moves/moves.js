@@ -103,7 +103,13 @@ const calcPieceMoves = (
     }
     moves.push({ coord: currentMove, addFlag: addMoveFlag });
   }
-  return calcPieceMoves(R.slice(1, Infinity, patterns), coord, state, moves);
+  return calcPieceMoves(
+    R.slice(1, Infinity, patterns),
+    limit,
+    coord,
+    state,
+    moves
+  );
 };
 
 const mapMovesToBoard = R.curry((moves, board) =>
@@ -131,7 +137,7 @@ const pieceMovesList = {
   }),
   n: (coord, state) => {
     const moves = calcPieceMoves(
-      [({ x, y }) => ({ x: x + 3, y: y + 1 })],
+      [({ x, y }) => ({ x: x + 2, y: y + 1 })],
       count => count > 1,
       coord,
       state

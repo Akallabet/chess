@@ -120,7 +120,10 @@ t.test('Select knight', t => {
       { piece: 'n', x: 4, y: 3 },
       { FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' }
     ).board,
-    getBoard([{ coord: { x: 4, y: 3 }, cell: { piece: 'n', selected: true } }])
+    getBoard([
+      { coord: { x: 4, y: 3 }, cell: { piece: 'n', selected: true } },
+      { coord: { x: 6, y: 4 }, cell: { move: true } },
+    ])
   );
   t.end();
 });

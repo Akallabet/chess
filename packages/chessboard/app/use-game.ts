@@ -8,7 +8,7 @@ export type getMovesGameFn = {
 };
 
 export const useGame = (FEN: string) => {
-  const [game, setGame] = useState(chess.start(FEN));
+  const [game, setGame] = useState(chess.start({ FEN }));
   const { board } = game;
   return {
     board,

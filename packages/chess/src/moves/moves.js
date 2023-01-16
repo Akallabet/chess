@@ -10,6 +10,7 @@ const areOpponents = (pa, pb) =>
 
 const addMoveFlag = R.assoc('move', true);
 const addCaptureFlag = R.assoc('capture', true);
+const addSelectedFlag = R.assoc('selected', true);
 const isSamePos =
   ({ x, y }) =>
   m =>
@@ -59,6 +60,7 @@ const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   ) {
     captures.push({ x: coord.x - 1, y: coord.y + 1 });
   }
+  if (!nextRank[coord.x + 1]) return captures;
   if (
     nextRank[coord.x + 1].piece &&
     areOpponents(board[coord.y][coord.x].piece, nextRank[coord.x + 1].piece)
@@ -85,6 +87,7 @@ const mapMovesToBoard = R.curry((moves, board) =>
 const pieceMovesList = {
   p: R.curry((coord, state) => {
     const moves = [
+      { coord, addFlag: addSelectedFlag },
       ...calcPawnMoves(coord, state),
       ...calcPawnCaptures(coord, state),
     ];

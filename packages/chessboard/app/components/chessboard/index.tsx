@@ -48,10 +48,18 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
   <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
       <div key={i} className="flex h-1/8 w-full flex-row">
-        {row.map(({ piece }, j) => {
+        {row.map(({ piece, move, selected }, j) => {
+          const highlight = move || selected;
           const isWhiteSquare =
             (isEven(i) && isEven(j)) || (isOdd(i) && isOdd(j));
-          const bg = isWhiteSquare ? 'bg-primary' : 'bg-secondary';
+          const bg =
+            (isWhiteSquare && highlight && 'bg-primary-dark') ||
+            (isWhiteSquare && 'bg-primary') ||
+            (highlight && 'bg-secondary-dark') ||
+            'bg-secondary';
+          const onPieceClick = () => {
+            onSelect({ piece, x: i, y: j });
+          };
           return (
             <div
               key={j}
@@ -63,7 +71,7 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
                 {piece && (
                   <div
                     className="flex h-full w-full items-center justify-center"
-                    onClick={() => onSelect({ piece, x: i, y: j })}
+                    onClick={onPieceClick}
                   >
                     <Piece
                       piece={piece}

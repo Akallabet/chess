@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import chess from '@chess/chess';
 
 export type getMovesGameFn = {
@@ -9,6 +9,9 @@ export type getMovesGameFn = {
 
 export const useGame = (FEN: string) => {
   const [game, setGame] = useState(chess.start({ FEN }));
+  useEffect(() => {
+    setGame(chess.start({ FEN }));
+  }, [FEN]);
   const { board } = game;
   return {
     board,

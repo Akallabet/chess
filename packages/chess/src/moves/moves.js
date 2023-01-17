@@ -86,8 +86,12 @@ const calcMovesFromPattern = (
   if (!row) return moves;
   const cell = board[currentMove.y][currentMove.x];
   if (!cell) return moves;
-  if (cell.piece) return moves;
-  moves.push({ coord: currentMove, addFlag: addMoveFlag });
+  if (cell.piece && !areOpponents(cell.piece, board[coord.y][coord.x].piece))
+    return moves;
+  if (cell.piece && areOpponents(cell.piece, board[coord.y][coord.x].piece)) {
+    moves.push({ coord: currentMove, addFlag: addCaptureFlag });
+  }
+  if (!cell.piece) moves.push({ coord: currentMove, addFlag: addMoveFlag });
   return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
 };
 const calcPieceMoves = (

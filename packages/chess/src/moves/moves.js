@@ -70,6 +70,26 @@ const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   return R.map(coord => ({ coord, addFlag: addCaptureFlag }), captures);
 });
 
+const calcMovesFromPattern = (
+  pattern,
+  limit,
+  count,
+  moves = [],
+  coord,
+  state
+) => {
+  if (limit(count)) return moves;
+  const { board } = state;
+  const lastMove = R.last(moves) || { coord };
+  const currentMove = pattern(lastMove.coord);
+  const row = board[currentMove.y];
+  if (!row) return moves;
+  const cell = board[currentMove.y][currentMove.x];
+  if (!cell) return moves;
+  if (cell.piece) return moves;
+  moves.push({ coord: currentMove, addFlag: addMoveFlag });
+  return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
+};
 const calcPieceMoves = (
   patterns = [],
   limit,
@@ -78,37 +98,16 @@ const calcPieceMoves = (
   moves = []
 ) => {
   if (patterns.length === 0) return moves;
-  const { board } = state;
-  const pattern = R.head(patterns);
-  let count = 0;
-  let isValid = true;
-  while (isValid) {
-    if (limit(count)) break;
-    const lastMove = R.last(moves) || { coord };
-    const currentMove = pattern(lastMove.coord);
-    const row = board[currentMove.y];
-    if (!row) {
-      isValid = false;
-      break;
-    }
-    const cell = board[currentMove.y][currentMove.x];
 
-    if (!cell) {
-      isValid = false;
-      break;
-    }
-    if (cell.piece) {
-      isValid = false;
-      break;
-    }
-    moves.push({ coord: currentMove, addFlag: addMoveFlag });
-  }
   return calcPieceMoves(
     R.slice(1, Infinity, patterns),
     limit,
     coord,
     state,
-    moves
+    R.concat(
+      moves,
+      calcMovesFromPattern(R.head(patterns), limit, 0, [], coord, state)
+    )
   );
 };
 
@@ -137,8 +136,17 @@ const pieceMovesList = {
   }),
   n: (coord, state) => {
     const moves = calcPieceMoves(
-      [({ x, y }) => ({ x: x + 2, y: y + 1 })],
-      count => count > 1,
+      [
+        ({ x, y }) => ({ x: x + 2, y: y + 1 }),
+        ({ x, y }) => ({ x: x + 1, y: y + 2 }),
+        ({ x, y }) => ({ x: x - 1, y: y + 2 }),
+        ({ x, y }) => ({ x: x - 2, y: y + 1 }),
+        ({ x, y }) => ({ x: x - 2, y: y - 1 }),
+        ({ x, y }) => ({ x: x - 1, y: y - 2 }),
+        ({ x, y }) => ({ x: x + 1, y: y - 2 }),
+        ({ x, y }) => ({ x: x + 2, y: y - 1 }),
+      ],
+      count => count >= 1,
       coord,
       state
     );

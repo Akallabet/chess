@@ -125,6 +125,28 @@ const mapMovesToBoard = R.curry((moves, board) =>
   )
 );
 
+const calcKnightMoves = (coord, state) => {
+  const moves = calcPieceMoves(
+    [
+      ({ x, y }) => ({ x: x + 2, y: y + 1 }),
+      ({ x, y }) => ({ x: x + 1, y: y + 2 }),
+      ({ x, y }) => ({ x: x - 1, y: y + 2 }),
+      ({ x, y }) => ({ x: x - 2, y: y + 1 }),
+      ({ x, y }) => ({ x: x - 2, y: y - 1 }),
+      ({ x, y }) => ({ x: x - 1, y: y - 2 }),
+      ({ x, y }) => ({ x: x + 1, y: y - 2 }),
+      ({ x, y }) => ({ x: x + 2, y: y - 1 }),
+    ],
+    count => count >= 1,
+    coord,
+    state
+  );
+  return mapMovesToBoard(
+    [{ coord, addFlag: addSelectedFlag }, ...moves],
+    state.board
+  );
+};
+
 const pieceMovesList = {
   p: R.curry((coord, state) => {
     const moves = [
@@ -134,27 +156,7 @@ const pieceMovesList = {
     ];
     return mapMovesToBoard(moves, state.board);
   }),
-  n: (coord, state) => {
-    const moves = calcPieceMoves(
-      [
-        ({ x, y }) => ({ x: x + 2, y: y + 1 }),
-        ({ x, y }) => ({ x: x + 1, y: y + 2 }),
-        ({ x, y }) => ({ x: x - 1, y: y + 2 }),
-        ({ x, y }) => ({ x: x - 2, y: y + 1 }),
-        ({ x, y }) => ({ x: x - 2, y: y - 1 }),
-        ({ x, y }) => ({ x: x - 1, y: y - 2 }),
-        ({ x, y }) => ({ x: x + 1, y: y - 2 }),
-        ({ x, y }) => ({ x: x + 2, y: y - 1 }),
-      ],
-      count => count >= 1,
-      coord,
-      state
-    );
-    return mapMovesToBoard(
-      [{ coord, addFlag: addSelectedFlag }, ...moves],
-      state.board
-    );
-  },
+  n: calcKnightMoves,
   P: R.curry((coord, { board }) =>
     R.pipe(
       rotate,
@@ -163,6 +165,7 @@ const pieceMovesList = {
       rotate
     )(board)
   ),
+  N: calcKnightMoves,
 };
 export const getPieceMoves = (piece, coord, state) =>
   pieceMovesList[piece](coord, state);

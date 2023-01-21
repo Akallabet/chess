@@ -90,6 +90,7 @@ const calcMovesFromPattern = (
     return moves;
   if (cell.piece && areOpponents(cell.piece, board[coord.y][coord.x].piece)) {
     moves.push({ coord: currentMove, addFlag: addCaptureFlag });
+    return moves;
   }
   if (!cell.piece) moves.push({ coord: currentMove, addFlag: addMoveFlag });
   return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
@@ -151,6 +152,23 @@ const calcKnightMoves = (coord, state) => {
   );
 };
 
+const calcBishopMoves = (coord, state) => {
+  const moves = calcPieceMoves(
+    [
+      ({ x, y }) => ({ x: x + 1, y: y + 1 }),
+      ({ x, y }) => ({ x: x - 1, y: y + 1 }),
+      ({ x, y }) => ({ x: x - 1, y: y - 1 }),
+      ({ x, y }) => ({ x: x + 1, y: y - 1 }),
+    ],
+    R.F,
+    coord,
+    state
+  );
+  return mapMovesToBoard(
+    [{ coord, addFlag: addSelectedFlag }, ...moves],
+    state.board
+  );
+};
 const pieceMovesList = {
   p: R.curry((coord, state) => {
     const moves = [
@@ -170,6 +188,8 @@ const pieceMovesList = {
     )(board)
   ),
   N: calcKnightMoves,
+  b: calcBishopMoves,
+  B: calcBishopMoves,
 };
 export const getPieceMoves = (piece, coord, state) =>
   pieceMovesList[piece](coord, state);

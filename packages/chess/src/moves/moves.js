@@ -95,26 +95,6 @@ const calcMovesFromPattern = (
   if (!cell.piece) moves.push({ coord: currentMove, addFlag: addMoveFlag });
   return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
 };
-const calcPieceMoves = (
-  patterns = [],
-  limit,
-  coord = { x: 0, y: 0 },
-  state,
-  moves = []
-) => {
-  if (patterns.length === 0) return moves;
-
-  return calcPieceMoves(
-    R.slice(1, Infinity, patterns),
-    limit,
-    coord,
-    state,
-    R.concat(
-      moves,
-      calcMovesFromPattern(R.head(patterns), limit, 0, [], coord, state)
-    )
-  );
-};
 
 const mapMovesToBoard = R.curry((moves, board) =>
   mapI(
@@ -130,62 +110,60 @@ const mapMovesToBoard = R.curry((moves, board) =>
   )
 );
 
-const calcKnightMoves = (coord, state) => {
-  const moves = calcPieceMoves(
-    [
-      ({ x, y }) => ({ x: x + 2, y: y + 1 }),
-      ({ x, y }) => ({ x: x + 1, y: y + 2 }),
-      ({ x, y }) => ({ x: x - 1, y: y + 2 }),
-      ({ x, y }) => ({ x: x - 2, y: y + 1 }),
-      ({ x, y }) => ({ x: x - 2, y: y - 1 }),
-      ({ x, y }) => ({ x: x - 1, y: y - 2 }),
-      ({ x, y }) => ({ x: x + 1, y: y - 2 }),
-      ({ x, y }) => ({ x: x + 2, y: y - 1 }),
-    ],
-    count => count >= 1,
-    coord,
-    state
-  );
-  return mapMovesToBoard(
-    [{ coord, addFlag: addSelectedFlag }, ...moves],
-    state.board
-  );
-};
+const calcPieceMoves = R.curryN(
+  4,
+  (patterns = [], limit, coord = { x: 0, y: 0 }, state, moves = []) => {
+    if (patterns.length === 0)
+      return mapMovesToBoard(
+        [{ coord, addFlag: addSelectedFlag }, ...moves],
+        state.board
+      );
 
-const calcBishopMoves = (coord, state) => {
-  const moves = calcPieceMoves(
-    [
-      ({ x, y }) => ({ x: x + 1, y: y + 1 }),
-      ({ x, y }) => ({ x: x - 1, y: y + 1 }),
-      ({ x, y }) => ({ x: x - 1, y: y - 1 }),
-      ({ x, y }) => ({ x: x + 1, y: y - 1 }),
-    ],
-    R.F,
-    coord,
-    state
-  );
-  return mapMovesToBoard(
-    [{ coord, addFlag: addSelectedFlag }, ...moves],
-    state.board
-  );
-};
-const calcRookMoves = (coord, state) => {
-  const moves = calcPieceMoves(
-    [
-      ({ x, y }) => ({ x: x + 1, y }),
-      ({ x, y }) => ({ x: x - 1, y }),
-      ({ x, y }) => ({ x, y: y - 1 }),
-      ({ x, y }) => ({ x, y: y + 1 }),
-    ],
-    R.F,
-    coord,
-    state
-  );
-  return mapMovesToBoard(
-    [{ coord, addFlag: addSelectedFlag }, ...moves],
-    state.board
-  );
-};
+    return calcPieceMoves(
+      R.slice(1, Infinity, patterns),
+      limit,
+      coord,
+      state,
+      R.concat(
+        moves,
+        calcMovesFromPattern(R.head(patterns), limit, 0, [], coord, state)
+      )
+    );
+  }
+);
+
+const calcKnightMoves = calcPieceMoves(
+  [
+    ({ x, y }) => ({ x: x + 2, y: y + 1 }),
+    ({ x, y }) => ({ x: x + 1, y: y + 2 }),
+    ({ x, y }) => ({ x: x - 1, y: y + 2 }),
+    ({ x, y }) => ({ x: x - 2, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 2, y: y - 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y - 2 }),
+    ({ x, y }) => ({ x: x + 1, y: y - 2 }),
+    ({ x, y }) => ({ x: x + 2, y: y - 1 }),
+  ],
+  count => count >= 1
+);
+
+const calcBishopMoves = calcPieceMoves(
+  [
+    ({ x, y }) => ({ x: x + 1, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y - 1 }),
+    ({ x, y }) => ({ x: x + 1, y: y - 1 }),
+  ],
+  R.F
+);
+const calcRookMoves = calcPieceMoves(
+  [
+    ({ x, y }) => ({ x: x + 1, y }),
+    ({ x, y }) => ({ x: x - 1, y }),
+    ({ x, y }) => ({ x, y: y - 1 }),
+    ({ x, y }) => ({ x, y: y + 1 }),
+  ],
+  R.F
+);
 
 const pieceMovesList = {
   p: R.curry((coord, state) => {

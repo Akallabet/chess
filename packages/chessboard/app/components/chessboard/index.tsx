@@ -58,7 +58,7 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
             (highlight && 'bg-secondary-dark') ||
             'bg-secondary';
           const onPieceClick = () => {
-            onSelect({ piece, x: i, y: j });
+            onSelect({ x: j, y: i });
           };
           return (
             <div

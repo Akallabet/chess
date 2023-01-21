@@ -3,7 +3,7 @@ import { fromChessBoardToCoordinates, getMoves } from '../src/get-moves.js';
 import { getBoard } from './test-utils.js';
 
 t.test('Convert chessboard piece coordinates to x/y coordinates', t => {
-  t.same(fromChessBoardToCoordinates('pe3'), { piece: 'p', x: 4, y: 5 });
+  t.same(fromChessBoardToCoordinates('e3'), { x: 4, y: 5 });
   t.end();
 });
 
@@ -11,10 +11,7 @@ t.test('Get Moves - wrong format', t => {
   const FEN = '8/4p3/8/8/8/8/8/8 b KQkq - 0 1';
   t.same(getMoves('', { FEN }), { error: 'WRONG_FORMAT', FEN });
   t.same(getMoves('Pb', { FEN }), { error: 'WRONG_FORMAT', FEN });
-  t.same(getMoves({ piece: 'p', x: 1, y: 9 }, { FEN }), {
-    error: 'WRONG_FORMAT',
-    FEN,
-  });
+  t.same(getMoves({ x: 1, y: 9 }, { FEN }).error, 'NO_PIECE_SELECTED');
   t.end();
 });
 t.test('Chessboard position', t => {
@@ -26,10 +23,7 @@ t.test('Chessboard position', t => {
 });
 t.test('Get moves - Black pawn - rank 7', t => {
   t.same(
-    getMoves(
-      { piece: 'p', x: 4, y: 1 },
-      { FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 1 }, { FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 4, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 2 }, cell: { move: true } },
@@ -40,10 +34,7 @@ t.test('Get moves - Black pawn - rank 7', t => {
 });
 t.test('Get moves - Black pawn - after rank 7', t => {
   t.same(
-    getMoves(
-      { piece: 'p', x: 4, y: 2 },
-      { FEN: '8/8/4p3/8/8/8/8/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 2 }, { FEN: '8/8/4p3/8/8/8/8/8 b KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 4, y: 2 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 3 }, cell: { move: true } },
@@ -53,10 +44,7 @@ t.test('Get moves - Black pawn - after rank 7', t => {
 });
 t.test('Get moves - Black pawn - other piece in front', t => {
   t.same(
-    getMoves(
-      { piece: 'p', x: 4, y: 1 },
-      { FEN: '8/4p3/4p3/8/8/8/8/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 1 }, { FEN: '8/4p3/4p3/8/8/8/8/8 b KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 4, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 2 }, cell: { piece: 'p' } },
@@ -66,10 +54,7 @@ t.test('Get moves - Black pawn - other piece in front', t => {
 });
 t.test('Get moves - Black pawn - moves and captures', t => {
   t.same(
-    getMoves(
-      { piece: 'p', x: 4, y: 1 },
-      { FEN: '8/4p3/3P4/8/8/8/8/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 1 }, { FEN: '8/4p3/3P4/8/8/8/8/8 b KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 4, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 2 }, cell: { move: true } },
@@ -84,10 +69,7 @@ t.test('Get moves - Black pawn - moves and captures', t => {
 });
 t.test('Get moves - White pawn - moves and captures', t => {
   t.same(
-    getMoves(
-      { piece: 'P', x: 4, y: 6 },
-      { FEN: '8/8/8/8/8/3p4/4P3/8 w KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 6 }, { FEN: '8/8/8/8/8/3p4/4P3/8 w KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 4, y: 6 }, cell: { piece: 'P', selected: true } },
       { coord: { x: 4, y: 5 }, cell: { move: true } },
@@ -102,10 +84,7 @@ t.test('Get moves - White pawn - moves and captures', t => {
 });
 t.test('Select pawn on file h', t => {
   t.same(
-    getMoves(
-      { piece: 'p', x: 7, y: 1 },
-      { FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 7, y: 1 }, { FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 7, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 7, y: 2 }, cell: { move: true } },

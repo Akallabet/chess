@@ -1,3 +1,8 @@
+interface Coordinates {
+  x: number;
+  y: number;
+}
+
 export interface Square {
   piece: string;
   move: boolean;
@@ -19,3 +24,5 @@ export const ranks: string[];
 export function start(args: StartArgs): ChessState;
 export function getMoves(SAN: string): (args: ChessState) => ChessState;
 export function getMoves(SAN: string, args: ChessState): ChessState;
+export function getMoves(coords: Coordinates): (args: ChessState) => ChessState;
+export function getMoves(coords: Coordinates, args: ChessState): ChessState;

@@ -189,5 +189,6 @@ const pieceMovesList = {
   r: calcRookMoves,
   R: calcRookMoves,
 };
-export const getPieceMoves = (piece, coord, state) =>
-  pieceMovesList[piece](coord, state);
+export const highlightMoves = (coord, state) => {
+  return pieceMovesList[state.board[coord.y][coord.x].piece](coord, state);
+};

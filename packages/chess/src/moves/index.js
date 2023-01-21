@@ -1,1 +1,1 @@
-export { getPieceMoves } from './moves.js';
+export { highlightMoves } from './moves.js';

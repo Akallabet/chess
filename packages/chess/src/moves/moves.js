@@ -169,6 +169,24 @@ const calcBishopMoves = (coord, state) => {
     state.board
   );
 };
+const calcRookMoves = (coord, state) => {
+  const moves = calcPieceMoves(
+    [
+      ({ x, y }) => ({ x: x + 1, y }),
+      ({ x, y }) => ({ x: x - 1, y }),
+      ({ x, y }) => ({ x, y: y - 1 }),
+      ({ x, y }) => ({ x, y: y + 1 }),
+    ],
+    R.F,
+    coord,
+    state
+  );
+  return mapMovesToBoard(
+    [{ coord, addFlag: addSelectedFlag }, ...moves],
+    state.board
+  );
+};
+
 const pieceMovesList = {
   p: R.curry((coord, state) => {
     const moves = [
@@ -190,6 +208,8 @@ const pieceMovesList = {
   N: calcKnightMoves,
   b: calcBishopMoves,
   B: calcBishopMoves,
+  r: calcRookMoves,
+  R: calcRookMoves,
 };
 export const getPieceMoves = (piece, coord, state) =>
   pieceMovesList[piece](coord, state);

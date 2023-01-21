@@ -159,3 +159,29 @@ t.test('Highlight Bishop moves', t => {
   );
   t.end();
 });
+t.test('Highlight Rook moves', t => {
+  const expected = getBoard([
+    { coord: { x: 4, y: 3 }, cell: { piece: 'r', selected: true } },
+    { coord: { x: 4, y: 4 }, cell: { move: true } },
+    { coord: { x: 4, y: 5 }, cell: { move: true } },
+    { coord: { x: 4, y: 6 }, cell: { piece: 'P', capture: true } },
+    { coord: { x: 4, y: 2 }, cell: { move: true } },
+    { coord: { x: 4, y: 1 }, cell: { move: true } },
+    { coord: { x: 4, y: 0 }, cell: { move: true } },
+    { coord: { x: 3, y: 3 }, cell: { move: true } },
+    { coord: { x: 2, y: 3 }, cell: { move: true } },
+    { coord: { x: 1, y: 3 }, cell: { move: true } },
+    { coord: { x: 0, y: 3 }, cell: { move: true } },
+    { coord: { x: 5, y: 3 }, cell: { move: true } },
+    { coord: { x: 6, y: 3 }, cell: { move: true } },
+    { coord: { x: 7, y: 3 }, cell: { piece: 'q' } },
+  ]);
+  t.same(
+    getMoves(
+      { piece: 'r', x: 4, y: 3 },
+      { FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' }
+    ).board,
+    expected
+  );
+  t.end();
+});

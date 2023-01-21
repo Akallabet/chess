@@ -49,6 +49,7 @@ const calcPawnMoves = (coord = { x: 0, y: 0 }, { board }) => {
   }
   return R.map(coord => ({ coord, addFlag: addMoveFlag }), moves);
 };
+
 const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   const captures = [];
   const nextRank = board[coord.y + 1];
@@ -78,10 +79,10 @@ const calcMovesFromPattern = (
   coord,
   state
 ) => {
-  if (limit(count)) return moves;
+  if (limit(count, state)) return moves;
   const { board } = state;
   const lastMove = R.last(moves) || { coord };
-  const currentMove = pattern(lastMove.coord);
+  const currentMove = pattern(lastMove.coord, state);
   const row = board[currentMove.y];
   if (!row) return moves;
   const cell = board[currentMove.y][currentMove.x];
@@ -164,6 +165,32 @@ const calcRookMoves = calcPieceMoves(
   ],
   R.F
 );
+const calcQueenMoves = calcPieceMoves(
+  [
+    ({ x, y }) => ({ x: x + 1, y }),
+    ({ x, y }) => ({ x: x - 1, y }),
+    ({ x, y }) => ({ x, y: y - 1 }),
+    ({ x, y }) => ({ x, y: y + 1 }),
+    ({ x, y }) => ({ x: x + 1, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y - 1 }),
+    ({ x, y }) => ({ x: x + 1, y: y - 1 }),
+  ],
+  R.F
+);
+const calcKingMoves = calcPieceMoves(
+  [
+    ({ x, y }) => ({ x: x + 1, y }),
+    ({ x, y }) => ({ x: x - 1, y }),
+    ({ x, y }) => ({ x, y: y - 1 }),
+    ({ x, y }) => ({ x, y: y + 1 }),
+    ({ x, y }) => ({ x: x + 1, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y + 1 }),
+    ({ x, y }) => ({ x: x - 1, y: y - 1 }),
+    ({ x, y }) => ({ x: x + 1, y: y - 1 }),
+  ],
+  limit => limit >= 1
+);
 
 const pieceMovesList = {
   p: R.curry((coord, state) => {
@@ -174,7 +201,6 @@ const pieceMovesList = {
     ];
     return mapMovesToBoard(moves, state.board);
   }),
-  n: calcKnightMoves,
   P: R.curry((coord, { board }) =>
     R.pipe(
       rotate,
@@ -183,11 +209,16 @@ const pieceMovesList = {
       rotate
     )(board)
   ),
+  n: calcKnightMoves,
   N: calcKnightMoves,
   b: calcBishopMoves,
   B: calcBishopMoves,
   r: calcRookMoves,
   R: calcRookMoves,
+  q: calcQueenMoves,
+  Q: calcQueenMoves,
+  k: calcKingMoves,
+  K: calcKingMoves,
 };
 export const highlightMoves = (coord, state) => {
   return pieceMovesList[state.board[coord.y][coord.x].piece](coord, state);

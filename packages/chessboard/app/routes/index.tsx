@@ -23,7 +23,7 @@ export default function App() {
       </div>
       <div className="my-5" />
       <div className="mx-auto max-w-md">
-        <FENForm />
+        <FENForm FEN={FEN} />
       </div>
     </div>
   );

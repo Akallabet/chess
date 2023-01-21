@@ -2,13 +2,18 @@ import { Form } from '@remix-run/react';
 
 const inputClassName = `w-full rounded border border-gray-500 px-2 py-1 text-lg`;
 
-export const FENForm = () => {
+export const FENForm = ({ FEN }: { FEN: string }) => {
   return (
     <Form method="get">
       <p>
         <label>
           Use FEN string
-          <input name="fen" type="text" className={inputClassName} />
+          <input
+            name="fen"
+            type="text"
+            className={inputClassName}
+            defaultValue={FEN}
+          />
         </label>
       </p>
       <p>

@@ -16,39 +16,19 @@ const isSamePos =
   m =>
     m.y === y && m.x === x;
 
-const calcPawnMoves = (coord = { x: 0, y: 0 }, { board }) => {
-  const moves = [];
-  let isValid = true;
-  while (isValid) {
-    const lastMove = R.last(moves) || coord;
-    const currentMove = { x: lastMove.x, y: lastMove.y + 1 };
-    const row = board[currentMove.y];
-    if (!row) {
-      isValid = false;
-      break;
-    }
-    const cell = board[currentMove.y][currentMove.x];
-
-    if (!cell) {
-      isValid = false;
-      break;
-    }
-    if (cell.piece) {
-      isValid = false;
-      break;
-    }
-    if (coord.y > 1 && currentMove.y > coord.y + 1) {
-      isValid = false;
-      break;
-    }
-    if (coord.y === 1 && currentMove.y > coord.y + 2) {
-      isValid = false;
-      break;
-    }
-    moves.push(currentMove);
-  }
-  return R.map(coord => ({ coord, addFlag: addMoveFlag }), moves);
-};
+const mapMovesToBoard = R.curry((board, moves) =>
+  mapI(
+    (row, y) =>
+      mapI((cell, x) => {
+        const move = R.find(
+          R.pipe(R.prop('coord'), isSamePos({ x, y })),
+          moves
+        );
+        return move ? move.addFlag(cell) : cell;
+      }, row),
+    board
+  )
+);
 
 const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   const captures = [];
@@ -79,10 +59,10 @@ const calcMovesFromPattern = (
   coord,
   state
 ) => {
-  if (limit(count, state)) return moves;
-  const { board } = state;
   const lastMove = R.last(moves) || { coord };
   const currentMove = pattern(lastMove.coord, state);
+  if (limit(count, currentMove, coord, state)) return moves;
+  const { board } = state;
   const row = board[currentMove.y];
   if (!row) return moves;
   const cell = board[currentMove.y][currentMove.x];
@@ -97,28 +77,14 @@ const calcMovesFromPattern = (
   return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
 };
 
-const mapMovesToBoard = R.curry((moves, board) =>
-  mapI(
-    (row, y) =>
-      mapI((cell, x) => {
-        const move = R.find(
-          R.pipe(R.prop('coord'), isSamePos({ x, y })),
-          moves
-        );
-        return move ? move.addFlag(cell) : cell;
-      }, row),
-    board
-  )
-);
-
 const calcPieceMoves = R.curryN(
   4,
   (patterns = [], limit, coord = { x: 0, y: 0 }, state, moves = []) => {
     if (patterns.length === 0)
-      return mapMovesToBoard(
-        [{ coord, addFlag: addSelectedFlag }, ...moves],
-        state.board
-      );
+      return mapMovesToBoard(state.board, [
+        { coord, addFlag: addSelectedFlag },
+        ...moves,
+      ]);
 
     return calcPieceMoves(
       R.slice(1, Infinity, patterns),
@@ -196,10 +162,21 @@ const pieceMovesList = {
   p: R.curry((coord, state) => {
     const moves = [
       { coord, addFlag: addSelectedFlag },
-      ...calcPawnMoves(coord, state),
+      ...calcMovesFromPattern(
+        ({ x, y }) => ({ x, y: y + 1 }),
+        (count, { x, y }, start, { board }) => {
+          if (board[y][x].piece) return true;
+          if (start.y > 1 && count >= 1) return true;
+          if (start.y === 1 && count >= 2) return true;
+        },
+        0,
+        [],
+        coord,
+        state
+      ),
       ...calcPawnCaptures(coord, state),
     ];
-    return mapMovesToBoard(moves, state.board);
+    return mapMovesToBoard(state.board, moves);
   }),
   P: R.curry((coord, { board }) =>
     R.pipe(

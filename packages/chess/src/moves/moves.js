@@ -96,21 +96,11 @@ const calcMovesFromPatterns = R.curryN(
 const highlightMovesFromPatterns = R.curryN(
   4,
   (patterns = [], limit, coord = { x: 0, y: 0 }, state) => {
-    const moves = [
+    const moves = calcMovesFromPatterns(patterns, limit, coord, state);
+    return mapMovesToBoard(state.board, [
       { coord, addFlag: addSelectedFlag },
-      ...calcMovesFromPatterns(patterns, limit, coord, state),
-    ];
-    return mapI(
-      (row, y) =>
-        mapI((cell, x) => {
-          const move = R.find(
-            R.pipe(R.prop('coord'), isSamePos({ x, y })),
-            moves
-          );
-          return move ? move.addFlag(cell) : cell;
-        }, row),
-      state.board
-    );
+      ...moves,
+    ]);
   }
 );
 

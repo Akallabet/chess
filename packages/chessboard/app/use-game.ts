@@ -17,5 +17,8 @@ export const useGame = (FEN: string) => {
     getMoves: ({ x, y }: getMovesGameFn) => {
       setGame(chess.getMoves({ x, y }, game));
     },
+    clearBoard: () => {
+      setGame(chess.clearBoard(game));
+    },
   };
 };

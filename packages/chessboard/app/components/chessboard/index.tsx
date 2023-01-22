@@ -41,10 +41,15 @@ const Piece = ({
 
 type ChessBoardProps = {
   board: ChessBoardType;
-  onSelect: (args: getMovesGameFn) => ChessBoardType;
+  onSelect: (args: getMovesGameFn) => void;
+  onEmptySquareClick: () => void;
 };
 
-export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
+export const ChessBoard = ({
+  board,
+  onSelect,
+  onEmptySquareClick,
+}: ChessBoardProps) => (
   <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
       <div key={i} className="flex h-1/8 w-full flex-row">
@@ -57,8 +62,9 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
             (isWhiteSquare && 'bg-primary') ||
             (highlight && 'bg-secondary-dark') ||
             'bg-secondary';
-          const onPieceClick = () => {
-            onSelect({ x: j, y: i });
+          const handleClick = () => {
+            if (piece) return onSelect({ x: j, y: i });
+            return onEmptySquareClick();
           };
           return (
             <div
@@ -67,12 +73,9 @@ export const ChessBoard = ({ board, onSelect }: ChessBoardProps) => (
                 piece ? 'cursor-pointer' : 'cursor-auto'
               }`}
             >
-              <div className={`${bg} h-full w-full`}>
+              <div className={`${bg} h-full w-full`} onClick={handleClick}>
                 {piece && (
-                  <div
-                    className="flex h-full w-full items-center justify-center"
-                    onClick={onPieceClick}
-                  >
+                  <div className="flex h-full w-full items-center justify-center">
                     <Piece
                       piece={piece}
                       fill={isWhitePiece(piece) ? '#ffffff' : '#000000'}

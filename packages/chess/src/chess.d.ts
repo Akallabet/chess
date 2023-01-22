@@ -26,3 +26,4 @@ export function getMoves(SAN: string): (args: ChessState) => ChessState;
 export function getMoves(SAN: string, args: ChessState): ChessState;
 export function getMoves(coords: Coordinates): (args: ChessState) => ChessState;
 export function getMoves(coords: Coordinates, args: ChessState): ChessState;
+export function clearBoard(args: StartArgs): (args: ChessState) => ChessState;

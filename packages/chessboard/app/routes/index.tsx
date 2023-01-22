@@ -14,12 +14,18 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function App() {
   const FEN = useLoaderData<typeof loader>();
-  const { board, getMoves } = useGame(FEN);
+  const { board, getMoves, clearBoard } = useGame(FEN);
   return (
     <div>
       <div className="my-5" />
       <div className="mx-auto">
-        {board && <ChessBoard board={board} onSelect={getMoves} />}
+        {board && (
+          <ChessBoard
+            board={board}
+            onSelect={getMoves}
+            onEmptySquareClick={clearBoard}
+          />
+        )}
       </div>
       <div className="my-5" />
       <div className="mx-auto max-w-md">

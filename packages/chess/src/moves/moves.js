@@ -77,16 +77,11 @@ const calcMovesFromPattern = (
   return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
 };
 
-const calcPieceMoves = R.curryN(
+const calcMovesFromPatterns = R.curryN(
   4,
   (patterns = [], limit, coord = { x: 0, y: 0 }, state, moves = []) => {
-    if (patterns.length === 0)
-      return mapMovesToBoard(state.board, [
-        { coord, addFlag: addSelectedFlag },
-        ...moves,
-      ]);
-
-    return calcPieceMoves(
+    if (patterns.length === 0) return moves;
+    return calcMovesFromPatterns(
       R.slice(1, Infinity, patterns),
       limit,
       coord,
@@ -98,8 +93,28 @@ const calcPieceMoves = R.curryN(
     );
   }
 );
+const highlightMovesFromPatterns = R.curryN(
+  4,
+  (patterns = [], limit, coord = { x: 0, y: 0 }, state) => {
+    const moves = [
+      { coord, addFlag: addSelectedFlag },
+      ...calcMovesFromPatterns(patterns, limit, coord, state),
+    ];
+    return mapI(
+      (row, y) =>
+        mapI((cell, x) => {
+          const move = R.find(
+            R.pipe(R.prop('coord'), isSamePos({ x, y })),
+            moves
+          );
+          return move ? move.addFlag(cell) : cell;
+        }, row),
+      state.board
+    );
+  }
+);
 
-const calcKnightMoves = calcPieceMoves(
+const highlightKnightMoves = highlightMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 2, y: y + 1 }),
     ({ x, y }) => ({ x: x + 1, y: y + 2 }),
@@ -113,7 +128,7 @@ const calcKnightMoves = calcPieceMoves(
   count => count >= 1
 );
 
-const calcBishopMoves = calcPieceMoves(
+const highlightBishopMoves = highlightMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y: y + 1 }),
     ({ x, y }) => ({ x: x - 1, y: y + 1 }),
@@ -122,7 +137,7 @@ const calcBishopMoves = calcPieceMoves(
   ],
   R.F
 );
-const calcRookMoves = calcPieceMoves(
+const highlightRookMoves = highlightMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y }),
     ({ x, y }) => ({ x: x - 1, y }),
@@ -131,7 +146,7 @@ const calcRookMoves = calcPieceMoves(
   ],
   R.F
 );
-const calcQueenMoves = calcPieceMoves(
+const highlightQueenMoves = highlightMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y }),
     ({ x, y }) => ({ x: x - 1, y }),
@@ -144,7 +159,7 @@ const calcQueenMoves = calcPieceMoves(
   ],
   R.F
 );
-const calcKingMoves = calcPieceMoves(
+const highlightKingMoves = highlightMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y }),
     ({ x, y }) => ({ x: x - 1, y }),
@@ -158,7 +173,7 @@ const calcKingMoves = calcPieceMoves(
   limit => limit >= 1
 );
 
-const pieceMovesList = {
+const highlighMovesMap = {
   p: R.curry((coord, state) => {
     const moves = [
       { coord, addFlag: addSelectedFlag },
@@ -182,21 +197,22 @@ const pieceMovesList = {
     R.pipe(
       rotate,
       board => ({ board }),
-      pieceMovesList.p({ x: 7 - coord.x, y: 7 - coord.y }),
+      highlighMovesMap.p({ x: 7 - coord.x, y: 7 - coord.y }),
       rotate
     )(board)
   ),
-  n: calcKnightMoves,
-  N: calcKnightMoves,
-  b: calcBishopMoves,
-  B: calcBishopMoves,
-  r: calcRookMoves,
-  R: calcRookMoves,
-  q: calcQueenMoves,
-  Q: calcQueenMoves,
-  k: calcKingMoves,
-  K: calcKingMoves,
+  n: highlightKnightMoves,
+  N: highlightKnightMoves,
+  b: highlightBishopMoves,
+  B: highlightBishopMoves,
+  r: highlightRookMoves,
+  R: highlightRookMoves,
+  q: highlightQueenMoves,
+  Q: highlightQueenMoves,
+  k: highlightKingMoves,
+  K: highlightKingMoves,
 };
+
 export const highlightMoves = (coord, state) => {
-  return pieceMovesList[state.board[coord.y][coord.x].piece](coord, state);
+  return highlighMovesMap[state.board[coord.y][coord.x].piece](coord, state);
 };

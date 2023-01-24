@@ -13,7 +13,7 @@ export interface Square {
 export type ChessBoardType = Square[][];
 
 export interface ChessState {
-  board: ChessBoardType;
+  board: ChessBoardType | undefined;
   FEN: string;
 }
 interface StartArgs {
@@ -21,9 +21,23 @@ interface StartArgs {
 }
 export const files: string[];
 export const ranks: string[];
-export function start(args: StartArgs): ChessState;
-export function getMoves(SAN: string): (args: ChessState) => ChessState;
-export function getMoves(SAN: string, args: ChessState): ChessState;
-export function getMoves(coords: Coordinates): (args: ChessState) => ChessState;
-export function getMoves(coords: Coordinates, args: ChessState): ChessState;
-export function clearBoard(args: StartArgs): (args: ChessState) => ChessState;
+export default function chess(cmd: string, args: ChessState): ChessState;
+export default function chess(cmd: 'start', args: StartArgs): ChessState;
+export default function chess(
+  cmd: 'highlight',
+  SAN: string,
+  args: ChessState
+): ChessState;
+export default function chess(
+  cmd: 'highlight',
+  coords: Coordinates,
+  args: ChessState
+): ChessState;
+export default function chess(
+  cmd: 'highlight',
+  SAN: string
+): (args: ChessState) => ChessState;
+export default function chess(
+  cmd: 'highlight',
+  coords: Coordinates
+): (args: ChessState) => ChessState;

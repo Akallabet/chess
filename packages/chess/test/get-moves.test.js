@@ -95,10 +95,7 @@ t.test('Select pawn on file h', t => {
 });
 t.test('Select knight', t => {
   t.same(
-    getMoves(
-      { piece: 'n', x: 4, y: 3 },
-      { FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' }).board,
     getBoard([
       { coord: { x: 4, y: 3 }, cell: { piece: 'n', selected: true } },
       { coord: { x: 6, y: 4 }, cell: { move: true } },
@@ -130,10 +127,8 @@ t.test('Highlight Bishop moves', t => {
     { coord: { x: 7, y: 6 }, cell: { piece: 'q' } },
   ]);
   t.same(
-    getMoves(
-      { piece: 'b', x: 4, y: 3 },
-      { FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' }
-    ).board,
+    getMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' })
+      .board,
     expected
   );
   t.end();
@@ -156,10 +151,44 @@ t.test('Highlight Rook moves', t => {
     { coord: { x: 7, y: 3 }, cell: { piece: 'q' } },
   ]);
   t.same(
-    getMoves(
-      { piece: 'r', x: 4, y: 3 },
-      { FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' }
-    ).board,
+    getMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' })
+      .board,
+    expected
+  );
+  t.end();
+});
+t.test('Highlight Queen moves', t => {
+  const expected = getBoard([
+    { coord: { x: 4, y: 3 }, cell: { piece: 'q', selected: true } },
+    { coord: { x: 4, y: 4 }, cell: { move: true } },
+    { coord: { x: 4, y: 5 }, cell: { move: true } },
+    { coord: { x: 4, y: 6 }, cell: { piece: 'P', capture: true } },
+    { coord: { x: 4, y: 2 }, cell: { move: true } },
+    { coord: { x: 4, y: 1 }, cell: { move: true } },
+    { coord: { x: 4, y: 0 }, cell: { move: true } },
+    { coord: { x: 3, y: 3 }, cell: { move: true } },
+    { coord: { x: 2, y: 3 }, cell: { move: true } },
+    { coord: { x: 1, y: 3 }, cell: { move: true } },
+    { coord: { x: 0, y: 3 }, cell: { move: true } },
+    { coord: { x: 5, y: 3 }, cell: { move: true } },
+    { coord: { x: 6, y: 3 }, cell: { move: true } },
+    { coord: { x: 7, y: 3 }, cell: { piece: 'q' } },
+    { coord: { x: 3, y: 2 }, cell: { move: true } },
+    { coord: { x: 2, y: 1 }, cell: { move: true } },
+    { coord: { x: 1, y: 0 }, cell: { move: true } },
+    { coord: { x: 5, y: 2 }, cell: { move: true } },
+    { coord: { x: 6, y: 1 }, cell: { move: true } },
+    { coord: { x: 7, y: 0 }, cell: { move: true } },
+    { coord: { x: 2, y: 5 }, cell: { move: true } },
+    { coord: { x: 1, y: 6 }, cell: { piece: 'P', capture: true } },
+    { coord: { x: 5, y: 4 }, cell: { move: true } },
+    { coord: { x: 3, y: 4 }, cell: { move: true } },
+    { coord: { x: 6, y: 5 }, cell: { move: true } },
+    { coord: { x: 7, y: 6 }, cell: { piece: 'b' } },
+  ]);
+  t.same(
+    getMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' })
+      .board,
     expected
   );
   t.end();

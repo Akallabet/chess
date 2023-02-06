@@ -1,5 +1,5 @@
 import t from 'tap';
-import { getBoard } from './test-utils.js';
+import { getBoard } from '../test-utils.js';
 import { clearBoard } from '../src/clear-board.js';
 
 t.test('Clear board', t => {

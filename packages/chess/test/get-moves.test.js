@@ -1,6 +1,6 @@
 import t from 'tap';
 import { fromChessBoardToCoordinates, getMoves } from '../src/get-moves.js';
-import { getBoard } from './test-utils.js';
+import { getBoard } from '../test-utils.js';
 
 t.test('Convert chessboard piece coordinates to x/y coordinates', t => {
   t.same(fromChessBoardToCoordinates('e3'), { x: 4, y: 5 });
@@ -193,3 +193,22 @@ t.test('Highlight Queen moves', t => {
   );
   t.end();
 });
+t.skip('Highligh moves with king under threat', t => {
+  const expected = getBoard([
+    { coord: { x: 4, y: 0 }, cell: { piece: 'k' } },
+    { coord: { x: 3, y: 1 }, cell: { piece: 'p', selected: true } },
+    { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
+    { coord: { x: 0, y: 4 }, cell: { piece: 'B' } },
+  ]);
+  const FEN = '4k3/3pp3/8/8/B7/8/8/8 b KQkq - 0 1';
+  t.same(getMoves({ x: 3, y: 1 }, { FEN }).board, expected);
+  t.end();
+});
+//t.test('Highlight castling', t => {
+//  const expected = getBoard([]);
+//  t.same(
+//    getMoves({ x: 5, y: 0 }, { FEN: 'r3k2r/8/8/8/8/8/8/8 b KQkq - 0 1' }),
+//    expected
+//  );
+//  t.end();
+//});

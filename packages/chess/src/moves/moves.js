@@ -1,16 +1,11 @@
 import * as R from 'ramda';
-import { rotate } from '../utils/index.js';
+import { flags } from '../constants.js';
+import { areOpponents, rotate } from '../utils/index.js';
 const mapI = R.addIndex(R.map);
 
-const isWhitePiece = piece => new RegExp(/[PNBRQK]+/).test(piece);
-const isBlackPiece = piece => new RegExp(/[pnbrqk]+/).test(piece);
-const areOpponents = (pa, pb) =>
-  (isWhitePiece(pa) && isBlackPiece(pb)) ||
-  (isBlackPiece(pa) && isWhitePiece(pb));
-
-const addMoveFlag = R.assoc('move', true);
-const addCaptureFlag = R.assoc('capture', true);
-const addSelectedFlag = R.assoc('selected', true);
+const addMoveFlag = R.assoc(flags.move, true);
+const addCaptureFlag = R.assoc(flags.capture, true);
+const addSelectedFlag = R.assoc(flags.selected, true);
 const isSamePos =
   ({ x, y }) =>
   m =>

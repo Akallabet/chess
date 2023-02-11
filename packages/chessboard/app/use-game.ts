@@ -14,17 +14,29 @@ export const useGame = (FEN: string) => {
 
   return {
     board,
-    getMoves: ({ x, y }: Coordinates) => {
-      setGame(chess('highlight', { x, y }, game));
-      setSelected({ x, y });
-    },
-    clearBoard: () => {
-      setGame(chess('clear', game));
-      setSelected(undefined);
-    },
-    move: (target: Coordinates): void => {
-      if (selected) setGame(chess('move', selected, target, game));
-      setSelected(undefined);
+    action: (
+      { x, y }: Coordinates,
+      {
+        piece,
+        move,
+        capture,
+      }: { piece: String; move: Boolean; capture: Boolean }
+    ) => {
+      if (capture || move) {
+        setGame(chess('move', selected, { y, x }, game));
+        setSelected(undefined);
+        return;
+      }
+      if (!piece) {
+        setGame(chess('clear', game));
+        setSelected(undefined);
+        return;
+      }
+      if (piece) {
+        setGame(chess('highlight', { x, y }, game));
+        setSelected({ x, y });
+        return;
+      }
     },
   };
 };

@@ -40,17 +40,13 @@ const Piece = ({
 
 type ChessBoardProps = {
   board: ChessBoardType;
-  onSelect: (args: Coordinates) => void;
-  onMove: (args: Coordinates) => void;
-  onEmptySquareClick: () => void;
+  onCellClick: (
+    args: Coordinates,
+    { piece, move, capture }: { piece: String; move: Boolean; capture: Boolean }
+  ) => void;
 };
 
-export const ChessBoard = ({
-  board,
-  onSelect,
-  onMove,
-  onEmptySquareClick,
-}: ChessBoardProps) => (
+export const ChessBoard = ({ board, onCellClick }: ChessBoardProps) => (
   <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
       <div key={i} className="flex h-1/8 w-full flex-row">
@@ -64,9 +60,7 @@ export const ChessBoard = ({
             (highlight && 'bg-secondary-dark') ||
             'bg-secondary';
           const handleClick = () => {
-            if (piece) return onSelect({ x: j, y: i });
-            if (move) return onMove({ x: j, y: i });
-            return onEmptySquareClick();
+            onCellClick({ x: j, y: i }, { piece, move, capture });
           };
           return (
             <div

@@ -51,53 +51,76 @@ const calcMovesFromPattern = (
   limit,
   count,
   moves = [],
-  coord,
+  originCoord,
   state
 ) => {
-  const lastMove = R.last(moves) || { coord };
-  const currentMove = pattern(lastMove.coord, state);
-  if (limit(count, currentMove, coord, state)) return moves;
+  const lastMove = R.last(moves);
+  const currentCoord = pattern(lastMove.coord, state);
+  if (limit(count, currentCoord, originCoord, state)) return moves;
   const { board } = state;
-  const row = board[currentMove.y];
+  const row = board[currentCoord.y];
   if (!row) return moves;
-  const cell = board[currentMove.y][currentMove.x];
+  const cell = board[currentCoord.y][currentCoord.x];
   if (!cell) return moves;
-  if (cell.piece && !areOpponents(cell.piece, board[coord.y][coord.x].piece))
+  if (
+    cell.piece &&
+    !areOpponents(cell.piece, board[originCoord.y][originCoord.x].piece)
+  )
     return moves;
-  if (cell.piece && areOpponents(cell.piece, board[coord.y][coord.x].piece)) {
-    moves.push({ coord: currentMove, addFlag: addCaptureFlag });
+  if (
+    cell.piece &&
+    areOpponents(cell.piece, board[originCoord.y][originCoord.x].piece)
+  ) {
+    moves.push({ coord: currentCoord, addFlag: addCaptureFlag });
     return moves;
   }
-  if (!cell.piece) moves.push({ coord: currentMove, addFlag: addMoveFlag });
-  return calcMovesFromPattern(pattern, limit, count + 1, moves, coord, state);
+  if (!cell.piece) moves.push({ coord: currentCoord, addFlag: addMoveFlag });
+  return calcMovesFromPattern(
+    pattern,
+    limit,
+    count + 1,
+    moves,
+    originCoord,
+    state
+  );
 };
 
-const calcMovesFromPatterns = R.curryN(
-  4,
-  (patterns = [], limit, coord = { x: 0, y: 0 }, state, moves = []) => {
-    if (patterns.length === 0) return moves;
-    return calcMovesFromPatterns(
-      R.slice(1, Infinity, patterns),
-      limit,
-      coord,
-      state,
-      R.concat(
-        moves,
-        calcMovesFromPattern(R.head(patterns), limit, 0, [], coord, state)
+const calcMovesFromPatterns = (
+  patterns = [],
+  limit,
+  originCoord = { x: 0, y: 0 },
+  state,
+  moves = []
+) => {
+  if (patterns.length === 0) return moves;
+  return calcMovesFromPatterns(
+    R.slice(1, Infinity, patterns),
+    limit,
+    originCoord,
+    state,
+    R.concat(
+      moves,
+      calcMovesFromPattern(
+        R.head(patterns),
+        limit,
+        0,
+        [{ coord: originCoord }],
+        originCoord,
+        state
       )
-    );
-  }
-);
-const highlightMovesFromPatterns = R.curryN(
-  4,
-  (patterns = [], limit, coord = { x: 0, y: 0 }, state) => {
-    const moves = calcMovesFromPatterns(patterns, limit, coord, state);
+    )
+  );
+};
+
+const highlightMovesFromPatterns =
+  (patterns = [], limit) =>
+  (originCoord = { x: 0, y: 0 }, state) => {
+    const moves = calcMovesFromPatterns(patterns, limit, originCoord, state);
     return mapMovesToBoard(state.board, [
-      { coord, addFlag: addSelectedFlag },
+      { coord: originCoord, addFlag: addSelectedFlag },
       ...moves,
     ]);
-  }
-);
+  };
 
 const highlightKnightMoves = highlightMovesFromPatterns(
   [
@@ -158,34 +181,37 @@ const highlightKingMoves = highlightMovesFromPatterns(
   limit => limit >= 1
 );
 
+const highlightPawnMoves = (coord, state) => {
+  const moves = [
+    { coord, addFlag: addSelectedFlag },
+    ...calcMovesFromPattern(
+      ({ x, y }) => ({ x, y: y + 1 }),
+      (count, { x, y }, start, { board }) => {
+        if (board[y][x].piece) return true;
+        if (start.y > 1 && count >= 1) return true;
+        if (start.y === 1 && count >= 2) return true;
+      },
+      0,
+      [{ coord }],
+      coord,
+      state
+    ),
+    ...calcPawnCaptures(coord, state),
+  ];
+  return mapMovesToBoard(state.board, moves);
+};
+
+const highlightWhitePawnMoves = R.curry((coord, state) =>
+  R.pipe(
+    rotate,
+    board => highlightPawnMoves({ x: 7 - coord.x, y: 7 - coord.y }, { board }),
+    rotate
+  )(state.board)
+);
+
 const highlighMovesMap = {
-  p: R.curry((coord, state) => {
-    const moves = [
-      { coord, addFlag: addSelectedFlag },
-      ...calcMovesFromPattern(
-        ({ x, y }) => ({ x, y: y + 1 }),
-        (count, { x, y }, start, { board }) => {
-          if (board[y][x].piece) return true;
-          if (start.y > 1 && count >= 1) return true;
-          if (start.y === 1 && count >= 2) return true;
-        },
-        0,
-        [],
-        coord,
-        state
-      ),
-      ...calcPawnCaptures(coord, state),
-    ];
-    return mapMovesToBoard(state.board, moves);
-  }),
-  P: R.curry((coord, { board }) =>
-    R.pipe(
-      rotate,
-      board => ({ board }),
-      highlighMovesMap.p({ x: 7 - coord.x, y: 7 - coord.y }),
-      rotate
-    )(board)
-  ),
+  p: highlightPawnMoves,
+  P: highlightWhitePawnMoves,
   n: highlightKnightMoves,
   N: highlightKnightMoves,
   b: highlightBishopMoves,
@@ -199,5 +225,8 @@ const highlighMovesMap = {
 };
 
 export const highlightMoves = (coord, state) => {
-  return highlighMovesMap[state.board[coord.y][coord.x].piece](coord, state);
+  return R.prop(state.board[coord.y][coord.x].piece, highlighMovesMap)(
+    coord,
+    state
+  );
 };

@@ -122,19 +122,20 @@ const highlightMovesFromPatterns =
     ]);
   };
 
-const highlightKnightMoves = highlightMovesFromPatterns(
-  [
-    ({ x, y }) => ({ x: x + 2, y: y + 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y + 2 }),
-    ({ x, y }) => ({ x: x - 1, y: y + 2 }),
-    ({ x, y }) => ({ x: x - 2, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 2, y: y - 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y - 2 }),
-    ({ x, y }) => ({ x: x + 1, y: y - 2 }),
-    ({ x, y }) => ({ x: x + 2, y: y - 1 }),
-  ],
-  count => count >= 1
-);
+const highlightKnightMoves = k =>
+  highlightMovesFromPatterns(
+    [
+      ({ x, y }) => ({ x: x + 2, y: y + 1 }),
+      ({ x, y }) => ({ x: x + 1, y: y + 2 }),
+      ({ x, y }) => ({ x: x - 1, y: y + 2 }),
+      ({ x, y }) => ({ x: x - 2, y: y + 1 }),
+      ({ x, y }) => ({ x: x - 2, y: y - 1 }),
+      ({ x, y }) => ({ x: x - 1, y: y - 2 }),
+      ({ x, y }) => ({ x: x + 1, y: y - 2 }),
+      ({ x, y }) => ({ x: x + 2, y: y - 1 }),
+    ],
+    count => count >= 1
+  );
 
 const highlightBishopMoves = highlightMovesFromPatterns(
   [
@@ -204,8 +205,8 @@ const highlightPawnMoves = (coord, state) => {
 const highlighMovesMap = {
   p: highlightPawnMoves,
   P: withRotatedBoard(highlightPawnMoves),
-  n: highlightKnightMoves,
-  N: highlightKnightMoves,
+  n: highlightKnightMoves('k'),
+  N: highlightKnightMoves('K'),
   b: highlightBishopMoves,
   B: highlightBishopMoves,
   r: highlightRookMoves,

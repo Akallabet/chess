@@ -11,3 +11,6 @@ export const areOpponents = (pa, pb) =>
 export const overProp = R.curryN(3, (prop, fn, item) =>
   R.over(R.lensProp(prop), fn, item)
 );
+export const updateProp = R.curryN(3, (prop, fn, obj) =>
+  R.assoc(prop, fn(obj), obj)
+);

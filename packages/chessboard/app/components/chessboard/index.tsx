@@ -1,12 +1,11 @@
 import * as R from 'ramda';
-import type { ChessBoardType } from '@chess/chess';
+import type { ChessBoardType, Coordinates } from '@chess/chess';
 import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
 import Pawn from './pawn';
 import Queen from './queen';
 import Rook from './rook';
-import type { getMovesGameFn } from '../../use-game';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
@@ -41,13 +40,15 @@ const Piece = ({
 
 type ChessBoardProps = {
   board: ChessBoardType;
-  onSelect: (args: getMovesGameFn) => void;
+  onSelect: (args: Coordinates) => void;
+  onMove: (args: Coordinates) => void;
   onEmptySquareClick: () => void;
 };
 
 export const ChessBoard = ({
   board,
   onSelect,
+  onMove,
   onEmptySquareClick,
 }: ChessBoardProps) => (
   <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
@@ -64,6 +65,7 @@ export const ChessBoard = ({
             'bg-secondary';
           const handleClick = () => {
             if (piece) return onSelect({ x: j, y: i });
+            if (move) return onMove({ x: j, y: i });
             return onEmptySquareClick();
           };
           return (

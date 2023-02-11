@@ -21,8 +21,18 @@ interface StartArgs {
 }
 export const files: string[];
 export const ranks: string[];
-export default function chess(cmd: string, args: ChessState): ChessState;
 export default function chess(cmd: 'start', args: StartArgs): ChessState;
+export default function chess(
+  cmd: 'move',
+  origin: coordinates,
+  target: coordinates,
+  args: ChessState
+): ChessState;
+export default function chess(
+  cmd: 'move',
+  origin: coordinates,
+  target: coordinates
+): (args: ChessState) => ChessState;
 export default function chess(
   cmd: 'highlight',
   SAN: string,

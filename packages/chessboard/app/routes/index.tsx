@@ -14,7 +14,7 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function App() {
   const FEN = useLoaderData<typeof loader>();
-  const { board, getMoves, clearBoard } = useGame(FEN);
+  const { board, getMoves, clearBoard, move } = useGame(FEN);
   return (
     <div>
       <div className="my-5" />
@@ -24,6 +24,7 @@ export default function App() {
             board={board}
             onSelect={getMoves}
             onEmptySquareClick={clearBoard}
+            onMove={move}
           />
         )}
       </div>

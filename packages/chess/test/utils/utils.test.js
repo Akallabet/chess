@@ -1,5 +1,6 @@
 import t from 'tap';
-import { rotate } from '../../src/utils/index.js';
+import { getPieceCoord, rotate } from '../../src/utils/index.js';
+import { getBoard } from '../../test-utils.js';
 
 t.test('Rotate an 4 x 4 matrix', t => {
   const matrix = [
@@ -15,5 +16,27 @@ t.test('Rotate an 4 x 4 matrix', t => {
     [4, 3, 2, 1],
   ];
   t.same(rotate(matrix), rotated);
+  t.end();
+});
+
+t.test('Get white king coordinates', t => {
+  const coord = getPieceCoord(
+    'k',
+    getBoard([{ coord: { y: 0, x: 4 }, cell: { piece: 'k' } }])
+  );
+  t.same(coord, { y: 0, x: 4 });
+  t.end();
+});
+
+t.test('Get coordinates for first Rook', t => {
+  const coord = getPieceCoord(
+    'R',
+    getBoard([
+      { coord: { y: 0, x: 6 }, cell: { piece: 'R' } },
+      { coord: { y: 7, x: 2 }, cell: { piece: 'R' } },
+      { coord: { y: 0, x: 4 }, cell: { piece: 'k' } },
+    ])
+  );
+  t.same(coord, { y: 0, x: 6 });
   t.end();
 });

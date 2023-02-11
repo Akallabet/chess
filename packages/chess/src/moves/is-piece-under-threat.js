@@ -11,28 +11,28 @@ import { highlightMoves } from './moves.js';
 //        then return true
 //return false otherwise
 
-const canPieceMoveToCell = R.curryN(2, (flag, a, b, state) => {
-  const moves = highlightMoves(a, state);
-  return Boolean(moves[b.y][b.x][flag]);
-});
+export const canPieceMoveToTarget = (cell, target, state) => {
+  return R.pipe(
+    R.path([target.y, target.x]),
+    R.either(R.has(flags.capture), R.has(flags.move))
+  )(highlightMoves(cell, state));
+};
 
-export const canPieceThreathenCell = canPieceMoveToCell(flags.capture);
-
-const isCellInMoves = flag =>
-  R.curry((coord, state) => {
-    const { board } = state;
-    const target = board[coord.y][coord.x];
-    for (let y = 0; y < board.length - 1; y++) {
-      for (let x = 0; x < board[y].length - 1; x++) {
-        if (
-          board[y][x].piece &&
-          areOpponents(target.piece, board[y][x].piece) &&
-          canPieceMoveToCell(flag, { y, x }, coord, state)
-        )
-          return true;
+export const isCellInMoves = R.curry((target, state) => {
+  const { board } = state;
+  for (let y = 0; y < board.length - 1; y++) {
+    for (let x = 0; x < board[y].length - 1; x++) {
+      if (
+        R.hasPath([y, x, 'piece'], board) &&
+        areOpponents(
+          R.path([target.y, target.x, 'piece'], board),
+          R.path([y, x, 'piece'], board)
+        ) &&
+        canPieceMoveToTarget({ y, x }, target, state)
+      ) {
+        return true;
       }
     }
-    return false;
-  });
-
-export const isPieceUnderThreat = isCellInMoves(flags.capture);
+  }
+  return false;
+});

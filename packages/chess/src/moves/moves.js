@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
-import { areOpponents, rotate } from '../utils/index.js';
+import { areOpponents, withRotatedBoard } from '../utils/index.js';
 const mapI = R.addIndex(R.map);
 
 const addMoveFlag = R.assoc(flags.move, true);
@@ -201,17 +201,9 @@ const highlightPawnMoves = (coord, state) => {
   return mapMovesToBoard(state.board, moves);
 };
 
-const highlightWhitePawnMoves = R.curry((coord, state) =>
-  R.pipe(
-    rotate,
-    board => highlightPawnMoves({ x: 7 - coord.x, y: 7 - coord.y }, { board }),
-    rotate
-  )(state.board)
-);
-
 const highlighMovesMap = {
   p: highlightPawnMoves,
-  P: highlightWhitePawnMoves,
+  P: withRotatedBoard(highlightPawnMoves),
   n: highlightKnightMoves,
   N: highlightKnightMoves,
   b: highlightBishopMoves,

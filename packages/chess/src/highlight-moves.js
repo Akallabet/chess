@@ -22,7 +22,7 @@ export const fromChessBoardToCoordinates = pos => {
 //
 export const highlightMoves = R.curry((coord, { FEN }) => {
   const state = fromFEN(FEN);
-  const isNotCoord = !coord.x || !coord.y;
+  const isNotCoord = !R.has('x', coord) || !R.has('y', coord);
   const hasNoPiece = !R.hasPath([coord.y, coord.x, 'piece'], state.board);
 
   const error =

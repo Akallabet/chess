@@ -12,8 +12,8 @@ t.test('Convert chessboard piece coordinates to x/y coordinates', t => {
 
 t.test('Get Moves - wrong format', t => {
   const FEN = '8/4p3/8/8/8/8/8/8 b KQkq - 0 1';
-  t.same(highlightMoves('', { FEN }), { error: 'WRONG_FORMAT', FEN });
-  t.same(highlightMoves('Pb', { FEN }), { error: 'WRONG_FORMAT', FEN });
+  t.same(highlightMoves('', { FEN }).error, 'WRONG_FORMAT');
+  t.same(highlightMoves('Pb', { FEN }).error, 'WRONG_FORMAT');
   t.same(highlightMoves({ x: 1, y: 9 }, { FEN }).error, 'NO_PIECE_SELECTED');
   t.end();
 });

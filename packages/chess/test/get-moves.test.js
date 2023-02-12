@@ -195,12 +195,13 @@ t.test('Highlight Queen moves', t => {
 });
 t.skip('Highligh moves with king under threat', t => {
   const expected = getBoard([
-    { coord: { x: 4, y: 0 }, cell: { piece: 'k' } },
+    { coord: { x: 6, y: 0 }, cell: { piece: 'k' } },
     { coord: { x: 3, y: 1 }, cell: { piece: 'p', selected: true } },
+    { coord: { x: 3, y: 3 }, cell: { move: true } },
     { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
-    { coord: { x: 0, y: 4 }, cell: { piece: 'B' } },
+    { coord: { x: 0, y: 6 }, cell: { piece: 'B' } },
   ]);
-  const FEN = '4k3/3pp3/8/8/B7/8/8/8 b KQkq - 0 1';
+  const FEN = '6k1/3pp3/8/8/8/8/B7/8 b KQkq - 0 1';
   t.same(getMoves({ x: 3, y: 1 }, { FEN }).board, expected);
   t.end();
 });

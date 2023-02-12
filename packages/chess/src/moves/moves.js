@@ -1,6 +1,13 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
-import { areOpponents, withRotatedBoard } from '../utils/index.js';
+// import { movePiece } from '../move.js';
+import {
+  areOpponents,
+  // getPieceCoord,
+  overProp,
+  rotate,
+} from '../utils/index.js';
+// import { isCellInMoves } from './is-cell-in-moves.js';
 const mapI = R.addIndex(R.map);
 
 const addMoveFlag = R.assoc(flags.move, true);
@@ -116,10 +123,7 @@ const highlightMovesFromPatterns =
   (patterns = [], limit) =>
   (originCoord = { x: 0, y: 0 }, state) => {
     const moves = calcMovesFromPatterns(patterns, limit, originCoord, state);
-    return mapMovesToBoard(state.board, [
-      { coord: originCoord, addFlag: addSelectedFlag },
-      ...moves,
-    ]);
+    return [{ coord: originCoord, addFlag: addSelectedFlag }, ...moves];
   };
 
 const highlightKnightMoves = highlightMovesFromPatterns(
@@ -181,44 +185,61 @@ const highlightKingMoves = highlightMovesFromPatterns(
   limit => limit >= 1
 );
 
-const highlightPawnMoves = (coord, state) => {
-  const moves = [
-    { coord, addFlag: addSelectedFlag },
-    ...calcMovesFromPattern(
-      ({ x, y }) => ({ x, y: y + 1 }),
-      (count, { x, y }, start, { board }) => {
-        if (board[y][x].piece) return true;
-        if (start.y > 1 && count >= 1) return true;
-        if (start.y === 1 && count >= 2) return true;
-      },
-      0,
-      [{ coord }],
-      coord,
-      state
-    ),
-    ...calcPawnCaptures(coord, state),
-  ];
-  return mapMovesToBoard(state.board, moves);
-};
+// const isKingUnderAttack = (king, state, origin) => {
+//   return move => {
+//     const board = movePiece(origin, move, state.board);
+//     const kingCoord = getPieceCoord(king, board);
+//     isCellInMoves(kingCoord);
+//   };
+// };
 
-const highlighMovesMap = {
-  p: highlightPawnMoves,
-  P: withRotatedBoard(highlightPawnMoves),
-  n: highlightKnightMoves,
-  N: highlightKnightMoves,
-  b: highlightBishopMoves,
-  B: highlightBishopMoves,
-  r: highlightRookMoves,
-  R: highlightRookMoves,
-  q: highlightQueenMoves,
-  Q: highlightQueenMoves,
-  k: highlightKingMoves,
-  K: highlightKingMoves,
-};
-
-export const highlightMoves = (coord, state) => {
-  return R.prop(state.board[coord.y][coord.x].piece, highlighMovesMap)(
+const highlightPawnMoves = (coord, state) => [
+  { coord, addFlag: addSelectedFlag },
+  ...calcMovesFromPattern(
+    ({ x, y }) => ({ x, y: y + 1 }),
+    (count, { x, y }, start, { board }) => {
+      if (!board[y]) return true;
+      if (board[y][x].piece) return true;
+      if (start.y > 1 && count >= 1) return true;
+      if (start.y === 1 && count >= 2) return true;
+    },
+    0,
+    [{ coord }],
     coord,
     state
+  ),
+  ...calcPawnCaptures(coord, state),
+];
+
+const highlightWhitePawnMoves = (coord, state) =>
+  R.pipe(
+    rotate,
+    board => highlightPawnMoves({ x: 7 - coord.x, y: 7 - coord.y }, { board }),
+    R.map(overProp('coord', ({ y, x }) => ({ y: 7 - y, x: 7 - x })))
+  )(state.board);
+
+export const highlightMoves = (coord, state /* rejectFn = R.F */) => {
+  const highlighMovesMap = {
+    p: highlightPawnMoves,
+    P: highlightWhitePawnMoves,
+    n: highlightKnightMoves,
+    N: highlightKnightMoves,
+    b: highlightBishopMoves,
+    B: highlightBishopMoves,
+    r: highlightRookMoves,
+    R: highlightRookMoves,
+    q: highlightQueenMoves,
+    Q: highlightQueenMoves,
+    k: highlightKingMoves,
+    K: highlightKingMoves,
+  };
+  const piece = R.path([coord.y, coord.x, 'piece'], state.board);
+  const highlightMovesFn = R.prop(piece, highlighMovesMap);
+  const moves = highlightMovesFn(coord, state);
+
+  return mapMovesToBoard(
+    state.board,
+    // R.reject(isKingUnderAttack(king, state, coord), moves)
+    moves
   );
 };

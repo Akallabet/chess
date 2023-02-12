@@ -1,1 +1,2 @@
-export { highlightMoves } from './moves.js';
+export { generateMoves } from './generate-moves.js';
+export { mapMovesToBoard } from './map-moves-to-board.js';

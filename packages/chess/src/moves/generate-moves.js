@@ -8,29 +8,10 @@ import {
   rotate,
 } from '../utils/index.js';
 // import { isCellInMoves } from './is-cell-in-moves.js';
-const mapI = R.addIndex(R.map);
 
 const addMoveFlag = R.assoc(flags.move, true);
 const addCaptureFlag = R.assoc(flags.capture, true);
 const addSelectedFlag = R.assoc(flags.selected, true);
-const isSamePos =
-  ({ x, y }) =>
-  m =>
-    m.y === y && m.x === x;
-
-const mapMovesToBoard = R.curry((board, moves) =>
-  mapI(
-    (row, y) =>
-      mapI((cell, x) => {
-        const move = R.find(
-          R.pipe(R.prop('coord'), isSamePos({ x, y })),
-          moves
-        );
-        return move ? move.addFlag(cell) : cell;
-      }, row),
-    board
-  )
-);
 
 const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   const captures = [];
@@ -218,7 +199,7 @@ const highlightWhitePawnMoves = (coord, state) =>
     R.map(overProp('coord', ({ y, x }) => ({ y: 7 - y, x: 7 - x })))
   )(state.board);
 
-export const highlightMoves = (coord, state /* rejectFn = R.F */) => {
+export const generateMoves = (coord, state /* rejectFn = R.F */) => {
   const highlighMovesMap = {
     p: highlightPawnMoves,
     P: highlightWhitePawnMoves,
@@ -235,11 +216,5 @@ export const highlightMoves = (coord, state /* rejectFn = R.F */) => {
   };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
   const highlightMovesFn = R.prop(piece, highlighMovesMap);
-  const moves = highlightMovesFn(coord, state);
-
-  return mapMovesToBoard(
-    state.board,
-    // R.reject(isKingUnderAttack(king, state, coord), moves)
-    moves
-  );
+  return highlightMovesFn(coord, state);
 };

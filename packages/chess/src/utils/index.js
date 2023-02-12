@@ -20,3 +20,5 @@ export const getPieceCoord = (piece, board) => {
     }
   }
 };
+export const isChessboardPos = pos =>
+  new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(pos);

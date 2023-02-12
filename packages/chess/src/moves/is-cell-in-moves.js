@@ -1,7 +1,8 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
 import { areOpponents } from '../utils/index.js';
-import { highlightMoves } from './moves.js';
+import { mapMovesToBoard } from './map-moves-to-board.js';
+import { generateMoves } from './generate-moves.js';
 //Loop through each row
 //Loop through each cell
 //If there is a piece and it's opponent
@@ -13,9 +14,10 @@ import { highlightMoves } from './moves.js';
 
 export const canPieceMoveToTarget = (cell, target, state) => {
   return R.pipe(
+    mapMovesToBoard(state.board),
     R.path([target.y, target.x]),
     R.either(R.has(flags.capture), R.has(flags.move))
-  )(highlightMoves(cell, state));
+  )(generateMoves(cell, state));
 };
 
 export const isCellInMoves = R.curry((target, state) => {

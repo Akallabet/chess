@@ -12,6 +12,14 @@ export const fromChessBoardToCoordinates = pos => {
   };
 };
 
+// const isKingUnderAttack = (king, state, origin) => {
+//   return move => {
+//     const board = movePiece(origin, move, state.board);
+//     const kingCoord = getPieceCoord(king, board);
+//     isCellInMoves(kingCoord);
+//   };
+// };
+//
 export const highlightMoves = R.curry((coord, { FEN }) => {
   const state = fromFEN(FEN);
   const isNotCoord = !coord.x || !coord.y;

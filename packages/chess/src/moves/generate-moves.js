@@ -1,13 +1,6 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
-// import { movePiece } from '../move.js';
-import {
-  areOpponents,
-  // getPieceCoord,
-  overProp,
-  rotate,
-} from '../utils/index.js';
-// import { isCellInMoves } from './is-cell-in-moves.js';
+import { areOpponents, overProp, rotate } from '../utils/index.js';
 
 const addMoveFlag = R.assoc(flags.move, true);
 const addCaptureFlag = R.assoc(flags.capture, true);
@@ -73,41 +66,31 @@ const calcMovesFromPattern = (
   );
 };
 
-const calcMovesFromPatterns = (
-  patterns = [],
-  limit,
-  originCoord = { x: 0, y: 0 },
-  state,
-  moves = []
-) => {
-  if (patterns.length === 0) return moves;
-  return calcMovesFromPatterns(
-    R.slice(1, Infinity, patterns),
-    limit,
-    originCoord,
-    state,
-    R.concat(
-      moves,
-      calcMovesFromPattern(
-        R.head(patterns),
-        limit,
-        0,
-        [{ coord: originCoord }],
-        originCoord,
-        state
+const calcMovesFromPatterns = R.curryN(
+  4,
+  (patterns = [], limit, originCoord = { x: 0, y: 0 }, state, moves = []) => {
+    if (patterns.length === 0) return moves;
+    return calcMovesFromPatterns(
+      R.slice(1, Infinity, patterns),
+      limit,
+      originCoord,
+      state,
+      R.concat(
+        moves,
+        calcMovesFromPattern(
+          R.head(patterns),
+          limit,
+          0,
+          [{ coord: originCoord }],
+          originCoord,
+          state
+        )
       )
-    )
-  );
-};
+    );
+  }
+);
 
-const highlightMovesFromPatterns =
-  (patterns = [], limit) =>
-  (originCoord = { x: 0, y: 0 }, state) => {
-    const moves = calcMovesFromPatterns(patterns, limit, originCoord, state);
-    return [{ coord: originCoord, addFlag: addSelectedFlag }, ...moves];
-  };
-
-const highlightKnightMoves = highlightMovesFromPatterns(
+const generateKnightMoves = calcMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 2, y: y + 1 }),
     ({ x, y }) => ({ x: x + 1, y: y + 2 }),
@@ -121,7 +104,7 @@ const highlightKnightMoves = highlightMovesFromPatterns(
   count => count >= 1
 );
 
-const highlightBishopMoves = highlightMovesFromPatterns(
+const generateBishopMoves = calcMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y: y + 1 }),
     ({ x, y }) => ({ x: x - 1, y: y + 1 }),
@@ -130,7 +113,7 @@ const highlightBishopMoves = highlightMovesFromPatterns(
   ],
   R.F
 );
-const highlightRookMoves = highlightMovesFromPatterns(
+const generateRookMoves = calcMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y }),
     ({ x, y }) => ({ x: x - 1, y }),
@@ -139,7 +122,7 @@ const highlightRookMoves = highlightMovesFromPatterns(
   ],
   R.F
 );
-const highlightQueenMoves = highlightMovesFromPatterns(
+const generateQueenMoves = calcMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y }),
     ({ x, y }) => ({ x: x - 1, y }),
@@ -152,7 +135,7 @@ const highlightQueenMoves = highlightMovesFromPatterns(
   ],
   R.F
 );
-const highlightKingMoves = highlightMovesFromPatterns(
+const generateKingMoves = calcMovesFromPatterns(
   [
     ({ x, y }) => ({ x: x + 1, y }),
     ({ x, y }) => ({ x: x - 1, y }),
@@ -166,16 +149,7 @@ const highlightKingMoves = highlightMovesFromPatterns(
   limit => limit >= 1
 );
 
-// const isKingUnderAttack = (king, state, origin) => {
-//   return move => {
-//     const board = movePiece(origin, move, state.board);
-//     const kingCoord = getPieceCoord(king, board);
-//     isCellInMoves(kingCoord);
-//   };
-// };
-
-const highlightPawnMoves = (coord, state) => [
-  { coord, addFlag: addSelectedFlag },
+const generatePawnMoves = (coord, state) => [
   ...calcMovesFromPattern(
     ({ x, y }) => ({ x, y: y + 1 }),
     (count, { x, y }, start, { board }) => {
@@ -192,29 +166,32 @@ const highlightPawnMoves = (coord, state) => [
   ...calcPawnCaptures(coord, state),
 ];
 
-const highlightWhitePawnMoves = (coord, state) =>
+const generateWhitePawnMoves = (coord, state) =>
   R.pipe(
     rotate,
-    board => highlightPawnMoves({ x: 7 - coord.x, y: 7 - coord.y }, { board }),
+    board => generatePawnMoves({ x: 7 - coord.x, y: 7 - coord.y }, { board }),
     R.map(overProp('coord', ({ y, x }) => ({ y: 7 - y, x: 7 - x })))
   )(state.board);
 
 export const generateMoves = (coord, state /* rejectFn = R.F */) => {
-  const highlighMovesMap = {
-    p: highlightPawnMoves,
-    P: highlightWhitePawnMoves,
-    n: highlightKnightMoves,
-    N: highlightKnightMoves,
-    b: highlightBishopMoves,
-    B: highlightBishopMoves,
-    r: highlightRookMoves,
-    R: highlightRookMoves,
-    q: highlightQueenMoves,
-    Q: highlightQueenMoves,
-    k: highlightKingMoves,
-    K: highlightKingMoves,
+  const generateMovesMap = {
+    p: generatePawnMoves,
+    P: generateWhitePawnMoves,
+    n: generateKnightMoves,
+    N: generateKnightMoves,
+    b: generateBishopMoves,
+    B: generateBishopMoves,
+    r: generateRookMoves,
+    R: generateRookMoves,
+    q: generateQueenMoves,
+    Q: generateQueenMoves,
+    k: generateKingMoves,
+    K: generateKingMoves,
   };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
-  const highlightMovesFn = R.prop(piece, highlighMovesMap);
-  return highlightMovesFn(coord, state);
+  const generateMovesFn = R.prop(piece, generateMovesMap);
+  return R.prepend(
+    { coord, addFlag: addSelectedFlag },
+    generateMovesFn(coord, state)
+  );
 };

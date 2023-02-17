@@ -20,7 +20,7 @@ export const canPieceMoveToTarget = (origin, target, state) => {
   )(generateMoves(origin, state, () => R.F));
 };
 
-export const isCellInMoves = R.curry((target, state) => {
+export const isCellUnderCheck = R.curry((target, state) => {
   const { board } = state;
   for (let y = 0; y < board.length - 1; y++) {
     for (let x = 0; x < board[y].length - 1; x++) {

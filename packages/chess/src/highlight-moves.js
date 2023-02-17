@@ -3,7 +3,7 @@ import { errorCodes } from '../error-codes.js';
 import { files, modes, modesList, ranks } from './constants.js';
 import {
   generateMoves,
-  isCellInMoves,
+  isCellUnderCheck,
   mapMovesToBoard,
 } from './moves/index.js';
 import { move } from './move.js';
@@ -15,7 +15,7 @@ const getKingPiece = ({ activeColor }) => (activeColor === 'w' ? 'K' : 'k');
 const isKingUnderAttack = (origin, state) => {
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);
   return target => {
-    return isCellInMoves(kingCoord, move(origin, target.coord, state));
+    return isCellUnderCheck(kingCoord, move(origin, target.coord, state));
   };
 };
 

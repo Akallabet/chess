@@ -12,12 +12,12 @@ import { generateMoves } from './generate-moves.js';
 //        then return true
 //return false otherwise
 
-export const canPieceMoveToTarget = (cell, target, state) => {
+export const canPieceMoveToTarget = (origin, target, state) => {
   return R.pipe(
     mapMovesToBoard(state.board),
     R.path([target.y, target.x]),
     R.either(R.has(flags.capture), R.has(flags.move))
-  )(generateMoves(cell, state));
+  )(generateMoves(origin, state, () => R.F));
 };
 
 export const isCellInMoves = R.curry((target, state) => {

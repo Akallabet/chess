@@ -8,3 +8,9 @@ export const flags = {
   move: 'move',
   selected: 'selected',
 };
+export const modes = {
+  standard: 'standard',
+  practice: 'practice',
+  demo: 'demo',
+};
+export const modesList = Object.keys(modes);

@@ -1,3 +1,5 @@
+import { modesList } from './constants.js';
+
 interface Coordinates {
   x: number;
   y: number;
@@ -12,9 +14,12 @@ export interface Square {
 
 export type ChessBoardType = Square[][];
 
+export type GameMode = typeof modesList[number];
+
 export interface ChessState {
   board: ChessBoardType | undefined;
   FEN: string;
+  mode: GameMode;
 }
 interface StartArgs {
   FEN: string;

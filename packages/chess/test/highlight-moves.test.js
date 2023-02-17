@@ -1,4 +1,5 @@
 import t from 'tap';
+import { modes } from '../src/constants.js';
 import {
   fromChessBoardToCoordinates,
   highlightMoves,
@@ -19,8 +20,10 @@ t.test('Get Moves - wrong format', t => {
 });
 t.test('Get moves - Black pawn - rank 7', t => {
   t.same(
-    highlightMoves({ x: 4, y: 1 }, { FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 1 },
+      { mode: modes.demo, FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 4, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 2 }, cell: { move: true } },
@@ -31,8 +34,10 @@ t.test('Get moves - Black pawn - rank 7', t => {
 });
 t.test('Get moves - Black pawn - after rank 7', t => {
   t.same(
-    highlightMoves({ x: 4, y: 2 }, { FEN: '8/8/4p3/8/8/8/8/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 2 },
+      { mode: 'demo', FEN: '8/8/4p3/8/8/8/8/8 b KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 4, y: 2 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 3 }, cell: { move: true } },
@@ -42,8 +47,10 @@ t.test('Get moves - Black pawn - after rank 7', t => {
 });
 t.test('Get moves - Black pawn - other piece in front', t => {
   t.same(
-    highlightMoves({ x: 4, y: 1 }, { FEN: '8/4p3/4p3/8/8/8/8/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 1 },
+      { mode: 'demo', FEN: '8/4p3/4p3/8/8/8/8/8 b KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 4, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 2 }, cell: { piece: 'p' } },
@@ -53,8 +60,10 @@ t.test('Get moves - Black pawn - other piece in front', t => {
 });
 t.test('Get moves - Black pawn - moves and captures', t => {
   t.same(
-    highlightMoves({ x: 4, y: 1 }, { FEN: '8/4p3/3P4/8/8/8/8/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 1 },
+      { mode: 'demo', FEN: '8/4p3/3P4/8/8/8/8/8 b KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 4, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 4, y: 2 }, cell: { move: true } },
@@ -69,8 +78,10 @@ t.test('Get moves - Black pawn - moves and captures', t => {
 });
 t.test('Get moves - White pawn - moves and captures', t => {
   t.same(
-    highlightMoves({ x: 4, y: 6 }, { FEN: '8/8/8/8/8/3p4/4P3/8 w KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 6 },
+      { mode: 'demo', FEN: '8/8/8/8/8/3p4/4P3/8 w KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 4, y: 6 }, cell: { piece: 'P', selected: true } },
       { coord: { x: 4, y: 5 }, cell: { move: true } },
@@ -85,8 +96,10 @@ t.test('Get moves - White pawn - moves and captures', t => {
 });
 t.test('Select pawn on file h', t => {
   t.same(
-    highlightMoves({ x: 7, y: 1 }, { FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 7, y: 1 },
+      { mode: 'demo', FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 7, y: 1 }, cell: { piece: 'p', selected: true } },
       { coord: { x: 7, y: 2 }, cell: { move: true } },
@@ -97,8 +110,10 @@ t.test('Select pawn on file h', t => {
 });
 t.test('Select knight', t => {
   t.same(
-    highlightMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 3 },
+      { mode: 'demo', FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' }
+    ).board,
     getBoard([
       { coord: { x: 4, y: 3 }, cell: { piece: 'n', selected: true } },
       { coord: { x: 6, y: 4 }, cell: { move: true } },
@@ -130,8 +145,10 @@ t.test('Highlight Bishop moves', t => {
     { coord: { x: 7, y: 6 }, cell: { piece: 'q' } },
   ]);
   t.same(
-    highlightMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 3 },
+      { mode: modes.demo, FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' }
+    ).board,
     expected
   );
   t.end();
@@ -154,8 +171,10 @@ t.test('Highlight Rook moves', t => {
     { coord: { x: 7, y: 3 }, cell: { piece: 'q' } },
   ]);
   t.same(
-    highlightMoves({ x: 4, y: 3 }, { FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' })
-      .board,
+    highlightMoves(
+      { x: 4, y: 3 },
+      { mode: modes.demo, FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' }
+    ).board,
     expected
   );
   t.end();
@@ -192,7 +211,7 @@ t.test('Highlight Queen moves', t => {
   t.same(
     highlightMoves(
       { x: 4, y: 3 },
-      { FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' }
+      { mode: modes.demo, FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' }
     ).board,
     expected
   );

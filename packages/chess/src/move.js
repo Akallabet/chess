@@ -5,7 +5,6 @@ import { overProp, updateProp } from './utils/index.js';
 const mapI = R.addIndex(R.map);
 
 export const movePiece = R.curryN(3, (origin, target, board) => {
-  console.log('allalal');
   const originCell = R.path([origin.y, origin.x], board);
   return mapI(
     (row, y) =>
@@ -30,6 +29,6 @@ const moveAndUpdate = (origin, target, state) => {
   )(state);
 };
 
-export const move = R.curry((origin, target, state) => {
+export const move = R.curryN(3, (origin, target, state) => {
   return moveAndUpdate(origin, target, fromFEN(state.FEN));
 });

@@ -2,10 +2,6 @@ import * as R from 'ramda';
 import { flags } from '../constants.js';
 import { areOpponents, overProp, rotate } from '../utils/index.js';
 
-const addMoveFlag = R.assoc(flags.move, true);
-const addCaptureFlag = R.assoc(flags.capture, true);
-const addSelectedFlag = R.assoc(flags.selected, true);
-
 const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   const captures = [];
   const nextRank = board[coord.y + 1];
@@ -24,7 +20,7 @@ const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   ) {
     captures.push({ x: coord.x + 1, y: coord.y + 1 });
   }
-  return R.map(coord => ({ coord, addFlag: addCaptureFlag }), captures);
+  return R.map(coord => ({ coord, flag: { [flags.capture]: true } }), captures);
 });
 
 const calcMovesFromPattern = (
@@ -35,7 +31,7 @@ const calcMovesFromPattern = (
   originCoord,
   state
 ) => {
-  const lastMove = R.last(moves);
+  const lastMove = R.last(moves) || { coord: originCoord };
   const currentCoord = pattern(lastMove.coord, state);
   if (limit(count, currentCoord, originCoord, state)) return moves;
   const { board } = state;
@@ -52,10 +48,11 @@ const calcMovesFromPattern = (
     cell.piece &&
     areOpponents(cell.piece, board[originCoord.y][originCoord.x].piece)
   ) {
-    moves.push({ coord: currentCoord, addFlag: addCaptureFlag });
+    moves.push({ coord: currentCoord, flag: { [flags.capture]: true } });
     return moves;
   }
-  if (!cell.piece) moves.push({ coord: currentCoord, addFlag: addMoveFlag });
+  if (!cell.piece)
+    moves.push({ coord: currentCoord, flag: { [flags.move]: true } });
   return calcMovesFromPattern(
     pattern,
     limit,
@@ -77,14 +74,7 @@ const calcMovesFromPatterns = R.curryN(
       state,
       R.concat(
         moves,
-        calcMovesFromPattern(
-          R.head(patterns),
-          limit,
-          0,
-          [{ coord: originCoord }],
-          originCoord,
-          state
-        )
+        calcMovesFromPattern(R.head(patterns), limit, 0, [], originCoord, state)
       )
     );
   }
@@ -159,7 +149,7 @@ const generatePawnMoves = (coord, state) => [
       if (start.y === 1 && count >= 2) return true;
     },
     0,
-    [{ coord }],
+    [],
     coord,
     state
   ),
@@ -173,7 +163,7 @@ const generateWhitePawnMoves = (coord, state) =>
     R.map(overProp('coord', ({ y, x }) => ({ y: 7 - y, x: 7 - x })))
   )(state.board);
 
-export const generateMoves = (coord, state /* rejectFn = R.F */) => {
+export const generateMoves = (coord, state, rejectFn = R.F) => {
   const generateMovesMap = {
     p: generatePawnMoves,
     P: generateWhitePawnMoves,
@@ -190,8 +180,10 @@ export const generateMoves = (coord, state /* rejectFn = R.F */) => {
   };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
   const generateMovesFn = R.prop(piece, generateMovesMap);
-  return R.prepend(
-    { coord, addFlag: addSelectedFlag },
-    generateMovesFn(coord, state)
-  );
+
+  return R.pipe(
+    generateMovesFn,
+    R.reject(rejectFn(coord, state)),
+    R.prepend({ coord, flag: { [flags.selected]: true } })
+  )(coord, state);
 };

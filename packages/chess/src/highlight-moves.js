@@ -1,8 +1,29 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
-import { files, ranks } from './constants.js';
-import { generateMoves, mapMovesToBoard } from './moves/index.js';
+import { files, modes, modesList, ranks } from './constants.js';
+import {
+  generateMoves,
+  isCellInMoves,
+  mapMovesToBoard,
+} from './moves/index.js';
+import { move } from './move.js';
 import { fromFEN } from './fen/index.js';
+import { getPieceCoord } from './utils/index.js';
+
+const getKingPiece = ({ FEN }) => (FEN.activeColor === 'w' ? 'K' : 'k');
+
+const isKingUnderAttack = (origin, state) => {
+  const kingCoord = getPieceCoord(getKingPiece(state), state.board);
+  return target => {
+    return isCellInMoves(kingCoord, move(origin, target.coord, state));
+  };
+};
+
+const modesMap = {
+  [modes.standard]: { rejectMoves: isKingUnderAttack },
+  [modes.demo]: { rejectMoves: () => R.F },
+  [modes.practice]: { rejectMoves: () => R.F },
+};
 
 export const fromChessBoardToCoordinates = pos => {
   const [file, rank] = R.split('', pos);
@@ -12,16 +33,8 @@ export const fromChessBoardToCoordinates = pos => {
   };
 };
 
-// const isKingUnderAttack = (king, state, origin) => {
-//   return move => {
-//     const board = movePiece(origin, move, state.board);
-//     const kingCoord = getPieceCoord(king, board);
-//     isCellInMoves(kingCoord);
-//   };
-// };
-//
-export const highlightMoves = R.curry((coord, { FEN }) => {
-  const state = fromFEN(FEN);
+export const highlightMoves = R.curry((coord, { FEN, ...initialState }) => {
+  const state = R.mergeRight(initialState, fromFEN(FEN));
   const isNotCoord = !R.has('x', coord) || !R.has('y', coord);
   const hasNoPiece = !R.hasPath([coord.y, coord.x, 'piece'], state.board);
 
@@ -31,13 +44,12 @@ export const highlightMoves = R.curry((coord, { FEN }) => {
 
   if (error) return R.assoc('error', error, state);
 
-  return R.assoc(
-    'board',
-    mapMovesToBoard(
-      state.board,
-      // R.reject(isKingUnderAttack(king, state, coord), moves)
-      generateMoves(coord, state)
-    ),
-    state
+  const rejectMoves = R.path(
+    [state.mode || modesList[0], 'rejectMoves'],
+    modesMap
   );
+
+  const moves = generateMoves(coord, state, rejectMoves);
+  const boardWithHighlights = mapMovesToBoard(state.board, moves);
+  return R.assoc('board', boardWithHighlights, state);
 });

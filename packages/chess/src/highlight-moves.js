@@ -1,29 +1,9 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
-import { files, modes, modesList, ranks } from './constants.js';
-import {
-  generateMoves,
-  isCellUnderCheck,
-  mapMovesToBoard,
-} from './moves/index.js';
-import { move } from './move.js';
+import { files, modesList, ranks } from './constants.js';
+import { generateMoves, mapMovesToBoard } from './moves/index.js';
 import { fromFEN } from './fen/index.js';
-import { getPieceCoord } from './utils/index.js';
-
-const getKingPiece = ({ activeColor }) => (activeColor === 'w' ? 'K' : 'k');
-
-const isKingUnderAttack = (origin, state) => {
-  const kingCoord = getPieceCoord(getKingPiece(state), state.board);
-  return target => {
-    return isCellUnderCheck(kingCoord, move(origin, target.coord, state));
-  };
-};
-
-const modesMap = {
-  [modes.standard]: { rejectMoves: isKingUnderAttack },
-  [modes.demo]: { rejectMoves: () => R.F },
-  [modes.practice]: { rejectMoves: () => R.F },
-};
+import { modesMap } from './modes.js';
 
 export const fromChessBoardToCoordinates = pos => {
   const [file, rank] = R.split('', pos);

@@ -217,7 +217,7 @@ t.test('Highlight Queen moves', t => {
   );
   t.end();
 });
-t.skip('Highligh moves with king under threat', t => {
+t.test('Highligh moves with king under check', t => {
   const expected = getBoard([
     { coord: { x: 6, y: 0 }, cell: { piece: 'k' } },
     { coord: { x: 3, y: 1 }, cell: { piece: 'p', selected: true } },

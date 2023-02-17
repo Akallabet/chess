@@ -1,10 +1,10 @@
 import t from 'tap';
-import { start } from '../src/start.js';
+import { start } from '../../src/start.js';
 import {
   canPieceMoveToTarget,
   isCellInMoves,
-} from '../src/moves/is-cell-in-moves.js';
-import { modes } from '../src/constants.js';
+} from '../../src/moves/is-cell-in-moves.js';
+import { modes } from '../../src/constants.js';
 
 t.test('e2 white bishop does not threthen e8 Black king', t => {
   const FEN = '4k3/8/8/8/8/8/4B3/3K4 b KQkq - 0 1';

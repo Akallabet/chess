@@ -10,7 +10,7 @@ import { move } from './move.js';
 import { fromFEN } from './fen/index.js';
 import { getPieceCoord } from './utils/index.js';
 
-const getKingPiece = ({ FEN }) => (FEN.activeColor === 'w' ? 'K' : 'k');
+const getKingPiece = ({ activeColor }) => (activeColor === 'w' ? 'K' : 'k');
 
 const isKingUnderAttack = (origin, state) => {
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);

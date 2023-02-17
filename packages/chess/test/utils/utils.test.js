@@ -19,12 +19,21 @@ t.test('Rotate an 4 x 4 matrix', t => {
   t.end();
 });
 
-t.test('Get white king coordinates', t => {
+t.test('Get coordinated for black king in e8', t => {
   const coord = getPieceCoord(
     'k',
     getBoard([{ coord: { y: 0, x: 4 }, cell: { piece: 'k' } }])
   );
   t.same(coord, { y: 0, x: 4 });
+  t.end();
+});
+
+t.test('Get coordinated for white king in e1', t => {
+  const coord = getPieceCoord(
+    'K',
+    getBoard([{ coord: { y: 7, x: 4 }, cell: { piece: 'K' } }])
+  );
+  t.same(coord, { y: 7, x: 4 });
   t.end();
 });
 

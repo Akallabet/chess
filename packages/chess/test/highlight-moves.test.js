@@ -1,5 +1,6 @@
 import t from 'tap';
 import { modes } from '../src/constants.js';
+// import { fromFEN } from '../src/fen/from-fen.js';
 import {
   fromChessBoardToCoordinates,
   highlightMoves,
@@ -229,11 +230,9 @@ t.test('Highligh moves with king under check', t => {
   t.same(highlightMoves({ x: 3, y: 1 }, { FEN }).board, expected);
   t.end();
 });
-//t.test('Highlight castling', t => {
-//  const expected = getBoard([]);
-//  t.same(
-//    highlightMoves({ x: 5, y: 0 }, { FEN: 'r3k2r/8/8/8/8/8/8/8 b KQkq - 0 1' }),
-//    expected
-//  );
-//  t.end();
-//});
+// t.test('Highlight castling', t => {
+//   const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+//   const expected = getBoard([]);
+//   t.same(highlightMoves({ x: 4, y: 0 }, { FEN }).board, expected);
+//   t.end();
+// });

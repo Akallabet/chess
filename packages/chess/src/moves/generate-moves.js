@@ -2,7 +2,7 @@ import * as R from 'ramda';
 import { flags } from '../constants.js';
 import { areOpponents, overProp, rotate } from '../utils/index.js';
 
-const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
+const generatePawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   const captures = [];
   const nextRank = board[coord.y + 1];
   if (!nextRank) return captures;
@@ -23,9 +23,8 @@ const calcPawnCaptures = R.curry((coord = { x: 0, y: 0 }, { board }) => {
   return R.map(coord => ({ coord, flag: { [flags.capture]: true } }), captures);
 });
 
-const calcMovesFromPattern = (
-  pattern,
-  limit,
+const generateMovesFromPattern = (
+  [pattern, limit],
   count,
   moves = [],
   originCoord,
@@ -53,9 +52,8 @@ const calcMovesFromPattern = (
   }
   if (!cell.piece)
     moves.push({ coord: currentCoord, flag: { [flags.move]: true } });
-  return calcMovesFromPattern(
-    pattern,
-    limit,
+  return generateMovesFromPattern(
+    [pattern, limit],
     count + 1,
     moves,
     originCoord,
@@ -63,97 +61,83 @@ const calcMovesFromPattern = (
   );
 };
 
-const calcMovesFromPatterns = R.curryN(
-  4,
-  (patterns = [], limit, originCoord = { x: 0, y: 0 }, state, moves = []) => {
+const generateMovesFromPatterns = R.curryN(
+  3,
+  (patterns = [], originCoord = { x: 0, y: 0 }, state, moves = []) => {
     if (patterns.length === 0) return moves;
-    return calcMovesFromPatterns(
+    return generateMovesFromPatterns(
       R.slice(1, Infinity, patterns),
-      limit,
       originCoord,
       state,
       R.concat(
         moves,
-        calcMovesFromPattern(R.head(patterns), limit, 0, [], originCoord, state)
+        generateMovesFromPattern(R.head(patterns), 0, [], originCoord, state)
       )
     );
   }
 );
 
-const generateKnightMoves = calcMovesFromPatterns(
-  [
-    ({ x, y }) => ({ x: x + 2, y: y + 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y + 2 }),
-    ({ x, y }) => ({ x: x - 1, y: y + 2 }),
-    ({ x, y }) => ({ x: x - 2, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 2, y: y - 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y - 2 }),
-    ({ x, y }) => ({ x: x + 1, y: y - 2 }),
-    ({ x, y }) => ({ x: x + 2, y: y - 1 }),
-  ],
-  count => count >= 1
-);
+const generateKnightMoves = generateMovesFromPatterns([
+  [({ x, y }) => ({ x: x + 2, y: y + 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x + 1, y: y + 2 }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 1, y: y + 2 }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 2, y: y + 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 2, y: y - 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 1, y: y - 2 }), R.lte(1)],
+  [({ x, y }) => ({ x: x + 1, y: y - 2 }), R.lte(1)],
+  [({ x, y }) => ({ x: x + 2, y: y - 1 }), R.lte(1)],
+]);
 
-const generateBishopMoves = calcMovesFromPatterns(
-  [
-    ({ x, y }) => ({ x: x + 1, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y - 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y - 1 }),
-  ],
-  R.F
-);
-const generateRookMoves = calcMovesFromPatterns(
-  [
-    ({ x, y }) => ({ x: x + 1, y }),
-    ({ x, y }) => ({ x: x - 1, y }),
-    ({ x, y }) => ({ x, y: y - 1 }),
-    ({ x, y }) => ({ x, y: y + 1 }),
-  ],
-  R.F
-);
-const generateQueenMoves = calcMovesFromPatterns(
-  [
-    ({ x, y }) => ({ x: x + 1, y }),
-    ({ x, y }) => ({ x: x - 1, y }),
-    ({ x, y }) => ({ x, y: y - 1 }),
-    ({ x, y }) => ({ x, y: y + 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y - 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y - 1 }),
-  ],
-  R.F
-);
-const generateKingMoves = calcMovesFromPatterns(
-  [
-    ({ x, y }) => ({ x: x + 1, y }),
-    ({ x, y }) => ({ x: x - 1, y }),
-    ({ x, y }) => ({ x, y: y - 1 }),
-    ({ x, y }) => ({ x, y: y + 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y + 1 }),
-    ({ x, y }) => ({ x: x - 1, y: y - 1 }),
-    ({ x, y }) => ({ x: x + 1, y: y - 1 }),
-  ],
-  limit => limit >= 1
-);
+const generateBishopMoves = generateMovesFromPatterns([
+  [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.F],
+  [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.F],
+  [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.F],
+  [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
+]);
+const generateRookMoves = generateMovesFromPatterns([
+  [({ x, y }) => ({ x: x + 1, y }), R.F],
+  [({ x, y }) => ({ x: x - 1, y }), R.F],
+  [({ x, y }) => ({ x, y: y - 1 }), R.F],
+  [({ x, y }) => ({ x, y: y + 1 }), R.F],
+]);
+const generateQueenMoves = generateMovesFromPatterns([
+  [({ x, y }) => ({ x: x + 1, y }), R.F],
+  [({ x, y }) => ({ x: x - 1, y }), R.F],
+  [({ x, y }) => ({ x, y: y - 1 }), R.F],
+  [({ x, y }) => ({ x, y: y + 1 }), R.F],
+  [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.F],
+  [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.F],
+  [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.F],
+  [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
+]);
+const generateKingMoves = generateMovesFromPatterns([
+  [({ x, y }) => ({ x: x + 1, y }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 1, y }), R.lte(1)],
+  [({ x, y }) => ({ x, y: y - 1 }), R.lte(1)],
+  [({ x, y }) => ({ x, y: y + 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.lte(1)],
+  [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.lte(1)],
+]);
 
 const generatePawnMoves = (coord, state) => [
-  ...calcMovesFromPattern(
-    ({ x, y }) => ({ x, y: y + 1 }),
-    (count, { x, y }, start, { board }) => {
-      if (!board[y]) return true;
-      if (board[y][x].piece) return true;
-      if (start.y > 1 && count >= 1) return true;
-      if (start.y === 1 && count >= 2) return true;
-    },
+  ...generateMovesFromPattern(
+    [
+      ({ x, y }) => ({ x, y: y + 1 }),
+      (count, { x, y }, start, { board }) => {
+        if (!board[y]) return true;
+        if (board[y][x].piece) return true;
+        if (start.y > 1 && count >= 1) return true;
+        if (start.y === 1 && count >= 2) return true;
+      },
+    ],
     0,
     [],
     coord,
     state
   ),
-  ...calcPawnCaptures(coord, state),
+  ...generatePawnCaptures(coord, state),
 ];
 
 const generateWhitePawnMoves = (coord, state) =>

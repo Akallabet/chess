@@ -4,9 +4,9 @@ const mapI = R.addIndex(R.map);
 
 const cell = {};
 const row = [cell, cell, cell, cell, cell, cell, cell, cell];
-const board = [row, row, row, row, row, row, row, row];
+const defaultBoard = [row, row, row, row, row, row, row, row];
 
-export const getBoard = (items = []) =>
+export const getBoard = (items = [], board = defaultBoard) =>
   mapI(
     (row, y) =>
       mapI(

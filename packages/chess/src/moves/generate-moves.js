@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
+import { getCastlingRights } from '../fen/index.js';
 import { areOpponents, overProp, rotate } from '../utils/index.js';
 
 const generateMovesFromPattern = (
@@ -11,26 +12,27 @@ const generateMovesFromPattern = (
 ) => {
   const lastMove = R.last(moves) || { coord: originCoord };
   const currentCoord = pattern(lastMove.coord, state);
-  const { board } = state;
-  const row = board[currentCoord.y];
+  const row = state.board[currentCoord.y];
   if (!row) return moves;
-  const cell = board[currentCoord.y][currentCoord.x];
+  const cell = state.board[currentCoord.y][currentCoord.x];
   if (!cell) return moves;
   if (limit(count, currentCoord, originCoord, state)) return moves;
   if (
     cell.piece &&
-    !areOpponents(cell.piece, board[originCoord.y][originCoord.x].piece)
+    !areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
   )
     return moves;
   if (
     cell.piece &&
-    areOpponents(cell.piece, board[originCoord.y][originCoord.x].piece)
+    areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
   ) {
-    moves.push({
-      coord: currentCoord,
-      flag: { [flag || flags.capture]: true },
-    });
-    return moves;
+    return R.append(
+      {
+        coord: currentCoord,
+        flag: { [flag || flags.capture]: true },
+      },
+      moves
+    );
   }
   if (!cell.piece)
     moves.push({ coord: currentCoord, flag: { [flag || flags.move]: true } });
@@ -44,11 +46,19 @@ const generateMovesFromPattern = (
 };
 
 const generateMovesFromPatterns = R.curryN(
-  3,
-  (patterns = [], originCoord = { x: 0, y: 0 }, state, moves = []) => {
-    if (patterns.length === 0) return moves;
+  4,
+  (
+    patterns = [],
+    rejectFn,
+    originCoord = { x: 0, y: 0 },
+    state,
+    moves = []
+  ) => {
+    if (patterns.length === 0)
+      return R.reject(rejectFn(originCoord, state), moves);
     return generateMovesFromPatterns(
       R.slice(1, Infinity, patterns),
+      rejectFn,
       originCoord,
       state,
       R.concat(
@@ -93,7 +103,19 @@ const generateQueenMoves = generateMovesFromPatterns([
   [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
 ]);
 const generateKingMoves = generateMovesFromPatterns([
-  [({ x, y }) => ({ x: x + 1, y }), R.lte(1)],
+  [
+    ({ x, y }) => ({ x: x + 1, y }),
+    (count, _, origin, state) => {
+      if (count === 0) return false;
+      if (count > 1) return true;
+      const hasCastlingRights = getCastlingRights(
+        R.path([origin.y, origin.x, 'piece'], state.board),
+        state
+      );
+      if (!hasCastlingRights.kingSide) return true;
+      return false;
+    },
+  ],
   [({ x, y }) => ({ x: x - 1, y }), R.lte(1)],
   [({ x, y }) => ({ x, y: y - 1 }), R.lte(1)],
   [({ x, y }) => ({ x, y: y + 1 }), R.lte(1)],
@@ -137,26 +159,24 @@ const withRotatedBoard = generateMovesFn => (coord, state) =>
 
 export const generateMoves = (coord, state, rejectFn = R.F) => {
   const generateMovesMap = {
-    p: generatePawnMoves,
-    P: withRotatedBoard(generatePawnMoves),
-    n: generateKnightMoves,
-    N: generateKnightMoves,
-    b: generateBishopMoves,
-    B: generateBishopMoves,
-    r: generateRookMoves,
-    R: generateRookMoves,
-    q: generateQueenMoves,
-    Q: withRotatedBoard(generateQueenMoves),
-    k: generateKingMoves,
-    K: withRotatedBoard(generateKingMoves),
+    p: generatePawnMoves(rejectFn),
+    P: withRotatedBoard(generatePawnMoves(rejectFn)),
+    n: generateKnightMoves(rejectFn),
+    N: generateKnightMoves(rejectFn),
+    b: generateBishopMoves(rejectFn),
+    B: generateBishopMoves(rejectFn),
+    r: generateRookMoves(rejectFn),
+    R: generateRookMoves(rejectFn),
+    q: generateQueenMoves(rejectFn),
+    Q: withRotatedBoard(generateQueenMoves(rejectFn)),
+    k: generateKingMoves(rejectFn),
+    K: withRotatedBoard(generateKingMoves(rejectFn)),
   };
 
+  const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
   const generateMovesFn = R.prop(piece, generateMovesMap);
+  const moves = generateMovesFn(coord, state);
 
-  return R.pipe(
-    generateMovesFn,
-    R.reject(rejectFn(coord, state)),
-    R.prepend({ coord, flag: { [flags.selected]: true } })
-  )(coord, state);
+  return R.prepend(selected, moves);
 };

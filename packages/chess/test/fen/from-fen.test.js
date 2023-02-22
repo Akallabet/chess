@@ -1,5 +1,5 @@
 import t from 'tap';
-import { fromFEN, rowFromFEN } from '../src/fen/from-fen.js';
+import { fromFEN, rowFromFEN } from '../../src/fen/from-fen.js';
 
 const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}];
 const emptyBoard = [

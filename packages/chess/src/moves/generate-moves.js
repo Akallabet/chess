@@ -116,7 +116,19 @@ const generateKingMoves = generateMovesFromPatterns([
       return false;
     },
   ],
-  [({ x, y }) => ({ x: x - 1, y }), R.lte(1)],
+  [
+    ({ x, y }) => ({ x: x - 1, y }),
+    (count, _, origin, state) => {
+      if (count === 0) return false;
+      if (count > 2) return true;
+      const hasCastlingRights = getCastlingRights(
+        R.path([origin.y, origin.x, 'piece'], state.board),
+        state
+      );
+      if (!hasCastlingRights.queenSide) return true;
+      return false;
+    },
+  ],
   [({ x, y }) => ({ x, y: y - 1 }), R.lte(1)],
   [({ x, y }) => ({ x, y: y + 1 }), R.lte(1)],
   [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.lte(1)],

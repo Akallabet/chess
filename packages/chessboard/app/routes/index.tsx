@@ -14,7 +14,7 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function App() {
   const FEN = useLoaderData<typeof loader>();
-  const { board, action } = useGame(FEN);
+  const { board, action } = useGame(FEN, 'demo');
   return (
     <div>
       <div className="my-5" />

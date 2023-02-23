@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import chess from '@chess/chess';
-import type { Coordinates } from '@chess/chess';
+import type { Coordinates, GameMode, ChessState } from '@chess/chess';
 
-export const useGame = (FEN: string) => {
-  const [game, setGame] = useState(chess('start', { FEN }));
+export const useGame = (FEN: string, mode: GameMode) => {
+  const [game, setGame] = useState<undefined | ChessState>();
   const [selected, setSelected] = useState<Coordinates>();
 
   useEffect(() => {
-    setGame(chess('start', { FEN }));
-  }, [FEN]);
+    setGame(chess('start', { mode, FEN }));
+  }, [FEN, mode]);
+
+  if (!game) return {};
 
   const { board } = game;
 

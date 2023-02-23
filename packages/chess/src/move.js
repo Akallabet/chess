@@ -30,5 +30,5 @@ const moveAndUpdate = (origin, target, state) => {
 };
 
 export const move = R.curryN(3, (origin, target, state) => {
-  return moveAndUpdate(origin, target, fromFEN(state.FEN));
+  return moveAndUpdate(origin, target, R.mergeRight(state, fromFEN(state.FEN)));
 });

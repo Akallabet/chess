@@ -17,18 +17,15 @@ export type ChessBoardType = Square[][];
 export type GameMode = typeof modesList[number];
 
 export interface ChessState {
-  board: ChessBoardType | undefined;
+  board?: ChessBoardType | undefined;
   FEN: string;
   mode: GameMode;
 }
-interface StartArgs {
-  FEN: string;
-}
 export const files: string[];
 export const ranks: string[];
-export default function chess(cmd: 'start', args: StartArgs): ChessState;
-export default function chess(cmd: 'clear', args: StartArgs): ChessState;
-export default function chess(cmd: 'clear'): (args: StartArgs) => ChessState;
+export default function chess(cmd: 'start', args: ChessState): ChessState;
+export default function chess(cmd: 'clear', args: ChessState): ChessState;
+export default function chess(cmd: 'clear'): (args: ChessState) => ChessState;
 export default function chess(
   cmd: 'move',
   origin: coordinates,

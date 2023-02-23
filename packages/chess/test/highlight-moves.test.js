@@ -273,17 +273,14 @@ t.test(
     t.end();
   }
 );
-t.skip('No castling moves if one of the cells is under check', t => {
-  const FEN = 'r3k2r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
+
+t.test('No castling moves if one of the cells is under check', t => {
+  const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const input = fromFEN(FEN);
   const expected = getBoard(
     [
-      { coord: { x: 1, y: 0 }, cell: { move: true } },
-      { coord: { x: 2, y: 0 }, cell: { move: true } },
       { coord: { x: 3, y: 0 }, cell: { move: true } },
       { coord: { x: 4, y: 0 }, cell: { piece: 'k', selected: true } },
-      { coord: { x: 5, y: 0 }, cell: { move: true } },
-      { coord: { x: 6, y: 0 }, cell: { move: true } },
       { coord: { x: 4, y: 1 }, cell: { move: true } },
     ],
     input.board

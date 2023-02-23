@@ -9,7 +9,7 @@ const getKingPiece = ({ activeColor }) => (activeColor === 'w' ? 'K' : 'k');
 const isKingUnderAttack = (origin, state) => {
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);
   return target => {
-    return isCellUnderCheck(kingCoord, move(origin, target.coord, state));
+    return isCellUnderCheck(move(origin, target.coord, state), kingCoord);
   };
 };
 

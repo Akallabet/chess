@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import { flags } from '../constants.js';
 import { getCastlingRights } from '../fen/index.js';
 import { areOpponents, overProp, rotate } from '../utils/index.js';
+import { isCellUnderCheck } from './is-cell-under-check.js';
 
 const generateMovesFromPattern = (
   [pattern, limit, flag],
@@ -102,11 +103,14 @@ const generateQueenMoves = generateMovesFromPatterns([
   [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.F],
   [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
 ]);
+
 const generateKingMoves = generateMovesFromPatterns([
   [
     ({ x, y }) => ({ x: x + 1, y }),
-    (count, _, origin, state) => {
-      if (count === 0) return false;
+    (count, current, origin, state) => {
+      if (count === 0) return isCellUnderCheck(state, current);
+      if (current.y > 0) return true;
+      if (count === 1) return isCellUnderCheck(state, current);
       if (count > 1) return true;
       const hasCastlingRights = getCastlingRights(
         R.path([origin.y, origin.x, 'piece'], state.board),
@@ -118,9 +122,14 @@ const generateKingMoves = generateMovesFromPatterns([
   ],
   [
     ({ x, y }) => ({ x: x - 1, y }),
-    (count, _, origin, state) => {
-      if (count === 0) return false;
-      if (count > 2) return true;
+    (count, current, origin, state) => {
+      if (count === 0) return isCellUnderCheck(state, current);
+      if (current.y > 0) return true;
+      if (count === 1)
+        return R.any(isCellUnderCheck(state), [
+          current,
+          { y: current.y, x: current.x - 1 },
+        ]);
       const hasCastlingRights = getCastlingRights(
         R.path([origin.y, origin.x, 'piece'], state.board),
         state

@@ -22,3 +22,19 @@ export const getPieceCoord = (piece, board) => {
 };
 export const isChessboardPos = pos =>
   new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(pos);
+
+export const isCellEmpty = R.curry((state, { y, x }) =>
+  R.isNil(R.path([y, x, 'piece'], state.board))
+);
+
+export const isCellOccupied = R.curry((state, { y, x }) =>
+  R.hasPath([y, x, 'piece'], state.board)
+);
+
+export const areCellsEmpty = R.curry((state, cells) =>
+  R.all(isCellEmpty(state), cells)
+);
+
+export const anyCellOccupied = R.curry((state, cells) =>
+  R.any(isCellOccupied(state), cells)
+);

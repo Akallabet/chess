@@ -38,3 +38,7 @@ export const isCellUnderCheck = R.curry((state, target) => {
   }
   return false;
 });
+
+export const anyCellUnderCheck = R.curry((state, cells) =>
+  R.any(isCellUnderCheck(state), cells)
+);

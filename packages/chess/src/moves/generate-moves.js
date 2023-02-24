@@ -1,8 +1,14 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
 import { getCastlingRights } from '../fen/index.js';
-import { areOpponents, overProp, rotate } from '../utils/index.js';
-import { isCellUnderCheck } from './is-cell-under-check.js';
+import {
+  areOpponents,
+  overProp,
+  rotate,
+  anyCellOccupied,
+  isCellOccupied,
+} from '../utils/index.js';
+import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
 
 const generateMovesFromPattern = (
   [pattern, limit, flag],
@@ -104,46 +110,53 @@ const generateQueenMoves = generateMovesFromPatterns([
   [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
 ]);
 
+const canKingMoveHere = (count, current, _, state) =>
+  count === 0 && isCellUnderCheck(state, current);
 const generateKingMoves = generateMovesFromPatterns([
   [
     ({ x, y }) => ({ x: x + 1, y }),
     (count, current, origin, state) => {
       if (count === 0) return isCellUnderCheck(state, current);
-      if (current.y > 0) return true;
-      if (count === 1) return isCellUnderCheck(state, current);
-      if (count > 1) return true;
-      const hasCastlingRights = getCastlingRights(
-        R.path([origin.y, origin.x, 'piece'], state.board),
-        state
-      );
-      if (!hasCastlingRights.kingSide) return true;
-      return false;
+      if (count === 1 && current.y === 0) {
+        const hasCastlingRights = getCastlingRights(
+          R.path([origin.y, origin.x, 'piece'], state.board),
+          state
+        );
+        if (!hasCastlingRights.kingSide) return true;
+        return (
+          isCellUnderCheck(state, current) || isCellOccupied(state, current)
+        );
+      }
+      return true;
     },
   ],
   [
     ({ x, y }) => ({ x: x - 1, y }),
     (count, current, origin, state) => {
       if (count === 0) return isCellUnderCheck(state, current);
-      if (current.y > 0) return true;
-      if (count === 1)
-        return R.any(isCellUnderCheck(state), [
-          current,
-          { y: current.y, x: current.x - 1 },
-        ]);
-      const hasCastlingRights = getCastlingRights(
-        R.path([origin.y, origin.x, 'piece'], state.board),
-        state
-      );
-      if (!hasCastlingRights.queenSide) return true;
-      return false;
+      if (count === 1 && current.y === 0) {
+        const hasCastlingRights = getCastlingRights(
+          R.path([origin.y, origin.x, 'piece'], state.board),
+          state
+        );
+        if (!hasCastlingRights.queenSide) return true;
+        return (
+          anyCellUnderCheck(state, [
+            current,
+            { y: current.y, x: current.x - 1 },
+          ]) ||
+          anyCellOccupied(state, [current, { y: current.y, x: current.x - 1 }])
+        );
+      }
+      return true;
     },
   ],
-  [({ x, y }) => ({ x, y: y - 1 }), R.lte(1)],
-  [({ x, y }) => ({ x, y: y + 1 }), R.lte(1)],
-  [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.lte(1)],
-  [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.lte(1)],
-  [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.lte(1)],
-  [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.lte(1)],
+  [({ x, y }) => ({ x, y: y - 1 }), canKingMoveHere],
+  [({ x, y }) => ({ x, y: y + 1 }), canKingMoveHere],
+  [({ x, y }) => ({ x: x + 1, y: y + 1 }), canKingMoveHere],
+  [({ x, y }) => ({ x: x - 1, y: y + 1 }), canKingMoveHere],
+  [({ x, y }) => ({ x: x - 1, y: y - 1 }), canKingMoveHere],
+  [({ x, y }) => ({ x: x + 1, y: y - 1 }), canKingMoveHere],
 ]);
 
 const stopIfOpponent = (_, { x, y }, start, { board }) => {

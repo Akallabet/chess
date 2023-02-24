@@ -1,5 +1,13 @@
 import t from 'tap';
-import { getPieceCoord, rotate } from '../../src/utils/index.js';
+import { fromFEN } from '../../src/fen/index.js';
+import {
+  anyCellOccupied,
+  areCellsEmpty,
+  getPieceCoord,
+  isCellEmpty,
+  isCellOccupied,
+  rotate,
+} from '../../src/utils/index.js';
 import { getBoard } from '../../test-utils.js';
 
 t.test('Rotate an 4 x 4 matrix', t => {
@@ -47,5 +55,48 @@ t.test('Get coordinates for first Rook', t => {
     ])
   );
   t.same(coord, { y: 0, x: 6 });
+  t.end();
+});
+
+t.test('Cell is empty', t => {
+  const FEN = '8/8/8/8/8/8/8/8 b KQkq - 0 1';
+  const state = fromFEN(FEN);
+  t.same(isCellEmpty(state, { x: 4, y: 6 }), true);
+  t.end();
+});
+
+t.test('Cell is occupied', t => {
+  const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
+  const state = fromFEN(FEN);
+  t.same(isCellOccupied(state, { x: 3, y: 2 }), true);
+  t.end();
+});
+
+t.test('List of cells are all empty', t => {
+  const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
+  const state = fromFEN(FEN);
+  t.same(
+    areCellsEmpty(state, [
+      { x: 3, y: 0 },
+      { x: 2, y: 0 },
+      { x: 3, y: 5 },
+    ]),
+    true
+  );
+  t.end();
+});
+
+t.test('List of cells with at least one occupied', t => {
+  const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
+  const state = fromFEN(FEN);
+  t.same(
+    anyCellOccupied(state, [
+      { x: 3, y: 0 },
+      { x: 2, y: 0 },
+      { x: 3, y: 5 },
+      { x: 3, y: 2 },
+    ]),
+    true
+  );
   t.end();
 });

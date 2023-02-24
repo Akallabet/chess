@@ -231,6 +231,7 @@ t.test('Highligh moves with king under check', t => {
   t.same(highlightMoves({ x: 3, y: 1 }, { FEN }).board, expected);
   t.end();
 });
+
 t.test(
   'Highlight kingside castling when no cells are in check and empty',
   t => {
@@ -258,7 +259,6 @@ t.test(
     const input = fromFEN(FEN);
     const expected = getBoard(
       [
-        { coord: { x: 1, y: 0 }, cell: { move: true } },
         { coord: { x: 2, y: 0 }, cell: { move: true } },
         { coord: { x: 3, y: 0 }, cell: { move: true } },
         { coord: { x: 4, y: 0 }, cell: { piece: 'k', selected: true } },
@@ -281,7 +281,21 @@ t.test('No castling moves if one of the cells is under check', t => {
     [
       { coord: { x: 3, y: 0 }, cell: { move: true } },
       { coord: { x: 4, y: 0 }, cell: { piece: 'k', selected: true } },
-      { coord: { x: 4, y: 1 }, cell: { move: true } },
+    ],
+    input.board
+  );
+  const actual = highlightMoves({ x: 4, y: 0 }, { FEN }).board;
+  t.same(actual, expected);
+  t.end();
+});
+
+t.test('No castling moves if one of the cells is occupied', t => {
+  const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
+  const input = fromFEN(FEN);
+  const expected = getBoard(
+    [
+      { coord: { x: 3, y: 0 }, cell: { move: true } },
+      { coord: { x: 4, y: 0 }, cell: { piece: 'k', selected: true } },
     ],
     input.board
   );

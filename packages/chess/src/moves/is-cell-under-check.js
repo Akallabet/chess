@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
-import { getPieceColor, isOpponentPiece } from '../utils/index.js';
+import { isOpponentPiece } from '../utils/index.js';
 import { mapMovesToBoard } from './map-moves-to-board.js';
 import { generateMoves } from './generate-moves.js';
 //Loop through each row
@@ -37,14 +37,6 @@ export const isCellUnderCheck = R.curry((state, activeColor, target) => {
   return false;
 });
 
-export const anyCellUnderCheck = R.curry((state, coords) =>
-  R.any(
-    coord =>
-      isCellUnderCheck(
-        state,
-        getPieceColor(R.path([coord.y, coord.x, 'piece'], state.board)),
-        coord
-      ),
-    coords
-  )
+export const anyCellUnderCheck = R.curry((state, activeColor, coords) =>
+  R.any(coord => isCellUnderCheck(state, activeColor, coord), coords)
 );

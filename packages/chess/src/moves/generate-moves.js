@@ -80,13 +80,60 @@ const stopIfOpponent = (_, { x, y }, start, { board }) => {
   return true;
 };
 
-const canKingMoveHere = (count, current, origin, state) =>
-  count === 0 &&
+const shouldKingStop = (count, current, origin, state) =>
+  count > 0 ||
   isCellUnderCheck(
     state,
     getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
     current
   );
+
+const kingsideCastlingMove = startRow => (count, current, origin, state) => {
+  if (count === 0)
+    return isCellUnderCheck(
+      state,
+      getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
+      current
+    );
+  if (count === 1 && current.y === startRow) {
+    const hasCastlingRights = getCastlingRights(
+      R.path([origin.y, origin.x, 'piece'], state.board),
+      state
+    );
+    if (!hasCastlingRights.kingSide) return true;
+    return (
+      isCellUnderCheck(
+        state,
+        getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
+        current
+      ) || isCellOccupied(state, current)
+    );
+  }
+  return true;
+};
+const queensideCastlingMove = startRow => (count, current, origin, state) => {
+  if (count === 0)
+    return isCellUnderCheck(
+      state,
+      getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
+      current
+    );
+  if (count === 1 && current.y === startRow) {
+    const hasCastlingRights = getCastlingRights(
+      R.path([origin.y, origin.x, 'piece'], state.board),
+      state
+    );
+    if (!hasCastlingRights.queenSide) return true;
+    return (
+      anyCellUnderCheck(
+        state,
+        getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
+        [current, { y: current.y, x: current.x - 1 }]
+      ) || anyCellOccupied(state, [current, { y: current.y, x: current.x - 1 }])
+    );
+  }
+  return true;
+};
 
 const patterns = {
   p: [
@@ -133,68 +180,14 @@ const patterns = {
     [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
   ],
   k: [
-    [
-      ({ x, y }) => ({ x: x + 1, y }),
-      (count, current, origin, state) => {
-        if (count === 0)
-          return isCellUnderCheck(
-            state,
-            getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-            current
-          );
-        if (count === 1 && current.y === 0) {
-          const hasCastlingRights = getCastlingRights(
-            R.path([origin.y, origin.x, 'piece'], state.board),
-            state
-          );
-          if (!hasCastlingRights.kingSide) return true;
-          return (
-            isCellUnderCheck(
-              state,
-              getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-              current
-            ) || isCellOccupied(state, current)
-          );
-        }
-        return true;
-      },
-    ],
-    [
-      ({ x, y }) => ({ x: x - 1, y }),
-      (count, current, origin, state) => {
-        if (count === 0)
-          return isCellUnderCheck(
-            state,
-            getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-            current
-          );
-        if (count === 1 && current.y === 0) {
-          const hasCastlingRights = getCastlingRights(
-            R.path([origin.y, origin.x, 'piece'], state.board),
-            state
-          );
-          if (!hasCastlingRights.queenSide) return true;
-          return (
-            anyCellUnderCheck(
-              state,
-              getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-              [current, { y: current.y, x: current.x - 1 }]
-            ) ||
-            anyCellOccupied(state, [
-              current,
-              { y: current.y, x: current.x - 1 },
-            ])
-          );
-        }
-        return true;
-      },
-    ],
-    [({ x, y }) => ({ x, y: y - 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x, y: y + 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), canKingMoveHere],
+    [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(0)],
+    [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(0)],
+    [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
+    [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
   ],
   P: [
     [
@@ -208,68 +201,14 @@ const patterns = {
     [({ x, y }) => ({ x: x - 1, y: y - 1 }), stopIfOpponent, flags.capture],
   ],
   K: [
-    [
-      ({ x, y }) => ({ x: x - 1, y }),
-      (count, current, origin, state) => {
-        if (count === 0)
-          return isCellUnderCheck(
-            state,
-            getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-            current
-          );
-        if (count === 1 && current.y === 7) {
-          const hasCastlingRights = getCastlingRights(
-            R.path([origin.y, origin.x, 'piece'], state.board),
-            state
-          );
-          if (!hasCastlingRights.queenSide) return true;
-          return (
-            anyCellUnderCheck(
-              state,
-              getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-              [current, { y: current.y, x: current.x - 1 }]
-            ) ||
-            anyCellOccupied(state, [
-              current,
-              { y: current.y, x: current.x - 1 },
-            ])
-          );
-        }
-        return true;
-      },
-    ],
-    [
-      ({ x, y }) => ({ x: x + 1, y }),
-      (count, current, origin, state) => {
-        if (count === 0)
-          return isCellUnderCheck(
-            state,
-            getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-            current
-          );
-        if (count === 1 && current.y === 7) {
-          const hasCastlingRights = getCastlingRights(
-            R.path([origin.y, origin.x, 'piece'], state.board),
-            state
-          );
-          if (!hasCastlingRights.kingSide) return true;
-          return (
-            isCellUnderCheck(
-              state,
-              getPieceColor(R.path([origin.y, origin.x, 'piece'], state.board)),
-              current
-            ) || isCellOccupied(state, current)
-          );
-        }
-        return true;
-      },
-    ],
-    [({ x, y }) => ({ x, y: y - 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x, y: y + 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), canKingMoveHere],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), canKingMoveHere],
+    [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(7)],
+    [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(7)],
+    [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
+    [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
+    [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
   ],
 };
 

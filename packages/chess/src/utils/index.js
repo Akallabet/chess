@@ -3,10 +3,16 @@ export { rotate } from './rotate.js';
 
 export const isWhitePiece = piece => new RegExp(/[PNBRQK]+/).test(piece);
 export const isBlackPiece = piece => new RegExp(/[pnbrqk]+/).test(piece);
+export const isActiveColorWhite = activeColor => activeColor === 'w';
+export const isActiveColorBlack = activeColor => activeColor === 'b';
+export const isOpponentPiece = (activeColor, piece) =>
+  (isActiveColorWhite(activeColor) && isBlackPiece(piece)) ||
+  (isActiveColorBlack(activeColor) && isWhitePiece(piece));
 export const areOpponents = (pa, pb) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));
 
+export const getPieceColor = piece => (isWhitePiece(piece) ? 'w' : 'b');
 export const overProp = R.curryN(3, (prop, fn, item) =>
   R.over(R.lensProp(prop), fn, item)
 );
@@ -32,7 +38,11 @@ export const isCellOccupied = R.curry((state, { y, x }) =>
 );
 
 export const areCellsEmpty = R.curry((state, cells) =>
-  R.all(isCellEmpty(state), cells)
+  R.all(
+    ({ y, x }) =>
+      isCellEmpty(state, getPieceColor(R.path([y, x, 'piece'], state.board))),
+    cells
+  )
 );
 
 export const anyCellOccupied = R.curry((state, cells) =>

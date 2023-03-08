@@ -5,7 +5,10 @@ interface Coordinates {
   y: number;
 }
 
-export type Position = Coordinates | String;
+type Ranks = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+type Address = `${Files}${Ranks}`;
+export type Position = Coordinates | Address;
 
 export interface Square {
   piece: string;

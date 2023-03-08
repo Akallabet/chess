@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import type { Position, ChessBoardType } from '@chess/chess';
+import type { Position, ChessBoardType, Files, Ranks } from '@chess/chess';
 import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
@@ -40,8 +40,8 @@ const Piece = ({
 
 type ChessBoardProps = {
   board: ChessBoardType;
-  files: String[];
-  ranks: String[];
+  files: Files[];
+  ranks: Ranks[];
   onCellClick: (
     addr: Position,
     { piece, move, capture }: { piece: String; move: Boolean; capture: Boolean }

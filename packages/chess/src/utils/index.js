@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { errorCodes } from '../../error-codes.js';
+import { errorCodes } from '../error-codes.js';
 import { files, ranks } from '../constants.js';
 export { rotate } from './rotate.js';
 

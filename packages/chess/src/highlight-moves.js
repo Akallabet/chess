@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { errorCodes } from '../error-codes.js';
+import { errorCodes } from './error-codes.js';
 import { modesList } from './constants.js';
 import { generateMoves, mapMovesToBoard } from './moves/index.js';
 import { fromFEN } from './fen/index.js';

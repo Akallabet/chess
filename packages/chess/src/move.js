@@ -1,6 +1,10 @@
 import * as R from 'ramda';
 import { fromFEN, toFEN } from './fen/index.js';
-import { overProp, updateProp } from './utils/index.js';
+import {
+  fromPositionToCoordinates,
+  overProp,
+  updateProp,
+} from './utils/index.js';
 
 const mapI = R.addIndex(R.map);
 
@@ -30,5 +34,9 @@ const moveAndUpdate = (origin, target, state) => {
 };
 
 export const move = R.curryN(3, (origin, target, state) => {
-  return moveAndUpdate(origin, target, R.mergeRight(state, fromFEN(state.FEN)));
+  return moveAndUpdate(
+    fromPositionToCoordinates(origin),
+    fromPositionToCoordinates(target),
+    R.mergeRight(state, fromFEN(state.FEN))
+  );
 });

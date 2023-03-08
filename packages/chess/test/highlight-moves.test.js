@@ -1,23 +1,20 @@
 import t from 'tap';
 import { modes } from '../src/constants.js';
 import { fromFEN } from '../src/fen/from-fen.js';
-// import { fromFEN } from '../src/fen/from-fen.js';
-import {
-  fromChessBoardToCoordinates,
-  highlightMoves,
-} from '../src/highlight-moves.js';
+import { highlightMoves } from '../src/highlight-moves.js';
+import { fromPositionToCoordinates } from '../src/utils/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.test('Convert chessboard piece coordinates to x/y coordinates', t => {
-  t.same(fromChessBoardToCoordinates('e3'), { x: 4, y: 5 });
+  t.same(fromPositionToCoordinates('e3'), { x: 4, y: 5 });
   t.end();
 });
 
 t.test('Get Moves - wrong format', t => {
   const FEN = '8/4p3/8/8/8/8/8/8 b KQkq - 0 1';
-  t.same(highlightMoves('', { FEN }).error, 'WRONG_FORMAT');
-  t.same(highlightMoves('Pb', { FEN }).error, 'WRONG_FORMAT');
-  t.same(highlightMoves({ x: 1, y: 9 }, { FEN }).error, 'NO_PIECE_SELECTED');
+  t.throws(() => highlightMoves('', { FEN }), 'WRONG_FORMAT');
+  t.throws(() => highlightMoves('Pb', { FEN }), 'WRONG_FORMAT');
+  t.throws(() => highlightMoves({ x: 1, y: 9 }, { FEN }), 'NO_PIECE_SELECTED');
   t.end();
 });
 t.test('Get moves - Black pawn - rank 7', t => {

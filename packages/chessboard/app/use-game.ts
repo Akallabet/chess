@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import chess from '@chess/chess';
-import type { Coordinates, GameMode, ChessState } from '@chess/chess';
+import chess, { files, ranks } from '@chess/chess';
+import type { Position, GameMode, ChessState } from '@chess/chess';
 
 export const useGame = (FEN: string, mode: GameMode) => {
   const [game, setGame] = useState<undefined | ChessState>();
-  const [selected, setSelected] = useState<Coordinates>();
+  const [selected, setSelected] = useState<undefined | Position>();
 
   useEffect(() => {
     setGame(chess('start', { mode, FEN }));
@@ -15,17 +15,19 @@ export const useGame = (FEN: string, mode: GameMode) => {
   const { board } = game;
 
   return {
+    files,
+    ranks,
     board,
     action: (
-      { x, y }: Coordinates,
+      addr: Position,
       {
         piece,
         move,
         capture,
       }: { piece: String; move: Boolean; capture: Boolean }
     ) => {
-      if (capture || move) {
-        setGame(chess('move', selected, { y, x }, game));
+      if (selected && (capture || move)) {
+        setGame(chess('move', selected, addr, game));
         setSelected(undefined);
         return;
       }
@@ -35,8 +37,8 @@ export const useGame = (FEN: string, mode: GameMode) => {
         return;
       }
       if (piece) {
-        setGame(chess('highlight', { x, y }, game));
-        setSelected({ x, y });
+        setGame(chess('highlight', addr, game));
+        setSelected(addr);
         return;
       }
     },

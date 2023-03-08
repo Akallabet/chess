@@ -5,6 +5,8 @@ interface Coordinates {
   y: number;
 }
 
+export type Position = Coordinates | String;
+
 export interface Square {
   piece: string;
   move: boolean;
@@ -28,14 +30,14 @@ export default function chess(cmd: 'clear', args: ChessState): ChessState;
 export default function chess(cmd: 'clear'): (args: ChessState) => ChessState;
 export default function chess(
   cmd: 'move',
-  origin: coordinates,
-  target: coordinates,
+  origin: Position,
+  target: Position,
   args: ChessState
 ): ChessState;
 export default function chess(
   cmd: 'move',
-  origin: coordinates,
-  target: coordinates
+  origin: Position,
+  target: Position
 ): (args: ChessState) => ChessState;
 export default function chess(
   cmd: 'highlight',
@@ -44,7 +46,7 @@ export default function chess(
 ): ChessState;
 export default function chess(
   cmd: 'highlight',
-  coords: Coordinates,
+  coords: Position,
   args: ChessState
 ): ChessState;
 export default function chess(
@@ -53,5 +55,5 @@ export default function chess(
 ): (args: ChessState) => ChessState;
 export default function chess(
   cmd: 'highlight',
-  coords: Coordinates
+  coords: Position
 ): (args: ChessState) => ChessState;

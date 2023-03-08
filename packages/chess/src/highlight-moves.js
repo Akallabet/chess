@@ -1,28 +1,17 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
-import { files, modesList, ranks } from './constants.js';
+import { modesList } from './constants.js';
 import { generateMoves, mapMovesToBoard } from './moves/index.js';
 import { fromFEN } from './fen/index.js';
 import { modesMap } from './modes.js';
+import { fromPositionToCoordinates } from './utils/index.js';
 
-export const fromChessBoardToCoordinates = pos => {
-  const [file, rank] = R.split('', pos);
-  return {
-    x: files.indexOf(file),
-    y: ranks.indexOf(Number(rank)),
-  };
-};
-
-export const highlightMoves = R.curry((coord, { FEN, ...initialState }) => {
+export const highlightMoves = R.curry((addr, { FEN, ...initialState }) => {
+  const coord = fromPositionToCoordinates(addr);
   const state = R.mergeRight(initialState, fromFEN(FEN));
-  const isNotCoord = !R.has('x', coord) || !R.has('y', coord);
   const hasNoPiece = !R.hasPath([coord.y, coord.x, 'piece'], state.board);
 
-  const error =
-    (isNotCoord && errorCodes.wrongFormat) ||
-    (hasNoPiece && errorCodes.no_piece_selected);
-
-  if (error) return R.assoc('error', error, state);
+  if (hasNoPiece) throw new Error(errorCodes.no_piece_selected);
 
   const rejectMoves = R.path(
     [state.mode || modesList[0], 'rejectMoves'],

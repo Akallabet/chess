@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import type { ChessBoardType, Coordinates } from '@chess/chess';
+import type { Position, ChessBoardType } from '@chess/chess';
 import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
@@ -40,13 +40,20 @@ const Piece = ({
 
 type ChessBoardProps = {
   board: ChessBoardType;
+  files: String[];
+  ranks: String[];
   onCellClick: (
-    args: Coordinates,
+    addr: Position,
     { piece, move, capture }: { piece: String; move: Boolean; capture: Boolean }
   ) => void;
 };
 
-export const ChessBoard = ({ board, onCellClick }: ChessBoardProps) => (
+export const ChessBoard = ({
+  board,
+  files,
+  ranks,
+  onCellClick,
+}: ChessBoardProps) => (
   <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
       <div key={i} className="flex h-1/8 w-full flex-row">
@@ -60,7 +67,7 @@ export const ChessBoard = ({ board, onCellClick }: ChessBoardProps) => (
             (highlight && 'bg-secondary-dark') ||
             'bg-secondary';
           const handleClick = () => {
-            onCellClick({ x: j, y: i }, { piece, move, capture });
+            onCellClick(`${files[j]}${ranks[i]}`, { piece, move, capture });
           };
           return (
             <div

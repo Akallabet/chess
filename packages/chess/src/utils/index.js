@@ -1,4 +1,6 @@
 import * as R from 'ramda';
+import { errorCodes } from '../../error-codes.js';
+import { files, ranks } from '../constants.js';
 export { rotate } from './rotate.js';
 
 export const isWhitePiece = piece => new RegExp(/[PNBRQK]+/).test(piece);
@@ -26,8 +28,22 @@ export const getPieceCoord = (piece, board) => {
     }
   }
 };
-export const isChessboardPos = pos =>
-  new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(pos);
+// export const isAddress = addr =>
+//   new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(addr);
+export const isAddress = addr => new RegExp(/([a-h]+[1-9]+)/).test(addr);
+
+export const fromPositionToCoordinates = pos => {
+  if (isAddress(pos)) {
+    const [file, rank] = R.split('', pos);
+    return {
+      x: files.indexOf(file),
+      y: ranks.indexOf(Number(rank)),
+    };
+  }
+  const isCoord = R.has('x', pos) && R.has('y', pos);
+  if (!isCoord) throw new Error(errorCodes.wrongFormat);
+  return pos;
+};
 
 export const isCellEmpty = R.curry((state, { y, x }) =>
   R.isNil(R.path([y, x, 'piece'], state.board))

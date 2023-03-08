@@ -15,3 +15,4 @@ const cmds = {
 
 const chess = (cmd, ...args) => cmds[cmd](...args);
 export default chess;
+export { files, ranks } from './constants.js';

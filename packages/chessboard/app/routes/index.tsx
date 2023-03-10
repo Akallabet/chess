@@ -14,7 +14,7 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function App() {
   const FEN = useLoaderData<typeof loader>();
-  const { board, action, files, ranks } = useGame(FEN, 'demo');
+  const { board, action, positions, files, ranks } = useGame(FEN, 'demo');
   return (
     <div>
       <div className="my-5" />
@@ -22,6 +22,7 @@ export default function App() {
         {board && (
           <ChessBoard
             board={board}
+            positions={positions}
             onCellClick={action}
             files={files}
             ranks={ranks}

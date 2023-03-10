@@ -1,5 +1,11 @@
 import * as R from 'ramda';
-import type { Position, ChessBoardType, Files, Ranks } from '@chess/chess';
+import type {
+  Position,
+  ChessBoardType,
+  Files,
+  Ranks,
+  Positions,
+} from '@chess/chess';
 import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
@@ -40,6 +46,7 @@ const Piece = ({
 
 type ChessBoardProps = {
   board: ChessBoardType;
+  positions: Positions;
   files: Files[];
   ranks: Ranks[];
   onCellClick: (
@@ -50,11 +57,12 @@ type ChessBoardProps = {
 
 export const ChessBoard = ({
   board,
+  positions,
   files,
   ranks,
   onCellClick,
 }: ChessBoardProps) => (
-  <div className="border-1 border-black mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
+  <div className="border-1 border-black relative mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
     {board.map((row, i) => (
       <div key={i} className="flex h-1/8 w-full flex-row">
         {row.map(({ piece, move, selected, capture }, j) => {
@@ -67,16 +75,29 @@ export const ChessBoard = ({
             (highlight && 'bg-secondary-dark') ||
             'bg-secondary';
           const handleClick = () => {
-            onCellClick(`${files[j]}${ranks[i]}`, { piece, move, capture });
+            onCellClick(positions[i][j], { piece, move, capture });
           };
           return (
             <div
               key={j}
-              className={`h-full w-1/8 ${
+              className={`relative h-full w-1/8 ${
                 piece ? 'cursor-pointer' : 'cursor-auto'
               }`}
             >
-              <div className={`${bg} h-full w-full`} onClick={handleClick}>
+              <div
+                className={`relative ${bg} h-full w-full`}
+                onClick={handleClick}
+              >
+                {j === 0 && (
+                  <span className="leading-1 absolute top-0 left-0.5 text-xs">
+                    {ranks[i]}
+                  </span>
+                )}
+                {i === row.length - 1 && (
+                  <div className="leading-1 absolute bottom-0 right-0.5 text-xs">
+                    {files[j]}
+                  </div>
+                )}
                 {piece && (
                   <div className="flex h-full w-full items-center justify-center">
                     <Piece

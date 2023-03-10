@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import chess, { files, ranks } from '@chess/chess';
-import type { Position, GameMode, ChessState } from '@chess/chess';
+import chess from '@chess/chess';
+import type { Position, GameMode, ChessStateOutput } from '@chess/chess';
 
 export const useGame = (FEN: string, mode: GameMode) => {
-  const [game, setGame] = useState<undefined | ChessState>();
+  const [game, setGame] = useState<undefined | ChessStateOutput>();
   const [selected, setSelected] = useState<undefined | Position>();
 
   useEffect(() => {
@@ -12,12 +12,13 @@ export const useGame = (FEN: string, mode: GameMode) => {
 
   if (!game) return {};
 
-  const { board } = game;
+  const { board, positions, ranks, files } = game;
 
   return {
     files,
     ranks,
     board,
+    positions,
     action: (
       addr: Position,
       {

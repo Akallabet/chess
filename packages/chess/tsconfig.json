@@ -1,12 +1,13 @@
 {
+  "include": ["**/*.js", "**/*.ts"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es2020"],
-    "module": "es2020",
-    "noEmit": true,
+    "lib": ["ES2021"],
+    "esModuleInterop": true,
+    "moduleResolution": "node16",
+    "target": "ES2019",
     "strict": true,
-    "esModuleInterop": true
-  },
-  "exclude": ["./test/types/*.test-d.ts"],
-  "include": [".src/*.d.ts"]
+    "allowJs": true,
+    "noEmit": true
+  }
 }

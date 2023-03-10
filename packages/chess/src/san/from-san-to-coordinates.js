@@ -1,5 +1,8 @@
 import * as R from 'ramda';
 import { files, pieces, ranks } from '../constants.js';
+import { errorCodes } from '../error-codes.js';
+import { generateMoves } from '../moves/generate-moves.js';
+import { getPieceCoord } from '../utils/index.js';
 
 const filesString = R.join('', files);
 const ranksString = R.join('', ranks);
@@ -43,6 +46,25 @@ const SANOptions = [
           y: R.indexOf(Number(rankTarget), ranks),
         },
       };
+    },
+  },
+  {
+    expr: new RegExp(`^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}$`),
+    parse: (SAN, state) => {
+      const [piece, fileTarget, rankTarget] = R.split('', SAN);
+      const target = {
+        x: R.indexOf(fileTarget, files),
+        y: R.indexOf(Number(rankTarget), ranks),
+      };
+      const origin = getPieceCoord(piece, state.board);
+
+      const hasTargetMove = R.find(
+        ({ coord: { x, y } }) => x === target.x && y === target.y,
+        generateMoves(origin, state)
+      );
+
+      if (!hasTargetMove) throw new Error();
+      return { piece, origin, target };
     },
   },
   // [
@@ -97,9 +119,10 @@ const SANOptions = [
   // ],
 ];
 export const fromSANToCoordinates = (SAN, state) => {
-  const { parse } = R.find(({ expr }) => {
-    console.log(R.match(expr, SAN));
+  const option = R.find(({ expr }) => {
     return R.test(expr, SAN);
   }, SANOptions);
+  if (!option) throw new Error(errorCodes.wrongFormat);
+  const { parse } = option;
   return parse(SAN, state);
 };

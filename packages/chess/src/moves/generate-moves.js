@@ -212,7 +212,7 @@ const patterns = {
   ],
 };
 
-export const generateMoves = (coord, state, rejectFn = R.F) => {
+export const generateMoves = (coord, state, rejectFn = () => R.F) => {
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
   const moves = generateMovesFromPatterns({

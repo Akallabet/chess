@@ -244,8 +244,9 @@ t.test('Highligh moves with king under check', t => {
     { coord: { x: 3, y: 3 }, cell: { move: true } },
     { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
     { coord: { x: 0, y: 6 }, cell: { piece: 'B' } },
+    { coord: { x: 3, y: 7 }, cell: { piece: 'K' } },
   ]);
-  const FEN = '6k1/3pp3/8/8/8/8/B7/8 b KQkq - 0 1';
+  const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   t.same(highlightMoves({ x: 3, y: 1 }, { FEN }).board, expected);
   t.end();
 });

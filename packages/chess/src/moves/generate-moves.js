@@ -41,7 +41,13 @@ const generateMovesFromPattern = (
     );
   }
   if (!cell.piece)
-    moves.push({ coord: currentCoord, flag: { [flag || flags.move]: true } });
+    moves.push({
+      coord: currentCoord,
+      flag: {
+        [flag || flags.move]: true,
+        // [flags.check]: isCheck(originCoord, currentCoord, state),
+      },
+    });
   return generateMovesFromPattern(
     [pattern, limit, flag],
     count + 1,
@@ -212,16 +218,25 @@ const patterns = {
   ],
 };
 
-export const generateMoves = (coord, state, rejectFn = () => R.F) => {
+export const generateMoves = (
+  coord,
+  state,
+  rejectFn = () => R.F,
+  isCheckFn = () => R.identity
+) => {
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
-  const moves = generateMovesFromPatterns({
-    patterns: patterns[piece] || patterns[piece.toLowerCase()],
-    rejectFn,
-    state,
-    origin: coord,
-    moves: [],
-  });
 
-  return R.prepend(selected, moves);
+  return R.pipe(
+    R.map(isCheckFn(coord, state)),
+    R.prepend(selected)
+  )(
+    generateMovesFromPatterns({
+      patterns: patterns[piece] || patterns[piece.toLowerCase()],
+      rejectFn,
+      state,
+      origin: coord,
+      moves: [],
+    })
+  );
 };

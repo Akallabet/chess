@@ -12,6 +12,7 @@ export const flags = {
   capture: 'capture',
   move: 'move',
   selected: 'selected',
+  check: 'check',
 };
 export const modes = {
   standard: 'standard',

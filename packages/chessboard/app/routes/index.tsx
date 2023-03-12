@@ -1,7 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { ChessBoard } from '../components/chessboard';
 import { useLoaderData } from '@remix-run/react';
-import { FENForm } from '../components/fen';
 import { useGame } from '../use-game';
 
 export const loader = ({ request }: LoaderArgs) => {
@@ -14,25 +13,22 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function App() {
   const FEN = useLoaderData<typeof loader>();
-  const { board, action, positions, files, ranks } = useGame(FEN, 'demo');
+  const game = useGame(FEN, 'standard');
+
   return (
     <div>
       <div className="my-5" />
-      <div className="mx-auto">
-        {board && (
-          <ChessBoard
-            board={board}
-            positions={positions}
-            onCellClick={action}
-            files={files}
-            ranks={ranks}
-          />
-        )}
-      </div>
-      <div className="my-5" />
-      <div className="mx-auto max-w-md">
-        <FENForm FEN={FEN} />
-      </div>
+      {game && (
+        <ChessBoard
+          board={game.board}
+          positions={game.positions}
+          onCellClick={game.action}
+          files={game.files}
+          ranks={game.ranks}
+          FEN={game.FEN}
+          mode={game.mode}
+        />
+      )}
     </div>
   );
 }

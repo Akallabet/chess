@@ -321,3 +321,21 @@ t.test('No castling moves if one of the cells is occupied', t => {
   t.same(actual, expected);
   t.end();
 });
+t.only('Highlight check', t => {
+  const FEN = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
+  const input = fromFEN(FEN);
+  const expected = getBoard(
+    [
+      { coord: { x: 0, y: 2 }, cell: { move: true } },
+      { coord: { x: 1, y: 3 }, cell: { move: true, check: true } },
+      { coord: { x: 2, y: 4 }, cell: { move: true } },
+      { coord: { x: 3, y: 5 }, cell: { move: true } },
+      { coord: { x: 4, y: 6 }, cell: { move: true } },
+      { coord: { x: 5, y: 7 }, cell: { piece: 'B', selected: true } },
+    ],
+    input.board
+  );
+  const actual = highlightMoves('f1', { FEN }).board;
+  t.same(actual, expected);
+  t.end();
+});

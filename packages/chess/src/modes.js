@@ -2,9 +2,7 @@ import * as R from 'ramda';
 import { modes } from './constants.js';
 import { isCellUnderCheck } from './moves/index.js';
 import { move } from './move.js';
-import { getPieceColor, getPieceCoord } from './utils/index.js';
-
-const getKingPiece = ({ activeColor }) => (activeColor === 'w' ? 'K' : 'k');
+import { getKingPiece, getPieceColor, getPieceCoord } from './utils/index.js';
 
 const isKingUnderAttack = (origin, state) => {
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);

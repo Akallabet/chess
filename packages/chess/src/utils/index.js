@@ -15,12 +15,9 @@ export const areOpponents = (pa, pb) =>
   (isBlackPiece(pa) && isWhitePiece(pb));
 
 export const getPieceColor = piece => (isWhitePiece(piece) ? 'w' : 'b');
-export const overProp = R.curryN(3, (prop, fn, item) =>
-  R.over(R.lensProp(prop), fn, item)
-);
-export const updateProp = R.curryN(3, (prop, fn, obj) =>
-  R.assoc(prop, fn(obj), obj)
-);
+export const getKingPiece = ({ activeColor }) =>
+  activeColor === 'w' ? 'K' : 'k';
+
 export const getPieceCoord = (piece, board) => {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
@@ -63,4 +60,11 @@ export const areCellsEmpty = R.curry((state, cells) =>
 
 export const anyCellOccupied = R.curry((state, cells) =>
   R.any(isCellOccupied(state), cells)
+);
+
+export const overProp = R.curryN(3, (prop, fn, item) =>
+  R.over(R.lensProp(prop), fn, item)
+);
+export const updateProp = R.curryN(3, (prop, fn, obj) =>
+  R.assoc(prop, fn(obj), obj)
 );

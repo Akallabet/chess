@@ -17,46 +17,60 @@ export interface Square {
   selected: boolean;
 }
 
+type Positions = Address[][];
 export type ChessBoardType = Square[][];
 
 export type GameMode = typeof modesList[number];
 
 export interface ChessState {
-  board?: ChessBoardType | undefined;
+  board?: ChessBoardType;
   FEN: string;
   mode: GameMode;
+  positions?: Positions;
+  ranks?: Ranks[];
+  files?: Files[];
 }
-export const files: string[];
-export const ranks: string[];
-export default function chess(cmd: 'start', args: ChessState): ChessState;
-export default function chess(cmd: 'clear', args: ChessState): ChessState;
-export default function chess(cmd: 'clear'): (args: ChessState) => ChessState;
+
+export interface ChessStateOutput {
+  board: ChessBoardType;
+  FEN: string;
+  mode: GameMode;
+  positions: Positions;
+  ranks: Ranks[];
+  files: Files[];
+}
+
+export default function chess(cmd: 'start', args: ChessState): ChessStateOutput;
+export default function chess(cmd: 'clear', args: ChessState): ChessStateOutput;
+export default function chess(
+  cmd: 'clear'
+): (args: ChessState) => ChessStateOutput;
 export default function chess(
   cmd: 'move',
   origin: Position,
   target: Position,
   args: ChessState
-): ChessState;
+): ChessStateOutput;
 export default function chess(
   cmd: 'move',
   origin: Position,
   target: Position
-): (args: ChessState) => ChessState;
+): (args: ChessState) => ChessStateOutput;
 export default function chess(
   cmd: 'highlight',
   SAN: string,
   args: ChessState
-): ChessState;
+): ChessStateOutput;
 export default function chess(
   cmd: 'highlight',
   coords: Position,
   args: ChessState
-): ChessState;
+): ChessStateOutput;
 export default function chess(
   cmd: 'highlight',
   SAN: string
-): (args: ChessState) => ChessState;
+): (args: ChessState) => ChessStateOutput;
 export default function chess(
   cmd: 'highlight',
   coords: Position
-): (args: ChessState) => ChessState;
+): (args: ChessState) => ChessStateOutput;

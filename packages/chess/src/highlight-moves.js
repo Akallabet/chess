@@ -13,12 +13,10 @@ export const highlightMoves = R.curry((addr, { FEN, ...initialState }) => {
 
   if (hasNoPiece) throw new Error(errorCodes.no_piece_selected);
 
-  const rejectMoves = R.path(
-    [state.mode || modesList[0], 'rejectMoves'],
-    modesMap
-  );
+  const { rejectMoves, addCheckFlag } = modesMap[state.mode || modesList[0]];
 
-  const moves = generateMoves(coord, state, rejectMoves);
+  const moves = generateMoves(coord, state, rejectMoves, addCheckFlag);
   const boardWithHighlights = mapMovesToBoard(state.board, moves);
+
   return R.assoc('board', boardWithHighlights, state);
 });

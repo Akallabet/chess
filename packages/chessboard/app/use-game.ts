@@ -1,31 +1,31 @@
 import { useEffect, useState } from 'react';
-import chess, { files, ranks } from '@chess/chess';
-import type { Position, GameMode, ChessState } from '@chess/chess';
+import chess from '@chess/chess';
+import type { Position, GameMode, ChessStateOutput } from '@chess/chess';
 
-export const useGame = (FEN: string, mode: GameMode) => {
-  const [game, setGame] = useState<undefined | ChessState>();
+type GameAction = (
+  pos: Position,
+  meta: { piece: String; move: Boolean; capture: Boolean }
+) => void;
+
+type GameOutput =
+  | (ChessStateOutput & {
+      action: GameAction;
+    })
+  | undefined;
+
+export const useGame = (FEN: string, mode: GameMode): GameOutput => {
+  const [game, setGame] = useState<undefined | ChessStateOutput>();
   const [selected, setSelected] = useState<undefined | Position>();
 
   useEffect(() => {
     setGame(chess('start', { mode, FEN }));
   }, [FEN, mode]);
 
-  if (!game) return {};
-
-  const { board } = game;
+  if (!game) return undefined;
 
   return {
-    files,
-    ranks,
-    board,
-    action: (
-      addr: Position,
-      {
-        piece,
-        move,
-        capture,
-      }: { piece: String; move: Boolean; capture: Boolean }
-    ) => {
+    ...game,
+    action: (addr, { piece, move, capture }) => {
       if (selected && (capture || move)) {
         setGame(chess('move', selected, addr, game));
         setSelected(undefined);

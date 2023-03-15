@@ -244,8 +244,9 @@ t.test('Highligh moves with king under check', t => {
     { coord: { x: 3, y: 3 }, cell: { move: true } },
     { coord: { x: 4, y: 1 }, cell: { piece: 'p' } },
     { coord: { x: 0, y: 6 }, cell: { piece: 'B' } },
+    { coord: { x: 3, y: 7 }, cell: { piece: 'K' } },
   ]);
-  const FEN = '6k1/3pp3/8/8/8/8/B7/8 b KQkq - 0 1';
+  const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   t.same(highlightMoves({ x: 3, y: 1 }, { FEN }).board, expected);
   t.end();
 });
@@ -318,6 +319,24 @@ t.test('No castling moves if one of the cells is occupied', t => {
     input.board
   );
   const actual = highlightMoves({ x: 4, y: 0 }, { FEN }).board;
+  t.same(actual, expected);
+  t.end();
+});
+t.only('Highlight check', t => {
+  const FEN = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
+  const input = fromFEN(FEN);
+  const expected = getBoard(
+    [
+      { coord: { x: 0, y: 2 }, cell: { move: true } },
+      { coord: { x: 1, y: 3 }, cell: { move: true, check: true } },
+      { coord: { x: 2, y: 4 }, cell: { move: true } },
+      { coord: { x: 3, y: 5 }, cell: { move: true } },
+      { coord: { x: 4, y: 6 }, cell: { move: true } },
+      { coord: { x: 5, y: 7 }, cell: { piece: 'B', selected: true } },
+    ],
+    input.board
+  );
+  const actual = highlightMoves('f1', { FEN }).board;
   t.same(actual, expected);
   t.end();
 });

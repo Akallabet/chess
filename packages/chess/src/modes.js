@@ -1,10 +1,9 @@
 import * as R from 'ramda';
-import { modes } from './constants.js';
+import { flags, modes } from './constants.js';
 import { isCellUnderCheck } from './moves/index.js';
 import { move } from './move.js';
-import { getPieceColor, getPieceCoord } from './utils/index.js';
-
-const getKingPiece = ({ activeColor }) => (activeColor === 'w' ? 'K' : 'k');
+import { getKingPiece, getPieceColor, getPieceCoord } from './utils/index.js';
+import { canPieceMoveToTarget } from './moves/is-cell-under-check.js';
 
 const isKingUnderAttack = (origin, state) => {
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);
@@ -18,8 +17,19 @@ const isKingUnderAttack = (origin, state) => {
   };
 };
 
+const addCheckFlag = (origin, state) => moveData => {
+  const { coord, flag } = moveData;
+  const moveState = move(origin, coord, state);
+  const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
+  const isUnderCheck = canPieceMoveToTarget(coord, kingCoord, moveState);
+
+  return isUnderCheck
+    ? { coord, flag: { ...flag, [flags.check]: isUnderCheck } }
+    : moveData;
+};
+
 export const modesMap = {
-  [modes.standard]: { rejectMoves: isKingUnderAttack },
-  [modes.demo]: { rejectMoves: () => R.F },
-  [modes.practice]: { rejectMoves: () => R.F },
+  [modes.standard]: { rejectMoves: isKingUnderAttack, addCheckFlag },
+  [modes.demo]: { rejectMoves: () => R.F, addCheckFlag: () => R.identity },
+  [modes.practice]: { rejectMoves: () => R.F, addCheckFlag: () => R.identity },
 };

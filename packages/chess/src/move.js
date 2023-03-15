@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { fromFEN, toFEN } from './fen/index.js';
+import { colours } from './constants.js';
 import {
   fromPositionToCoordinates,
   overProp,
@@ -7,6 +8,9 @@ import {
 } from './utils/index.js';
 
 const mapI = R.addIndex(R.map);
+
+const changeActiveColor = activeColour =>
+  activeColour === colours.white ? colours.black : colours.white;
 
 export const movePiece = R.curryN(3, (origin, target, board) => {
   const originCell = R.path([origin.y, origin.x], board);
@@ -29,6 +33,7 @@ const moveAndUpdate = (origin, target, state) => {
 
   return R.pipe(
     overProp('board', movePiece(origin, target)),
+    overProp('activeColor', changeActiveColor),
     updateProp('FEN', toFEN)
   )(state);
 };

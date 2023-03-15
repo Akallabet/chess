@@ -10,6 +10,6 @@ t.test('Move white pawn from e8 to e7', t => {
     { FEN: '8/8/8/8/8/8/4P3/8 w KQkq - 0 1' }
   );
   t.same(state.board, expected);
-  t.same(state.FEN, '8/8/8/8/8/4P3/8/8 w KQkq - 0 1');
+  t.same(state.FEN, '8/8/8/8/8/4P3/8/8 b KQkq - 0 1');
   t.end();
 });

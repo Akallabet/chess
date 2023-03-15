@@ -5,7 +5,6 @@ import t from 'tap';
 import { fromSANToCoordinates } from '../../src/san/from-san-to-coordinates.js';
 import { start } from '../../src/start.js';
 
-// t.test('SAN to Coordinates', t => {
 // [
 //   '0-0',
 //   {
@@ -24,8 +23,6 @@ import { start } from '../../src/start.js';
 //     isKingside: false,
 //   },
 // ],
-// ['Qe8', { name: 'Q', x: 4, y: 0 }],
-// ['c4', { name: 'P', x: 2, y: 4 }],
 // ['Nbc3', { name: 'N', originX: 1, x: 2, y: 5 }],
 // ['Qe1e8+', { name: 'Q', originX: 4, originY: 7, x: 4, y: 0, check: '+' }],
 // ['Qe1xe8', { name: 'Q', originX: 4, originY: 7, x: 4, y: 0, capture: 'x' }],
@@ -38,9 +35,10 @@ t.test('SAN - Wrong format', t => {
   const FEN = '8/8/8/8/8/8/8/4Q3 w KQkq - 0 1';
   const san = 'Qp1e8';
   const game = start({ FEN });
-  t.throws(() => fromSANToCoordinates(san, game), 'WRONG_FORMAT');
+  t.throws(() => fromSANToCoordinates(san, game));
   t.end();
 });
+
 t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
   const FEN = '8/8/8/8/8/8/8/4Q3 w KQkq - 0 1';
   const san = 'Qe1e8';
@@ -68,4 +66,22 @@ t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
   t.same(fromSANToCoordinates(san, game), expected);
   t.end();
 });
-// });
+
+t.test('Pawn i.e. "c4"', t => {
+  const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const san = 'c4';
+  const expected = {
+    piece: 'P',
+    origin: { x: 2, y: 6 },
+    target: { x: 2, y: 4 },
+  };
+  t.same(fromSANToCoordinates(san, start({ FEN })), expected);
+  t.end();
+});
+
+t.only('SAN - Pawn wrong format i.e. "c3"', t => {
+  const FEN = 'rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
+  const san = 'h5';
+  t.throws(() => fromSANToCoordinates(san, start({ FEN })));
+  t.end();
+});

@@ -4,6 +4,7 @@ import {
   anyCellOccupied,
   areCellsEmpty,
   getPieceCoord,
+  isActiveColorPiece,
   isCellEmpty,
   isCellOccupied,
   rotate,
@@ -98,5 +99,11 @@ t.test('List of cells with at least one occupied', t => {
     ]),
     true
   );
+  t.end();
+});
+t.test('Is active color piece', t => {
+  const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const state = fromFEN(FEN);
+  t.same(isActiveColorPiece(state, 'P'), true);
   t.end();
 });

@@ -1,7 +1,8 @@
 import * as R from 'ramda';
-import { files, pieces, ranks } from '../constants.js';
+import { files, pieces, piecesMap, ranks } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
 import { generateMoves } from '../moves/generate-moves.js';
+import { getOriginsForTargetCell } from '../moves/is-cell-under-check.js';
 import { getPieceCoord } from '../utils/index.js';
 
 const filesString = R.join('', files);
@@ -26,6 +27,31 @@ const SANOptions = [
   //     x: files.indexOf(file),
   //   }),
   // ],
+  {
+    expr: new RegExp(`^[${filesString}]{1}[${ranksString}]{1}$`),
+    parse: (SAN, state) => {
+      const [file, rank] = R.split('', SAN);
+      const target = {
+        x: R.indexOf(file, files),
+        y: R.indexOf(Number(rank), ranks),
+      };
+      const origins = getOriginsForTargetCell(target, state.activeColor, state);
+
+      if (origins.length > 1) throw new Error(errorCodes.wrongMove);
+
+      const origin = R.head(origins);
+      const piece = R.path([origin.y, origin.x, 'piece'], state.board);
+
+      if (piece !== piecesMap.P && piece !== piecesMap.p)
+        throw new Error(errorCodes.wrongMove);
+
+      return {
+        piece,
+        origin: origin,
+        target,
+      };
+    },
+  },
   {
     expr: new RegExp(
       `^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}[${filesString}]{1}[${ranksString}]{1}$`

@@ -5,8 +5,18 @@ export const blackPieces = 'pnbrqk';
 export const whitePieces = 'PNBRQK';
 export const pieces = `${blackPieces}${whitePieces}`;
 export const piecesMap = {
-  [colours.white]: whitePieces,
-  [colours.black]: blackPieces,
+  p: 'p',
+  n: 'n',
+  b: 'b',
+  r: 'r',
+  q: 'q',
+  k: 'k',
+  P: 'P',
+  N: 'N',
+  B: 'B',
+  R: 'R',
+  Q: 'Q',
+  K: 'K',
 };
 export const flags = {
   capture: 'capture',

@@ -10,6 +10,8 @@ export const isActiveColorBlack = activeColor => activeColor === 'b';
 export const isOpponentPiece = (activeColor, piece) =>
   (isActiveColorWhite(activeColor) && isBlackPiece(piece)) ||
   (isActiveColorBlack(activeColor) && isWhitePiece(piece));
+export const isActiveColorPiece = R.complement(isOpponentPiece);
+
 export const areOpponents = (pa, pb) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));

@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { flags } from '../constants.js';
-import { isOpponentPiece } from '../utils/index.js';
+import { isActiveColorPiece, isOpponentPiece } from '../utils/index.js';
 import { mapMovesToBoard } from './map-moves-to-board.js';
 import { generateMoves } from './generate-moves.js';
 //Loop through each row
@@ -18,6 +18,24 @@ export const canPieceMoveToTarget = (origin, target, state) => {
     R.path([target.y, target.x]),
     R.either(R.has(flags.capture), R.has(flags.move))
   )(generateMoves(origin, state, () => R.F));
+};
+
+export const getOriginsForTargetCell = (target, activeColor, state) => {
+  const { board } = state;
+  const origins = [];
+
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      if (
+        R.hasPath([y, x, 'piece'], board) &&
+        isActiveColorPiece(activeColor, R.path([y, x, 'piece'], board)) &&
+        canPieceMoveToTarget({ y, x }, target, state)
+      ) {
+        origins.push({ y, x });
+      }
+    }
+  }
+  return origins;
 };
 
 export const isCellUnderCheck = R.curry((state, activeColor, target) => {

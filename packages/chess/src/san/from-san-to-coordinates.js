@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { files, pieces, piecesMap, ranks } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
-import { generateMoves } from '../moves/generate-moves.js';
+import { generateLegalMoves } from '../moves/generate-moves.js';
 import { getOriginsForTargetCell } from '../moves/is-cell-under-check.js';
 import { getPieceCoord } from '../utils/index.js';
 
@@ -86,7 +86,7 @@ const SANOptions = [
 
       const hasTargetMove = R.find(
         ({ coord: { x, y } }) => x === target.x && y === target.y,
-        generateMoves(origin, state)
+        generateLegalMoves(origin, state)
       );
 
       if (!hasTargetMove) throw new Error();

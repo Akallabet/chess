@@ -40,7 +40,7 @@ t.test('SAN - Wrong format', t => {
 });
 
 t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
-  const FEN = '8/8/8/8/8/8/8/4Q3 w KQkq - 0 1';
+  const FEN = '2k5/8/8/8/8/8/8/4Q3 w KQkq - 0 1';
   const san = 'Qe1e8';
   const expected = {
     piece: 'Q',
@@ -54,7 +54,7 @@ t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
 });
 
 t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
-  const FEN = '8/2N5/8/8/8/8/8/4Q3 w KQkq - 0 1';
+  const FEN = '2k5/2N5/8/8/8/8/8/4QK2 w KQkq - 0 1';
   const san = 'Qe8';
   const expected = {
     piece: 'Q',
@@ -79,7 +79,7 @@ t.test('Pawn i.e. "c4"', t => {
   t.end();
 });
 
-t.only('SAN - Pawn wrong format i.e. "c3"', t => {
+t.test('SAN - Pawn wrong format i.e. "c3"', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
   const san = 'h5';
   t.throws(() => fromSANToCoordinates(san, start({ FEN })));

@@ -17,7 +17,7 @@ export const canPieceMoveToTarget = (origin, target, state) => {
     mapMovesToBoard(state.board),
     R.path([target.y, target.x]),
     R.either(R.has(flags.capture), R.has(flags.move))
-  )(generateMoves(origin, state, () => R.F));
+  )(generateMoves(origin, state));
 };
 
 export const getOriginsForTargetCell = (target, activeColor, state) => {
@@ -41,8 +41,8 @@ export const getOriginsForTargetCell = (target, activeColor, state) => {
 export const isCellUnderCheck = R.curry((state, activeColor, target) => {
   const { board } = state;
 
-  for (let y = 0; y < board.length - 1; y++) {
-    for (let x = 0; x < board[y].length - 1; x++) {
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
       if (
         R.hasPath([y, x, 'piece'], board) &&
         isOpponentPiece(activeColor, R.path([y, x, 'piece'], board)) &&

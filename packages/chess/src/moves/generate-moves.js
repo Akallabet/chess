@@ -1,6 +1,7 @@
 import * as R from 'ramda';
-import { flags } from '../constants.js';
+import { flags, modesList } from '../constants.js';
 import { getCastlingRights } from '../fen/index.js';
+import { modesMap } from '../modes.js';
 import {
   areOpponents,
   anyCellOccupied,
@@ -141,7 +142,7 @@ const queensideCastlingMove = startRow => (count, current, origin, state) => {
   return true;
 };
 
-const patterns = {
+const getPatterns = patterns => ({
   p: [
     [
       ({ x, y }) => ({ x, y: y + 1 }),
@@ -185,16 +186,6 @@ const patterns = {
     [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.F],
     [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
   ],
-  k: [
-    [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(0)],
-    [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(0)],
-    [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
-    [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
-  ],
   P: [
     [
       ({ x, y }) => ({ x, y: y - 1 }),
@@ -206,34 +197,74 @@ const patterns = {
     [({ x, y }) => ({ x: x + 1, y: y - 1 }), stopIfOpponent, flags.capture],
     [({ x, y }) => ({ x: x - 1, y: y - 1 }), stopIfOpponent, flags.capture],
   ],
-  K: [
-    [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(7)],
-    [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(7)],
-    [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
-    [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
-  ],
-};
+  ...patterns,
+});
 
-export const generateMoves = (
-  coord,
-  state,
-  rejectFn = () => R.F,
-  isCheckFn = () => R.identity
-) => {
+export const generateMoves = (coord, state) => {
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
+  const kingMoves = [
+    [({ x, y }) => ({ x: x + 1, y }), R.lte(1)],
+    [({ x, y }) => ({ x: x - 1, y }), R.lte(1)],
+    [({ x, y }) => ({ x, y: y - 1 }), R.lte(1)],
+    [({ x, y }) => ({ x, y: y + 1 }), R.lte(1)],
+    [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.lte(1)],
+    [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.lte(1)],
+    [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.lte(1)],
+    [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.lte(1)],
+  ];
+
+  const patterns = getPatterns({
+    k: kingMoves,
+    K: kingMoves,
+  });
+
+  return R.pipe(R.prepend(selected))(
+    generateMovesFromPatterns({
+      patterns: patterns[piece] || patterns[piece.toLowerCase()],
+      rejectFn: () => R.F,
+      state,
+      origin: coord,
+      moves: [],
+    })
+  );
+};
+
+export const generateLegalMoves = (coord, state) => {
+  const { rejectMoves, addCheckFlag } = modesMap[state.mode || modesList[0]];
+  const selected = { coord, flag: { [flags.selected]: true } };
+  const piece = R.path([coord.y, coord.x, 'piece'], state.board);
+  const patterns = getPatterns({
+    k: [
+      [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(0)],
+      [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(0)],
+      [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
+      [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
+    ],
+    K: [
+      [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(7)],
+      [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(7)],
+      [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
+      [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
+      [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
+    ],
+  });
+
   return R.pipe(
-    R.map(isCheckFn(coord, state)),
+    R.map(addCheckFlag(coord, state)),
     R.prepend(selected)
   )(
     generateMovesFromPatterns({
       patterns: patterns[piece] || patterns[piece.toLowerCase()],
-      rejectFn,
+      rejectFn: rejectMoves,
       state,
       origin: coord,
       moves: [],

@@ -1,9 +1,7 @@
 import * as R from 'ramda';
 import { errorCodes } from './error-codes.js';
-import { modesList } from './constants.js';
-import { generateMoves, mapMovesToBoard } from './moves/index.js';
+import { generateLegalMoves, mapMovesToBoard } from './moves/index.js';
 import { fromFEN } from './fen/index.js';
-import { modesMap } from './modes.js';
 import { fromPositionToCoordinates } from './utils/index.js';
 
 export const highlightMoves = R.curry((addr, { FEN, ...initialState }) => {
@@ -13,9 +11,7 @@ export const highlightMoves = R.curry((addr, { FEN, ...initialState }) => {
 
   if (hasNoPiece) throw new Error(errorCodes.no_piece_selected);
 
-  const { rejectMoves, addCheckFlag } = modesMap[state.mode || modesList[0]];
-
-  const moves = generateMoves(coord, state, rejectMoves, addCheckFlag);
+  const moves = generateLegalMoves(coord, state);
   const boardWithHighlights = mapMovesToBoard(state.board, moves);
 
   return R.assoc('board', boardWithHighlights, state);

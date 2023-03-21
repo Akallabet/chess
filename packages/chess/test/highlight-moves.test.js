@@ -237,7 +237,7 @@ t.test('Highlight King moves', t => {
   );
   t.end();
 });
-t.test('Highligh moves with king under check', t => {
+t.only('Highligh moves with king under check', t => {
   const expected = getBoard([
     { coord: { x: 6, y: 0 }, cell: { piece: 'k' } },
     { coord: { x: 3, y: 1 }, cell: { piece: 'p', selected: true } },
@@ -248,6 +248,20 @@ t.test('Highligh moves with king under check', t => {
   ]);
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   t.same(highlightMoves({ x: 3, y: 1 }, { FEN }).board, expected);
+  t.end();
+});
+
+t.test('Highlight moves of king under check', t => {
+  const FEN = 'rnbqkbnr/ppp2ppp/8/1B1pp3/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 1';
+  const expected = getBoard(
+    [
+      { coord: { x: 4, y: 0 }, cell: { piece: 'k', selected: true } },
+      { coord: { x: 4, y: 1 }, cell: { move: true } },
+    ],
+    fromFEN(FEN).board
+  );
+  const actual = highlightMoves({ x: 4, y: 0 }, { FEN }).board;
+  t.same(actual, expected);
   t.end();
 });
 

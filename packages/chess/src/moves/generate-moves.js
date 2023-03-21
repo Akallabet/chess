@@ -11,14 +11,16 @@ import {
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
 
 const generateMovesFromPattern = (
-  [pattern, limit, flag],
+  pattern,
   count,
   moves = [],
   originCoord,
   state
 ) => {
+  const { step, shallStop, flag, rejectMove } = pattern;
+  console.log(pattern);
   const lastMove = R.last(moves) || { coord: originCoord };
-  const currentCoord = pattern(lastMove.coord, state);
+  const currentCoord = step(lastMove.coord, state);
   const row = state.board[currentCoord.y];
   if (!row) return moves;
   const cell = state.board[currentCoord.y][currentCoord.x];
@@ -28,10 +30,13 @@ const generateMovesFromPattern = (
     !areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
   )
     return moves;
-  if (limit(count, currentCoord, originCoord, state)) return moves;
+  if (shallStop(count, currentCoord, originCoord, state)) return moves;
+  const reject = rejectMove(originCoord, state, currentCoord);
+  console.log('reject', reject);
   if (
     cell.piece &&
-    areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
+    areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece) &&
+    !reject
   ) {
     return R.append(
       {
@@ -41,7 +46,7 @@ const generateMovesFromPattern = (
       moves
     );
   }
-  if (!cell.piece)
+  if (!cell.piece && !reject)
     moves.push({
       coord: currentCoord,
       flag: {
@@ -50,7 +55,7 @@ const generateMovesFromPattern = (
       },
     });
   return generateMovesFromPattern(
-    [pattern, limit, flag],
+    pattern,
     count + 1,
     moves,
     originCoord,
@@ -58,17 +63,11 @@ const generateMovesFromPattern = (
   );
 };
 
-const generateMovesFromPatterns = ({
-  patterns,
-  rejectFn,
-  origin,
-  state,
-  moves = [],
-}) => {
-  if (patterns.length === 0) return R.reject(rejectFn(origin, state), moves);
+const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
+  // if (patterns.length === 0) return R.reject(rejectFn(origin, state), moves);
+  if (patterns.length === 0) return moves;
   return generateMovesFromPatterns({
     patterns: R.slice(1, Infinity, patterns),
-    rejectFn,
     origin,
     state,
     moves: R.concat(
@@ -142,17 +141,26 @@ const queensideCastlingMove = startRow => (count, current, origin, state) => {
   return true;
 };
 
-const getPatterns = patterns => ({
+const topLeft = ({ x, y }) => ({ x: x - 1, y: y - 1 });
+const topRight = ({ x, y }) => ({ x: x - 1, y: y + 1 });
+const bottomLeft = ({ x, y }) => ({ x: x + 1, y: y - 1 });
+const bottomRight = ({ x, y }) => ({ x: x + 1, y: y + 1 });
+const top = ({ x, y }) => ({ x, y: y - 1 });
+const bottom = ({ x, y }) => ({ x, y: y + 1 });
+const right = ({ x, y }) => ({ x: x + 1, y });
+const left = ({ x, y }) => ({ x: x - 1, y });
+
+const getPatterns = rejectFn => ({
   p: [
     [
-      ({ x, y }) => ({ x, y: y + 1 }),
+      bottom,
       (count, _, start) => {
         if (start.y > 1 && count >= 1) return true;
         if (start.y === 1 && count >= 2) return true;
       },
     ],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), stopIfOpponent, flags.capture],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), stopIfOpponent, flags.capture],
+    [bottomRight, stopIfOpponent, flags.capture],
+    [topRight, stopIfOpponent, flags.capture],
   ],
   n: [
     [({ x, y }) => ({ x: x + 2, y: y + 1 }), R.lte(1)],
@@ -165,65 +173,68 @@ const getPatterns = patterns => ({
     [({ x, y }) => ({ x: x + 2, y: y - 1 }), R.lte(1)],
   ],
   b: [
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.F],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.F],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.F],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
+    [bottomRight, R.F],
+    [topRight, R.F],
+    [topLeft, R.F],
+    [bottomLeft, R.F],
   ],
   r: [
-    [({ x, y }) => ({ x: x + 1, y }), R.F],
-    [({ x, y }) => ({ x: x - 1, y }), R.F],
-    [({ x, y }) => ({ x, y: y - 1 }), R.F],
-    [({ x, y }) => ({ x, y: y + 1 }), R.F],
+    [right, R.F],
+    [left, R.F],
+    [top, R.F],
+    [bottom, R.F],
   ],
   q: [
-    [({ x, y }) => ({ x: x + 1, y }), R.F],
-    [({ x, y }) => ({ x: x - 1, y }), R.F],
-    [({ x, y }) => ({ x, y: y - 1 }), R.F],
-    [({ x, y }) => ({ x, y: y + 1 }), R.F],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.F],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.F],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.F],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.F],
+    [right, R.F],
+    [left, R.F],
+    [top, R.F],
+    [bottom, R.F],
+    [bottomRight, R.F],
+    [topRight, R.F],
+    [topLeft, R.F],
+    [bottomLeft, R.F],
   ],
   P: [
     [
-      ({ x, y }) => ({ x, y: y - 1 }),
+      top,
       (count, _, start) => {
         if (start.y < 6 && count >= 1) return true;
         if (start.y === 6 && count >= 2) return true;
       },
     ],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), stopIfOpponent, flags.capture],
+    [bottomLeft, stopIfOpponent, flags.capture],
     [({ x, y }) => ({ x: x - 1, y: y - 1 }), stopIfOpponent, flags.capture],
   ],
-  ...patterns,
 });
 
 export const generateMoves = (coord, state) => {
+  const rejectMove = R.F;
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const kingMoves = [
-    [({ x, y }) => ({ x: x + 1, y }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 1, y }), R.lte(1)],
-    [({ x, y }) => ({ x, y: y - 1 }), R.lte(1)],
-    [({ x, y }) => ({ x, y: y + 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x + 1, y: y + 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 1, y: y + 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x + 1, y: y - 1 }), R.lte(1)],
+    { step: right, shallStop: R.lte(1), rejectMove },
+    { step: left, shallStop: R.lte(1), rejectMove },
+    { step: top, shallStop: R.lte(1), rejectMove },
+    { step: bottom, shallStop: R.lte(1), rejectMove },
+    { step: bottomRight, shallStop: R.lte(1), rejectMove },
+    { step: topRight, shallStop: R.lte(1), rejectMove },
+    { step: topLeft, shallStop: R.lte(1), rejectMove },
+    { step: bottomLeft, shallStop: R.lte(1), rejectMove },
   ];
 
-  const patterns = getPatterns({
-    k: kingMoves,
-    K: kingMoves,
-  });
+  const patterns = R.map(
+    R.map(([step, shallStop, flag]) => ({ step, shallStop, flag, rejectMove })),
+    getPatterns()
+  );
+  patterns.k = kingMoves;
+  patterns.K = kingMoves;
 
-  return R.pipe(R.prepend(selected))(
+  console.log('generate all moves');
+  return R.prepend(
+    selected,
     generateMovesFromPatterns({
       patterns: patterns[piece] || patterns[piece.toLowerCase()],
-      rejectFn: () => R.F,
       state,
       origin: coord,
       moves: [],
@@ -232,42 +243,39 @@ export const generateMoves = (coord, state) => {
 };
 
 export const generateLegalMoves = (coord, state) => {
-  const { rejectMoves, addCheckFlag } = modesMap[state.mode || modesList[0]];
+  const { rejectMove, addCheckFlag } = modesMap[state.mode || modesList[0]];
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
-  const patterns = getPatterns({
-    k: [
-      [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(0)],
-      [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(0)],
-      [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
-      [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
-    ],
-    K: [
-      [({ x, y }) => ({ x: x + 1, y }), kingsideCastlingMove(7)],
-      [({ x, y }) => ({ x: x - 1, y }), queensideCastlingMove(7)],
-      [({ x, y }) => ({ x, y: y - 1 }), shouldKingStop],
-      [({ x, y }) => ({ x, y: y + 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x + 1, y: y + 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x - 1, y: y + 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x - 1, y: y - 1 }), shouldKingStop],
-      [({ x, y }) => ({ x: x + 1, y: y - 1 }), shouldKingStop],
-    ],
-  });
+  const kingMoves = [
+    { step: top, shallStop: shouldKingStop, rejectMove },
+    { step: bottom, shallStop: shouldKingStop, rejectMove },
+    { step: bottomRight, shallStop: shouldKingStop, rejectMove },
+    { step: topRight, shallStop: shouldKingStop, rejectMove },
+    { step: topLeft, shallStop: shouldKingStop, rejectMove },
+    { step: bottomLeft, shallStop: shouldKingStop, rejectMove },
+  ];
+  const patterns = R.map(
+    R.map(([step, shallStop, flag]) => ({ step, shallStop, flag, rejectMove })),
+    getPatterns()
+  );
+  patterns.k = kingMoves.concat([
+    { step: right, shallStop: kingsideCastlingMove(0), rejectMove },
+    { step: left, shallStop: queensideCastlingMove(0), rejectMove },
+  ]);
+  patterns.K = kingMoves.concat([
+    { step: right, shallStop: kingsideCastlingMove(7), rejectMove },
+    { step: left, shallStop: queensideCastlingMove(7), rejectMove },
+  ]);
 
-  return R.pipe(
-    R.map(addCheckFlag(coord, state)),
-    R.prepend(selected)
-  )(
+  console.log('generate legal moves');
+
+  return R.prepend(
+    selected,
     generateMovesFromPatterns({
       patterns: patterns[piece] || patterns[piece.toLowerCase()],
-      rejectFn: rejectMoves,
       state,
       origin: coord,
       moves: [],
-    })
+    }).map(addCheckFlag(coord, state))
   );
 };

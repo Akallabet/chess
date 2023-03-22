@@ -6,7 +6,6 @@ import { getKingPiece, getPieceColor, getPieceCoord } from './utils/index.js';
 import { canPieceMoveToTarget } from './moves/is-cell-under-check.js';
 
 const isKingUnderAttack = (origin, state, target) => {
-  console.log(origin, target);
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);
   const moveState = move(origin, target, state);
   const pieceColor = getPieceColor(

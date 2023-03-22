@@ -30,27 +30,28 @@ const generateMovesFromPattern = (
   )
     return moves;
   if (shallStop(count, currentCoord, originCoord, state)) return moves;
-  const reject = rejectMove(originCoord, state, currentCoord);
+  const invalid = rejectMove(originCoord, state, currentCoord);
   if (
     cell.piece &&
-    areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece) &&
-    !reject
+    areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
   ) {
     return R.append(
       {
         coord: currentCoord,
         flag: { [flag || flags.capture]: true },
+        invalid,
       },
       moves
     );
   }
-  if (!cell.piece && !reject)
+  if (!cell.piece)
     moves.push({
       coord: currentCoord,
       flag: {
         [flag || flags.move]: true,
         // [flags.check]: isCheck(originCoord, currentCoord, state),
       },
+      invalid,
     });
   return generateMovesFromPattern(
     pattern,
@@ -62,7 +63,7 @@ const generateMovesFromPattern = (
 };
 
 const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
-  if (patterns.length === 0) return moves;
+  if (patterns.length === 0) return moves.filter(move => !move.invalid);
   return generateMovesFromPatterns({
     patterns: R.slice(1, Infinity, patterns),
     origin,
@@ -210,14 +211,14 @@ export const generateMoves = (coord, state) => {
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const kingMoves = [
-    { step: right, shallStop: R.lte(1), rejectMove },
-    { step: left, shallStop: R.lte(1), rejectMove },
-    { step: top, shallStop: R.lte(1), rejectMove },
-    { step: bottom, shallStop: R.lte(1), rejectMove },
-    { step: bottomRight, shallStop: R.lte(1), rejectMove },
-    { step: topRight, shallStop: R.lte(1), rejectMove },
-    { step: topLeft, shallStop: R.lte(1), rejectMove },
-    { step: bottomLeft, shallStop: R.lte(1), rejectMove },
+    { step: right, shallStop: R.lte(1), rejectMove: R.F },
+    { step: left, shallStop: R.lte(1), rejectMove: R.F },
+    { step: top, shallStop: R.lte(1), rejectMove: R.F },
+    { step: bottom, shallStop: R.lte(1), rejectMove: R.F },
+    { step: bottomRight, shallStop: R.lte(1), rejectMove: R.F },
+    { step: topRight, shallStop: R.lte(1), rejectMove: R.F },
+    { step: topLeft, shallStop: R.lte(1), rejectMove: R.F },
+    { step: bottomLeft, shallStop: R.lte(1), rejectMove: R.F },
   ];
 
   const patterns = R.map(

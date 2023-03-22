@@ -18,7 +18,6 @@ const generateMovesFromPattern = (
   state
 ) => {
   const { step, shallStop, flag, rejectMove } = pattern;
-  console.log(pattern);
   const lastMove = R.last(moves) || { coord: originCoord };
   const currentCoord = step(lastMove.coord, state);
   const row = state.board[currentCoord.y];
@@ -32,7 +31,6 @@ const generateMovesFromPattern = (
     return moves;
   if (shallStop(count, currentCoord, originCoord, state)) return moves;
   const reject = rejectMove(originCoord, state, currentCoord);
-  console.log('reject', reject);
   if (
     cell.piece &&
     areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece) &&
@@ -64,7 +62,6 @@ const generateMovesFromPattern = (
 };
 
 const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
-  // if (patterns.length === 0) return R.reject(rejectFn(origin, state), moves);
   if (patterns.length === 0) return moves;
   return generateMovesFromPatterns({
     patterns: R.slice(1, Infinity, patterns),
@@ -150,7 +147,7 @@ const bottom = ({ x, y }) => ({ x, y: y + 1 });
 const right = ({ x, y }) => ({ x: x + 1, y });
 const left = ({ x, y }) => ({ x: x - 1, y });
 
-const getPatterns = rejectFn => ({
+const getPatterns = () => ({
   p: [
     [
       bottom,
@@ -230,7 +227,6 @@ export const generateMoves = (coord, state) => {
   patterns.k = kingMoves;
   patterns.K = kingMoves;
 
-  console.log('generate all moves');
   return R.prepend(
     selected,
     generateMovesFromPatterns({
@@ -246,28 +242,28 @@ export const generateLegalMoves = (coord, state) => {
   const { rejectMove, addCheckFlag } = modesMap[state.mode || modesList[0]];
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
-  const kingMoves = [
-    { step: top, shallStop: shouldKingStop, rejectMove },
-    { step: bottom, shallStop: shouldKingStop, rejectMove },
-    { step: bottomRight, shallStop: shouldKingStop, rejectMove },
-    { step: topRight, shallStop: shouldKingStop, rejectMove },
-    { step: topLeft, shallStop: shouldKingStop, rejectMove },
-    { step: bottomLeft, shallStop: shouldKingStop, rejectMove },
-  ];
+
   const patterns = R.map(
     R.map(([step, shallStop, flag]) => ({ step, shallStop, flag, rejectMove })),
     getPatterns()
   );
+
+  const kingMoves = [
+    { step: top, shallStop: shouldKingStop, rejectMove: R.F },
+    { step: bottom, shallStop: shouldKingStop, rejectMove: R.F },
+    { step: bottomRight, shallStop: shouldKingStop, rejectMove: R.F },
+    { step: topRight, shallStop: shouldKingStop, rejectMove: R.F },
+    { step: topLeft, shallStop: shouldKingStop, rejectMove: R.F },
+    { step: bottomLeft, shallStop: shouldKingStop, rejectMove: R.F },
+  ];
   patterns.k = kingMoves.concat([
-    { step: right, shallStop: kingsideCastlingMove(0), rejectMove },
-    { step: left, shallStop: queensideCastlingMove(0), rejectMove },
+    { step: right, shallStop: kingsideCastlingMove(0), rejectMove: R.F },
+    { step: left, shallStop: queensideCastlingMove(0), rejectMove: R.F },
   ]);
   patterns.K = kingMoves.concat([
-    { step: right, shallStop: kingsideCastlingMove(7), rejectMove },
-    { step: left, shallStop: queensideCastlingMove(7), rejectMove },
+    { step: right, shallStop: kingsideCastlingMove(7), rejectMove: R.F },
+    { step: left, shallStop: queensideCastlingMove(7), rejectMove: R.F },
   ]);
-
-  console.log('generate legal moves');
 
   return R.prepend(
     selected,

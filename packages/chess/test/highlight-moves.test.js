@@ -237,6 +237,7 @@ t.test('Highlight King moves', t => {
   );
   t.end();
 });
+
 t.only('Highligh moves with king under check', t => {
   const expected = getBoard([
     { coord: { x: 6, y: 0 }, cell: { piece: 'k' } },

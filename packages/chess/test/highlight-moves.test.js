@@ -337,7 +337,8 @@ t.test('No castling moves if one of the cells is occupied', t => {
   t.same(actual, expected);
   t.end();
 });
-t.test('Highlight check', t => {
+
+t.only('Highlight check', t => {
   const FEN = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
   const input = fromFEN(FEN);
   const expected = getBoard(

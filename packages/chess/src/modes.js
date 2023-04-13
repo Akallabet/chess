@@ -16,14 +16,16 @@ const isKingUnderAttack = (origin, state, target) => {
 };
 
 const addCheckFlag = (origin, state) => moveData => {
-  const { coord, flag } = moveData;
-  const moveState = move(origin, coord, state);
+  const moveState = move(origin, moveData.coord, state);
   const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
-  const isUnderCheck = canPieceMoveToTarget(coord, kingCoord, moveState);
+  const isUnderCheck = canPieceMoveToTarget(
+    moveData.coord,
+    kingCoord,
+    moveState
+  );
 
-  return isUnderCheck
-    ? { coord, flag: { ...flag, [flags.check]: isUnderCheck } }
-    : moveData;
+  if (isUnderCheck) moveData.flags[flags.check] = true;
+  return moveData;
 };
 
 export const modesMap = {

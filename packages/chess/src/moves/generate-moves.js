@@ -38,7 +38,7 @@ const generateMovesFromPattern = (
     return R.append(
       {
         coord: currentCoord,
-        flag: { [flag || flags.capture]: true },
+        flags: { [flag || flags.capture]: true },
         invalid,
       },
       moves
@@ -47,7 +47,7 @@ const generateMovesFromPattern = (
   if (!cell.piece)
     moves.push({
       coord: currentCoord,
-      flag: {
+      flags: {
         [flag || flags.move]: true,
         // [flags.check]: isCheck(originCoord, currentCoord, state),
       },
@@ -161,13 +161,13 @@ const getPatterns = rejectMove => ({
     {
       step: bottomRight,
       shallStop: stopIfOpponent,
-      flag: flags.capture,
+      flags: flags.capture,
       rejectMove,
     },
     {
       step: topRight,
       shallStop: stopIfOpponent,
-      flag: flags.capture,
+      flags: flags.capture,
       rejectMove,
     },
   ],
@@ -247,20 +247,20 @@ const getPatterns = rejectMove => ({
     {
       step: bottomLeft,
       shallStop: stopIfOpponent,
-      flag: flags.capture,
+      flags: flags.capture,
       rejectMove,
     },
     {
       step: ({ x, y }) => ({ x: x - 1, y: y - 1 }),
       shallStop: stopIfOpponent,
-      flag: flags.capture,
+      flags: flags.capture,
       rejectMove,
     },
   ],
 });
 
 export const generateMoves = (coord, state) => {
-  const selected = { coord, flag: { [flags.selected]: true } };
+  const selected = { coord, flags: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const kingMoves = [
@@ -290,7 +290,7 @@ export const generateMoves = (coord, state) => {
 
 export const generateLegalMoves = (coord, state) => {
   const { rejectMove, addCheckFlag } = modesMap[state.mode || modesList[0]];
-  const selected = { coord, flag: { [flags.selected]: true } };
+  const selected = { coord, flags: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const patterns = getPatterns(rejectMove);

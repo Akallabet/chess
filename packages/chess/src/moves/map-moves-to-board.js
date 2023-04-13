@@ -14,7 +14,7 @@ export const mapMovesToBoard = R.curry((board, moves) =>
           R.pipe(R.prop('coord'), isSamePos({ x, y })),
           moves
         );
-        return move ? { ...cell, ...move.flag } : cell;
+        return move ? { ...cell, ...move.flags } : cell;
       }, row),
     board
   )

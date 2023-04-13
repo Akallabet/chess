@@ -148,65 +148,118 @@ const bottom = ({ x, y }) => ({ x, y: y + 1 });
 const right = ({ x, y }) => ({ x: x + 1, y });
 const left = ({ x, y }) => ({ x: x - 1, y });
 
-const getPatterns = () => ({
+const getPatterns = rejectMove => ({
   p: [
-    [
-      bottom,
-      (count, _, start) => {
+    {
+      step: bottom,
+      shallStop: (count, _, start) => {
         if (start.y > 1 && count >= 1) return true;
         if (start.y === 1 && count >= 2) return true;
       },
-    ],
-    [bottomRight, stopIfOpponent, flags.capture],
-    [topRight, stopIfOpponent, flags.capture],
+      rejectMove,
+    },
+    {
+      step: bottomRight,
+      shallStop: stopIfOpponent,
+      flag: flags.capture,
+      rejectMove,
+    },
+    {
+      step: topRight,
+      shallStop: stopIfOpponent,
+      flag: flags.capture,
+      rejectMove,
+    },
   ],
   n: [
-    [({ x, y }) => ({ x: x + 2, y: y + 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x + 1, y: y + 2 }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 1, y: y + 2 }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 2, y: y + 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 2, y: y - 1 }), R.lte(1)],
-    [({ x, y }) => ({ x: x - 1, y: y - 2 }), R.lte(1)],
-    [({ x, y }) => ({ x: x + 1, y: y - 2 }), R.lte(1)],
-    [({ x, y }) => ({ x: x + 2, y: y - 1 }), R.lte(1)],
+    {
+      step: ({ x, y }) => ({ x: x + 2, y: y + 1 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x + 1, y: y + 2 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x - 1, y: y + 2 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x - 2, y: y + 1 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x - 2, y: y - 1 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x - 1, y: y - 2 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x + 1, y: y - 2 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x + 2, y: y - 1 }),
+      shallStop: R.lte(1),
+      rejectMove,
+    },
   ],
   b: [
-    [bottomRight, R.F],
-    [topRight, R.F],
-    [topLeft, R.F],
-    [bottomLeft, R.F],
+    { step: bottomRight, shallStop: R.F, rejectMove },
+    { step: topRight, shallStop: R.F, rejectMove },
+    { step: topLeft, shallStop: R.F, rejectMove },
+    { step: bottomLeft, shallStop: R.F, rejectMove },
   ],
   r: [
-    [right, R.F],
-    [left, R.F],
-    [top, R.F],
-    [bottom, R.F],
+    { step: right, shallStop: R.F, rejectMove },
+    { step: left, shallStop: R.F, rejectMove },
+    { step: top, shallStop: R.F, rejectMove },
+    { step: bottom, shallStop: R.F, rejectMove },
   ],
   q: [
-    [right, R.F],
-    [left, R.F],
-    [top, R.F],
-    [bottom, R.F],
-    [bottomRight, R.F],
-    [topRight, R.F],
-    [topLeft, R.F],
-    [bottomLeft, R.F],
+    { step: right, shallStop: R.F, rejectMove },
+    { step: left, shallStop: R.F, rejectMove },
+    { step: top, shallStop: R.F, rejectMove },
+    { step: bottom, shallStop: R.F, rejectMove },
+    { step: bottomRight, shallStop: R.F, rejectMove },
+    { step: topRight, shallStop: R.F, rejectMove },
+    { step: topLeft, shallStop: R.F, rejectMove },
+    { step: bottomLeft, shallStop: R.F, rejectMove },
   ],
   P: [
-    [
-      top,
-      (count, _, start) => {
+    {
+      step: top,
+      shallStop: (count, _, start) => {
         if (start.y < 6 && count >= 1) return true;
         if (start.y === 6 && count >= 2) return true;
       },
-    ],
-    [bottomLeft, stopIfOpponent, flags.capture],
-    [({ x, y }) => ({ x: x - 1, y: y - 1 }), stopIfOpponent, flags.capture],
+      rejectMove,
+    },
+    {
+      step: bottomLeft,
+      shallStop: stopIfOpponent,
+      flag: flags.capture,
+      rejectMove,
+    },
+    {
+      step: ({ x, y }) => ({ x: x - 1, y: y - 1 }),
+      shallStop: stopIfOpponent,
+      flag: flags.capture,
+      rejectMove,
+    },
   ],
 });
 
 export const generateMoves = (coord, state) => {
-  const rejectMove = R.F;
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
@@ -221,22 +274,18 @@ export const generateMoves = (coord, state) => {
     { step: bottomLeft, shallStop: R.lte(1), rejectMove: R.F },
   ];
 
-  const patterns = R.map(
-    R.map(([step, shallStop, flag]) => ({ step, shallStop, flag, rejectMove })),
-    getPatterns()
-  );
+  const patterns = getPatterns(R.F);
   patterns.k = kingMoves;
   patterns.K = kingMoves;
 
-  return R.prepend(
-    selected,
-    generateMovesFromPatterns({
-      patterns: patterns[piece] || patterns[piece.toLowerCase()],
-      state,
-      origin: coord,
-      moves: [],
-    })
-  );
+  const moves = generateMovesFromPatterns({
+    patterns: patterns[piece] || patterns[piece.toLowerCase()],
+    state,
+    origin: coord,
+    moves: [],
+  });
+  moves.unshift(selected);
+  return moves;
 };
 
 export const generateLegalMoves = (coord, state) => {
@@ -244,11 +293,7 @@ export const generateLegalMoves = (coord, state) => {
   const selected = { coord, flag: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
-  const patterns = R.map(
-    R.map(([step, shallStop, flag]) => ({ step, shallStop, flag, rejectMove })),
-    getPatterns()
-  );
-
+  const patterns = getPatterns(rejectMove);
   const kingMoves = [
     { step: top, shallStop: shouldKingStop, rejectMove: R.F },
     { step: bottom, shallStop: shouldKingStop, rejectMove: R.F },
@@ -266,13 +311,12 @@ export const generateLegalMoves = (coord, state) => {
     { step: left, shallStop: queensideCastlingMove(7), rejectMove: R.F },
   ]);
 
-  return R.prepend(
-    selected,
-    generateMovesFromPatterns({
-      patterns: patterns[piece] || patterns[piece.toLowerCase()],
-      state,
-      origin: coord,
-      moves: [],
-    }).map(addCheckFlag(coord, state))
-  );
+  const moves = generateMovesFromPatterns({
+    patterns: patterns[piece] || patterns[piece.toLowerCase()],
+    state,
+    origin: coord,
+    moves: [],
+  }).map(addCheckFlag(coord, state));
+  moves.unshift(selected);
+  return moves;
 };

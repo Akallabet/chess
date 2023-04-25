@@ -4,7 +4,21 @@ import { generateLegalMoves } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/start.js';
 import { fromPositionToCoordinates } from '../../src/utils/index.js';
 
-t.test('Convert chessboard piece coordinates to x/y coordinates', t => {
+const compareByMove = (a, b) => {
+  if (a.coord.x > b.coord.x) return 1;
+  if (a.coord.x < b.coord.x) return -1;
+  if (a.coord.y > b.coord.y) return 1;
+  if (a.coord.y < b.coord.y) return -1;
+  if (a.flags.selected && !b.flags.selected) return 1;
+  if (!a.flags.selected && b.flags.selected) return -1;
+  if (a.flags.move && !b.flags.move) return 1;
+  if (!a.flags.move && b.flags.move) return -1;
+  if (a.flags.capture && !b.flags.capture) return 1;
+  if (!a.flags.capture && b.flags.capture) return -1;
+  return 0;
+};
+
+t.test('Convert ches piece coordinates to x/y coordinates', t => {
   t.same(fromPositionToCoordinates('e3'), { x: 4, y: 5 });
   t.end();
 });
@@ -94,13 +108,253 @@ t.test('Select pawn on file h', t => {
   );
   t.end();
 });
+
+t.test('Select pawn on file h', t => {
+  t.same(
+    generateLegalMoves(
+      { x: 7, y: 1 },
+      start({ mode: 'demo', FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' })
+    ),
+    [
+      { coord: { x: 7, y: 1 }, flags: { selected: true } },
+      { coord: { x: 7, y: 2 }, flags: { move: true } },
+      { coord: { x: 7, y: 3 }, flags: { move: true } },
+    ]
+  );
+  t.end();
+});
+t.test('Select knight', t => {
+  t.same(
+    generateLegalMoves(
+      { x: 4, y: 3 },
+      start({ mode: 'demo', FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' })
+    ).sort(compareByMove),
+    [
+      { coord: { x: 4, y: 3 }, flags: { selected: true } },
+      { coord: { x: 6, y: 4 }, flags: { move: true } },
+      { coord: { x: 5, y: 5 }, flags: { move: true } },
+      { coord: { x: 3, y: 5 }, flags: { move: true } },
+      { coord: { x: 2, y: 4 }, flags: { move: true } },
+      { coord: { x: 2, y: 2 }, flags: { move: true } },
+      { coord: { x: 3, y: 1 }, flags: { move: true } },
+      { coord: { x: 5, y: 1 }, flags: { move: true } },
+      { coord: { x: 6, y: 2 }, flags: { move: true } },
+    ].sort(compareByMove)
+  );
+  t.end();
+});
+t.test('Highlight Bishop moves', t => {
+  const expected = [
+    { coord: { x: 4, y: 3 }, flags: { selected: true } },
+    { coord: { x: 3, y: 2 }, flags: { move: true } },
+    { coord: { x: 2, y: 1 }, flags: { move: true } },
+    { coord: { x: 1, y: 0 }, flags: { move: true } },
+    { coord: { x: 5, y: 2 }, flags: { move: true } },
+    { coord: { x: 6, y: 1 }, flags: { move: true } },
+    { coord: { x: 7, y: 0 }, flags: { move: true } },
+    { coord: { x: 2, y: 5 }, flags: { move: true } },
+    { coord: { x: 1, y: 6 }, flags: { capture: true } },
+    { coord: { x: 5, y: 4 }, flags: { move: true } },
+    { coord: { x: 3, y: 4 }, flags: { move: true } },
+    { coord: { x: 6, y: 5 }, flags: { move: true } },
+  ];
+  t.same(
+    generateLegalMoves(
+      { x: 4, y: 3 },
+      start({ mode: modes.demo, FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' })
+    ).sort(compareByMove),
+    expected.sort(compareByMove)
+  );
+  t.end();
+});
+t.test('Highlight Rook moves', t => {
+  const expected = [
+    { coord: { x: 4, y: 3 }, flags: { selected: true } },
+    { coord: { x: 4, y: 4 }, flags: { move: true } },
+    { coord: { x: 4, y: 5 }, flags: { move: true } },
+    { coord: { x: 4, y: 6 }, flags: { capture: true } },
+    { coord: { x: 4, y: 2 }, flags: { move: true } },
+    { coord: { x: 4, y: 1 }, flags: { move: true } },
+    { coord: { x: 4, y: 0 }, flags: { move: true } },
+    { coord: { x: 3, y: 3 }, flags: { move: true } },
+    { coord: { x: 2, y: 3 }, flags: { move: true } },
+    { coord: { x: 1, y: 3 }, flags: { move: true } },
+    { coord: { x: 0, y: 3 }, flags: { move: true } },
+    { coord: { x: 5, y: 3 }, flags: { move: true } },
+    { coord: { x: 6, y: 3 }, flags: { move: true } },
+  ];
+  t.same(
+    generateLegalMoves(
+      { x: 4, y: 3 },
+      start({ mode: modes.demo, FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' })
+    ).sort(compareByMove),
+    expected.sort(compareByMove)
+  );
+  t.end();
+});
+
+t.test('Highlight Queen moves', t => {
+  const expected = [
+    { coord: { x: 5, y: 3 }, flags: { move: true } },
+    { coord: { x: 6, y: 3 }, flags: { move: true } },
+    { coord: { x: 3, y: 3 }, flags: { move: true } },
+    { coord: { x: 4, y: 3 }, flags: { selected: true } },
+    { coord: { x: 4, y: 4 }, flags: { move: true } },
+    { coord: { x: 4, y: 5 }, flags: { move: true } },
+    { coord: { x: 4, y: 6 }, flags: { capture: true } },
+    { coord: { x: 4, y: 2 }, flags: { move: true } },
+    { coord: { x: 4, y: 1 }, flags: { move: true } },
+    { coord: { x: 4, y: 0 }, flags: { move: true } },
+    { coord: { x: 2, y: 3 }, flags: { move: true } },
+    { coord: { x: 1, y: 3 }, flags: { move: true } },
+    { coord: { x: 0, y: 3 }, flags: { move: true } },
+    { coord: { x: 3, y: 2 }, flags: { move: true } },
+    { coord: { x: 2, y: 1 }, flags: { move: true } },
+    { coord: { x: 1, y: 0 }, flags: { move: true } },
+    { coord: { x: 5, y: 2 }, flags: { move: true } },
+    { coord: { x: 6, y: 1 }, flags: { move: true } },
+    { coord: { x: 7, y: 0 }, flags: { move: true } },
+    { coord: { x: 2, y: 5 }, flags: { move: true } },
+    { coord: { x: 1, y: 6 }, flags: { capture: true } },
+    { coord: { x: 5, y: 4 }, flags: { move: true } },
+    { coord: { x: 3, y: 4 }, flags: { move: true } },
+    { coord: { x: 6, y: 5 }, flags: { move: true } },
+  ];
+
+  t.same(
+    generateLegalMoves(
+      { x: 4, y: 3 },
+      start({ mode: modes.demo, FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' })
+    ).sort(compareByMove),
+    expected.sort(compareByMove)
+  );
+  t.end();
+});
+t.test('Highlight King moves', t => {
+  const expected = [
+    { coord: { x: 4, y: 3 }, flags: { selected: true } },
+    { coord: { x: 4, y: 2 }, flags: { move: true } },
+    { coord: { x: 4, y: 4 }, flags: { move: true } },
+    { coord: { x: 5, y: 4 }, flags: { move: true } },
+    { coord: { x: 3, y: 4 }, flags: { move: true } },
+    { coord: { x: 3, y: 2 }, flags: { move: true } },
+    { coord: { x: 5, y: 2 }, flags: { move: true } },
+    { coord: { x: 5, y: 3 }, flags: { move: true } },
+    { coord: { x: 3, y: 3 }, flags: { move: true } },
+  ];
+  t.same(
+    generateLegalMoves(
+      { x: 4, y: 3 },
+      start({ mode: modes.demo, FEN: '8/8/8/4k3/8/8/8/8 b KQkq - 0 1' })
+    ).sort(compareByMove),
+    expected.sort(compareByMove)
+  );
+  t.end();
+});
+
 t.test('Highligh moves with king under check', t => {
   const expected = [
     { coord: { x: 3, y: 1 }, flags: { selected: true } },
     { coord: { x: 3, y: 3 }, flags: { move: true } },
   ];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
-  const input = generateLegalMoves({ x: 3, y: 1 }, start({ FEN }));
-  t.same(input, expected);
+  const input = generateLegalMoves({ x: 3, y: 1 }, start(start({ FEN })));
+  t.same(input.sort(compareByMove), expected.sort(compareByMove));
+  t.end();
+});
+
+t.test('Highligh moves with king under check', t => {
+  const expected = [
+    { coord: { x: 3, y: 1 }, flags: { selected: true } },
+    { coord: { x: 3, y: 3 }, flags: { move: true } },
+  ];
+  const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
+  t.same(
+    generateLegalMoves({ x: 3, y: 1 }, start({ FEN })).sort(compareByMove),
+    expected.sort(compareByMove)
+  );
+  t.end();
+});
+
+t.test('Highlight moves of king under check', t => {
+  const FEN = 'rnbqkbnr/ppp2ppp/8/1B1pp3/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 1';
+  const expected = [
+    { coord: { x: 4, y: 0 }, flags: { selected: true } },
+    { coord: { x: 4, y: 1 }, flags: { move: true } },
+  ];
+
+  const actual = generateLegalMoves({ x: 4, y: 0 }, start({ FEN }));
+  t.same(actual.sort(compareByMove), expected.sort(compareByMove));
+  t.end();
+});
+
+t.test(
+  'Highlight kingside castling when no cells are in check and empty',
+  t => {
+    const FEN = 'rnbqk2r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
+    const expected = [
+      { coord: { x: 4, y: 0 }, flags: { selected: true } },
+      { coord: { x: 5, y: 0 }, flags: { move: true } },
+      { coord: { x: 6, y: 0 }, flags: { move: true } },
+      { coord: { x: 4, y: 1 }, flags: { move: true } },
+    ];
+    const actual = generateLegalMoves({ x: 4, y: 0 }, start({ FEN }));
+    t.same(actual.sort(compareByMove), expected.sort(compareByMove));
+    t.end();
+  }
+);
+
+t.test(
+  'Highlight queenside castling when no cells are in check and empty',
+  t => {
+    const FEN = 'r3k2r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
+    const expected = [
+      { coord: { x: 2, y: 0 }, flags: { move: true } },
+      { coord: { x: 3, y: 0 }, flags: { move: true } },
+      { coord: { x: 4, y: 0 }, flags: { selected: true } },
+      { coord: { x: 5, y: 0 }, flags: { move: true } },
+      { coord: { x: 6, y: 0 }, flags: { move: true } },
+      { coord: { x: 4, y: 1 }, flags: { move: true } },
+    ];
+    const actual = generateLegalMoves({ x: 4, y: 0 }, start({ FEN }));
+    t.same(actual.sort(compareByMove), expected.sort(compareByMove));
+    t.end();
+  }
+);
+
+t.test('No castling moves if one of the cells is under check', t => {
+  const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
+  const expected = [
+    { coord: { x: 3, y: 0 }, flags: { move: true } },
+    { coord: { x: 4, y: 0 }, flags: { selected: true } },
+  ];
+  const actual = generateLegalMoves({ x: 4, y: 0 }, start({ FEN }));
+  t.same(actual.sort(compareByMove), expected.sort(compareByMove));
+  t.end();
+});
+
+t.test('No castling moves if one of the cells is occupied', t => {
+  const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
+  const expected = [
+    { coord: { x: 3, y: 0 }, flags: { move: true } },
+    { coord: { x: 4, y: 0 }, flags: { selected: true } },
+  ];
+  const actual = generateLegalMoves({ x: 4, y: 0 }, start({ FEN }));
+  t.same(actual.sort(compareByMove), expected.sort(compareByMove));
+  t.end();
+});
+
+t.test('Highlight check', t => {
+  const FEN = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
+  const expected = [
+    { coord: { x: 0, y: 2 }, flags: { move: true } },
+    { coord: { x: 1, y: 3 }, flags: { move: true, check: true } },
+    { coord: { x: 2, y: 4 }, flags: { move: true } },
+    { coord: { x: 3, y: 5 }, flags: { move: true } },
+    { coord: { x: 4, y: 6 }, flags: { move: true } },
+    { coord: { x: 5, y: 7 }, flags: { selected: true } },
+  ];
+  const actual = generateLegalMoves({ x: 5, y: 7 }, start({ FEN }));
+  t.same(actual.sort(compareByMove), expected.sort(compareByMove));
   t.end();
 });

@@ -39,7 +39,6 @@ export interface ChessStateOutput {
   ranks: Ranks[];
   files: Files[];
 }
-
 export default function chess(cmd: 'start', args: ChessState): ChessStateOutput;
 export default function chess(cmd: 'clear', args: ChessState): ChessStateOutput;
 export default function chess(

@@ -298,7 +298,7 @@ export const generateLegalMoves = (coord, state) => {
   const moves = generateMovesFromPatterns({
     patterns: patterns[piece] || patterns[piece.toLowerCase()],
     state,
-    origin: coord,
+    origin: { ...coord },
     moves: [],
   })
     .map(addCheckFlag(coord, state))

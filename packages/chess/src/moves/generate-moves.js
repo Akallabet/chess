@@ -18,41 +18,38 @@ const generateMovesFromPattern = (
   state
 ) => {
   const { step, shallStop, flag, rejectMove } = pattern;
-  const lastMove = R.last(moves) || { coord: originCoord };
+  const lastMove = moves[moves.length - 1] || { coord: originCoord };
   const currentCoord = step(lastMove.coord, state);
-  const row = state.board[currentCoord.y];
-  if (!row) return moves;
-  const cell = state.board[currentCoord.y][currentCoord.x];
-  if (!cell) return moves;
   if (
-    cell.piece &&
-    !areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
+    currentCoord.y >= state.board.length ||
+    currentCoord.x >= state.board[0].length ||
+    currentCoord.y < 0 ||
+    currentCoord.x < 0
   )
     return moves;
   if (shallStop(count, currentCoord, originCoord, state)) return moves;
   const invalid = rejectMove(originCoord, state, currentCoord);
-  if (
-    cell.piece &&
-    areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
-  ) {
-    return R.append(
-      {
+
+  const cell = state.board[currentCoord.y][currentCoord.x];
+  if (cell.piece) {
+    if (
+      areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
+    ) {
+      moves.push({
         coord: currentCoord,
         flags: { [flag || flags.capture]: true },
         invalid,
-      },
-      moves
-    );
+      });
+    }
+    return moves;
   }
-  if (!cell.piece)
-    moves.push({
-      coord: currentCoord,
-      flags: {
-        [flag || flags.move]: true,
-        // [flags.check]: isCheck(originCoord, currentCoord, state),
-      },
-      invalid,
-    });
+  moves.push({
+    coord: currentCoord,
+    flags: {
+      [flag || flags.move]: true,
+    },
+    invalid,
+  });
   return generateMovesFromPattern(
     pattern,
     count + 1,
@@ -61,17 +58,20 @@ const generateMovesFromPattern = (
     state
   );
 };
-
+const isNotInvalid = move => !move.invalid;
+const deleteInvalid = move => {
+  delete move.invalid;
+  return move;
+};
 const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
-  if (patterns.length === 0) return moves.filter(move => !move.invalid);
+  if (patterns.length === 0)
+    return moves.filter(isNotInvalid).map(deleteInvalid);
+  moves.push(...generateMovesFromPattern(patterns[0], 0, [], origin, state));
   return generateMovesFromPatterns({
-    patterns: R.slice(1, Infinity, patterns),
+    patterns: patterns.slice(1),
     origin,
     state,
-    moves: R.concat(
-      moves,
-      generateMovesFromPattern(R.head(patterns), 0, [], origin, state)
-    ),
+    moves,
   });
 };
 

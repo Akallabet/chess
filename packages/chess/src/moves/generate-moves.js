@@ -10,69 +10,53 @@ import {
 } from '../utils/index.js';
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
 
-const generateMovesFromPattern = (
-  pattern,
-  count,
-  moves = [],
-  originCoord,
-  state
-) => {
-  const { step, shallStop, flag, rejectMove } = pattern;
-  const lastMove = moves[moves.length - 1] || { coord: originCoord };
-  const currentCoord = step(lastMove.coord, state);
-  if (
-    currentCoord.y >= state.board.length ||
-    currentCoord.x >= state.board[0].length ||
-    currentCoord.y < 0 ||
-    currentCoord.x < 0
-  )
-    return moves;
-  if (shallStop(count, currentCoord, originCoord, state)) return moves;
-  const invalid = rejectMove(originCoord, state, currentCoord);
-
-  const cell = state.board[currentCoord.y][currentCoord.x];
-  if (cell.piece) {
-    if (
-      areOpponents(cell.piece, state.board[originCoord.y][originCoord.x].piece)
-    ) {
-      moves.push({
-        coord: currentCoord,
-        flags: { [flag || flags.capture]: true },
-        invalid,
-      });
-    }
-    return moves;
-  }
-  moves.push({
-    coord: currentCoord,
-    flags: {
-      [flag || flags.move]: true,
-    },
-    invalid,
-  });
-  return generateMovesFromPattern(
-    pattern,
-    count + 1,
-    moves,
-    originCoord,
-    state
-  );
-};
 const isNotInvalid = move => !move.invalid;
 const deleteInvalid = move => {
   delete move.invalid;
   return move;
 };
+
 const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
-  if (patterns.length === 0)
-    return moves.filter(isNotInvalid).map(deleteInvalid);
-  moves.push(...generateMovesFromPattern(patterns[0], 0, [], origin, state));
-  return generateMovesFromPatterns({
-    patterns: patterns.slice(1),
-    origin,
-    state,
-    moves,
-  });
+  for (let i = 0; i < patterns.length; i++) {
+    const { step, shallStop, flag, rejectMove } = patterns[i];
+    let proceed = true;
+    let stepsCount = 0;
+    let prevMove = { coord: origin };
+    while (proceed) {
+      const currentCoord = step(prevMove.coord, state);
+      if (
+        currentCoord.y >= state.board.length ||
+        currentCoord.x >= state.board[0].length ||
+        currentCoord.y < 0 ||
+        currentCoord.x < 0
+      )
+        break;
+      if (shallStop(stepsCount, currentCoord, origin, state)) break;
+      const invalid = rejectMove(origin, state, currentCoord);
+
+      const cell = state.board[currentCoord.y][currentCoord.x];
+      if (cell.piece) {
+        if (areOpponents(cell.piece, state.board[origin.y][origin.x].piece)) {
+          moves.push({
+            coord: currentCoord,
+            flags: { [flag || flags.capture]: true },
+            invalid,
+          });
+        }
+        break;
+      }
+      moves.push({
+        coord: currentCoord,
+        flags: {
+          [flag || flags.move]: true,
+        },
+        invalid,
+      });
+      stepsCount++;
+      prevMove = moves[moves.length - 1];
+    }
+  }
+  return moves.filter(isNotInvalid).map(deleteInvalid);
 };
 
 const stopIfOpponent = (_, { x, y }, start, { board }) => {

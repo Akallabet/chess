@@ -3,6 +3,7 @@ import { errorCodes } from './error-codes.js';
 import { generateLegalMoves, mapMovesToBoard } from './moves/index.js';
 import { fromFEN } from './fen/index.js';
 import { fromPositionToCoordinates } from './utils/index.js';
+import { generateLegalMovesForAllPieces } from './moves/generate-moves.js';
 
 export const highlightMoves = R.curry((addr, { FEN, ...initialState }) => {
   const coord = fromPositionToCoordinates(addr);
@@ -17,3 +18,16 @@ export const highlightMoves = R.curry((addr, { FEN, ...initialState }) => {
 
   return R.assoc('board', boardWithHighlights, state);
 });
+export const createMovesBoard = state => {
+  const moves = generateLegalMovesForAllPieces(state);
+
+  const movesBoard = state.board.map(row => {
+    return row.map(() => []);
+  });
+  for (let i = 0; i < moves.length; i++) {
+    const { coord, ...move } = moves[i];
+    const { x, y } = coord;
+    movesBoard[y][x].push(move);
+  }
+  return movesBoard;
+};

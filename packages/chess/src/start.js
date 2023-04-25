@@ -1,8 +1,7 @@
-import * as R from 'ramda';
-import { addMetaData } from './add-metadata.js';
 import { fromFEN } from './fen/index.js';
 
-export const start = R.pipe(
-  ({ FEN, ...state }) => R.mergeRight(state, fromFEN(FEN)),
-  addMetaData
-);
+export const start = initialState => {
+  const { FEN } = initialState;
+  const state = fromFEN(FEN);
+  return { ...initialState, ...state };
+};

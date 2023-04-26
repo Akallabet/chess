@@ -1,17 +1,16 @@
 import { performance } from 'node:perf_hooks';
-import { generateLegalMoves } from '../src/moves/generate-moves.js';
+import { createMovesBoard } from '../src/moves/index.js';
 import { start } from '../src/start.js';
 
-function kingUnderCheck() {
-  const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
+function generateMoves(FEN) {
+  const state = start({ FEN });
   performance.measure('generateLegalMoves');
-  generateLegalMoves({ x: 3, y: 1 }, start({ FEN }));
+  createMovesBoard(state);
   console.log(performance.measure('generateLegalMoves'));
 }
 
 function performances() {
-  console.log('Generate moves with king under check');
-  kingUnderCheck();
+  generateMoves('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1');
 }
 
 performances();

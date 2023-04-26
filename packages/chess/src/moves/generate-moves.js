@@ -7,6 +7,7 @@ import {
   anyCellOccupied,
   isCellOccupied,
   getPieceColor,
+  isActiveColorPiece,
 } from '../utils/index.js';
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
 
@@ -244,7 +245,6 @@ const getPatterns = rejectMove => ({
 });
 
 export const generateMoves = (coord, state) => {
-  const selected = { coord, flags: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const kingMoves = [
@@ -268,13 +268,11 @@ export const generateMoves = (coord, state) => {
     origin: coord,
     moves: [],
   });
-  moves.unshift(selected);
   return moves;
 };
 
 export const generateLegalMoves = (coord, state) => {
   const { rejectMove, addCheckFlag } = modesMap[state.mode || modesList[0]];
-  const selected = { coord, flags: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const patterns = getPatterns(rejectMove);
@@ -298,9 +296,31 @@ export const generateLegalMoves = (coord, state) => {
   const moves = generateMovesFromPatterns({
     patterns: patterns[piece] || patterns[piece.toLowerCase()],
     state,
-    origin: coord,
+    origin: { ...coord },
     moves: [],
-  }).map(addCheckFlag(coord, state));
-  moves.unshift(selected);
+  })
+    .map(addCheckFlag(coord, state))
+    .map(move => {
+      move.origin = coord;
+      return move;
+    });
+  return moves;
+};
+
+export const generateLegalMovesForAllPieces = state => {
+  const moves = [];
+  for (let y = 0; y < state.board.length; y++) {
+    for (let x = 0; x < state.board[y].length; x++) {
+      if (
+        state.board[y][x].piece &&
+        isActiveColorPiece(state.activeColor, state.board[y][x].piece)
+      ) {
+        const legalMoves = generateLegalMoves({ x, y }, state);
+        for (let i = 0; i < legalMoves.length; i++) {
+          moves.push(legalMoves[i]);
+        }
+      }
+    }
+  }
   return moves;
 };

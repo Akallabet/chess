@@ -1,29 +1,24 @@
-import * as R from 'ramda';
 import { toFEN } from './fen/index.js';
 import { colours } from './constants.js';
+import { clearBoard } from './clear-board.js';
 import { fromPositionToCoordinates } from './utils/index.js';
 import { createMovesBoard } from './moves/index.js';
-
-const mapI = R.addIndex(R.map);
 
 const changeActiveColor = activeColour =>
   activeColour === colours.white ? colours.black : colours.white;
 
-export const boardWithMove = R.curryN(3, (origin, target, board) => {
-  const originCell = R.path([origin.y, origin.x], board);
-  return mapI(
-    (row, y) =>
-      mapI(
-        (cell, x) => {
-          if (y === origin.y && x === origin.x) return {};
-          if (y === target.y && x === target.x) return originCell;
-          return cell;
-        },
-        [...row]
-      ),
-    board
+const boardWithMove = (origin, target, board) => {
+  return board.map((row, y) =>
+    row.map(
+      (cell, x) => {
+        if (y === origin.y && x === origin.x) return {};
+        if (y === target.y && x === target.x) return board[origin.y][origin.x];
+        return cell;
+      },
+      [...row]
+    )
   );
-});
+};
 
 export const moveAndUpdateState = (origin, target, state) => {
   const board = boardWithMove(origin, target, state.board);
@@ -38,12 +33,12 @@ export const moveAndUpdateState = (origin, target, state) => {
   };
 };
 
-export const move = R.curryN(3, (origin, target, initialState) => {
+export const move = (origin, target, initialState) => {
   const state = moveAndUpdateState(
     fromPositionToCoordinates(origin),
     fromPositionToCoordinates(target),
-    initialState
+    clearBoard(initialState)
   );
   const movesBoard = createMovesBoard(state);
   return { ...state, movesBoard };
-});
+};

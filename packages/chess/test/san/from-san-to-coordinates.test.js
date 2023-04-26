@@ -32,7 +32,7 @@ import { start } from '../../src/start.js';
 // ['c8Q', { name: 'P', promotion: 'Q', x: 2, y: 0 }],
 // ['Qxf7#', { name: 'Q', x: 5, y: 1, capture: 'x', checkMate: '#' }],
 t.test('SAN - Wrong format', t => {
-  const FEN = '8/8/8/8/8/8/8/4Q3 w KQkq - 0 1';
+  const FEN = '3k4/8/8/8/8/8/8/3KQ3 w KQkq - 0 1';
   const san = 'Qp1e8';
   const game = start({ FEN });
   t.throws(() => fromSANToCoordinates(san, game));
@@ -40,7 +40,7 @@ t.test('SAN - Wrong format', t => {
 });
 
 t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
-  const FEN = '2k5/8/8/8/8/8/8/4Q3 w KQkq - 0 1';
+  const FEN = '2k5/8/8/8/8/8/8/3KQ3 w KQkq - 0 1';
   const san = 'Qe1e8';
   const expected = {
     piece: 'Q',

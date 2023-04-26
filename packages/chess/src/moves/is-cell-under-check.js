@@ -1,7 +1,5 @@
 import * as R from 'ramda';
-import { flags } from '../constants.js';
 import { isActiveColorPiece, isOpponentPiece } from '../utils/index.js';
-import { mapMovesToBoard } from './map-moves-to-board.js';
 import { generateMoves } from './generate-moves.js';
 //Loop through each row
 //Loop through each cell
@@ -13,11 +11,11 @@ import { generateMoves } from './generate-moves.js';
 //return false otherwise
 
 export const canPieceMoveToTarget = (origin, target, state) => {
-  return R.pipe(
-    mapMovesToBoard(state.board),
-    R.path([target.y, target.x]),
-    R.either(R.has(flags.capture), R.has(flags.move))
-  )(generateMoves(origin, state));
+  const moves = generateMoves(origin, state);
+  const targetMove = moves.find(
+    ({ coord }) => coord.x === target.x && coord.y === target.y
+  );
+  return !!targetMove;
 };
 
 export const getOriginsForTargetCell = (target, activeColor, state) => {

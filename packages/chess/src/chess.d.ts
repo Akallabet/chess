@@ -12,10 +12,18 @@ export type Position = Coordinates | Address;
 
 export interface Square {
   piece: string;
-  move: boolean;
-  capture: boolean;
   selected: boolean;
 }
+export interface Move {
+  origin: Coordinates;
+  flags: {
+    capture: boolean;
+    move: boolean;
+    check: boolean;
+  };
+}
+export type MoveSquare = Move[];
+export type MovesBoardType = MoveSquare[][];
 
 type Positions = Address[][];
 export type ChessBoardType = Square[][];
@@ -24,6 +32,7 @@ export type GameMode = typeof modesList[number];
 
 export interface ChessState {
   board?: ChessBoardType;
+  movesBoard?: MovesBoardType;
   FEN: string;
   mode: GameMode;
   positions?: Positions;
@@ -33,6 +42,7 @@ export interface ChessState {
 
 export interface ChessStateOutput {
   board: ChessBoardType;
+  movesBoard: MovesBoardType;
   FEN: string;
   mode: GameMode;
   positions: Positions;

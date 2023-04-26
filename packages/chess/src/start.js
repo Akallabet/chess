@@ -1,7 +1,14 @@
 import { fromFEN } from './fen/index.js';
+import { getMetadata } from './metadata.js';
+import { createMovesBoard } from './moves/index.js';
 
 export const start = initialState => {
-  const { FEN } = initialState;
-  const state = fromFEN(FEN);
-  return { ...initialState, ...state };
+  const state = { ...initialState, ...fromFEN(initialState.FEN) };
+  const movesBoard = createMovesBoard(state);
+  const metadata = getMetadata();
+  return {
+    ...state,
+    ...metadata,
+    movesBoard,
+  };
 };

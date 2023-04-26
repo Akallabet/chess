@@ -7,3 +7,8 @@ export const addMetaData = R.pipe(
   R.assoc('ranks', ranks),
   R.assoc('files', files)
 );
+export const getMetadata = () => ({
+  files,
+  ranks,
+  positions: getPositions(files, ranks),
+});

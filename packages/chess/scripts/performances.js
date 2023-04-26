@@ -1,5 +1,5 @@
 import { performance } from 'node:perf_hooks';
-import { createMovesBoard } from '../src/highlight-moves.js';
+import { createMovesBoard } from '../src/moves/index.js';
 import { start } from '../src/start.js';
 
 function generateMoves(FEN) {

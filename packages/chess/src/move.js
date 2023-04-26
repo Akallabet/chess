@@ -1,18 +1,15 @@
 import * as R from 'ramda';
-import { fromFEN, toFEN } from './fen/index.js';
+import { toFEN } from './fen/index.js';
 import { colours } from './constants.js';
-import {
-  fromPositionToCoordinates,
-  overProp,
-  updateProp,
-} from './utils/index.js';
+import { fromPositionToCoordinates } from './utils/index.js';
+import { createMovesBoard } from './moves/index.js';
 
 const mapI = R.addIndex(R.map);
 
 const changeActiveColor = activeColour =>
   activeColour === colours.white ? colours.black : colours.white;
 
-export const movePiece = R.curryN(3, (origin, target, board) => {
+export const boardWithMove = R.curryN(3, (origin, target, board) => {
   const originCell = R.path([origin.y, origin.x], board);
   return mapI(
     (row, y) =>
@@ -28,20 +25,25 @@ export const movePiece = R.curryN(3, (origin, target, board) => {
   );
 });
 
-const moveAndUpdate = (origin, target, state) => {
-  // const targetCell = R.path([target.y, target.x], state.board);
+export const moveAndUpdateState = (origin, target, state) => {
+  const board = boardWithMove(origin, target, state.board);
+  const activeColor = changeActiveColor(state.activeColor);
+  const FEN = toFEN({ ...state, board, activeColor });
 
-  return R.pipe(
-    overProp('board', movePiece(origin, target)),
-    overProp('activeColor', changeActiveColor),
-    updateProp('FEN', toFEN)
-  )(state);
+  return {
+    ...state,
+    board,
+    activeColor,
+    FEN,
+  };
 };
 
-export const move = R.curryN(3, (origin, target, state) => {
-  return moveAndUpdate(
+export const move = R.curryN(3, (origin, target, initialState) => {
+  const state = moveAndUpdateState(
     fromPositionToCoordinates(origin),
     fromPositionToCoordinates(target),
-    R.mergeRight(state, fromFEN(state.FEN))
+    initialState
   );
+  const movesBoard = createMovesBoard(state);
+  return { ...state, movesBoard };
 });

@@ -245,7 +245,6 @@ const getPatterns = rejectMove => ({
 });
 
 export const generateMoves = (coord, state) => {
-  const selected = { coord, flags: { [flags.selected]: true } };
   const piece = R.path([coord.y, coord.x, 'piece'], state.board);
 
   const kingMoves = [
@@ -269,7 +268,6 @@ export const generateMoves = (coord, state) => {
     origin: coord,
     moves: [],
   });
-  moves.unshift(selected);
   return moves;
 };
 

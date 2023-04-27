@@ -6,7 +6,7 @@
   "type": "module",
   "types": "src/chess.d.ts",
   "scripts": {
-    "test": "tap",
+    "test": "tap --rcfile=test/config/tap.yml test/*.test.ts",
     "test:only": "tap --only",
     "performances": "node ./scripts/performances.js"
   },
@@ -20,6 +20,7 @@
     "prettier-plugin-tailwindcss": "^0.2.1",
     "ramda": "^0.28.0",
     "tap": "^16.3.2",
+    "tsx": "^3.12.6",
     "typescript": "^4.9.4"
   }
 }

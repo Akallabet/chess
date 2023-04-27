@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import { ChessBoardType, FENObject } from '../types.js';
 
 export const emptyCell = {};
 const addEmptyCells = n => {
@@ -19,9 +20,26 @@ export const rowFromFEN = R.pipe(
   R.flatten
 );
 
-const boardFromFEN = R.pipe(R.split('/'), R.map(rowFromFEN));
+function boardFromFEN(FEN: string): ChessBoardType {
+  const FENRows = R.split('/', FEN);
+  const board = [];
+  for (let i = 0; i < FENRows.length; i++) {
+    const elements = FENRows[i].split('');
+    const row = [];
+    for (let j = 0; j < elements.length; j++) {
+      const element = Number(elements[j]);
+      if (isNaN(element)) {
+        row.push({ piece: element });
+      } else {
+        row.push(...addEmptyCells(element));
+      }
+    }
+    board.push(row);
+  }
+  return board;
+}
 
-export const fromFEN = FEN => {
+export function fromFEN(FEN: string): FENObject {
   const [
     piecePlacement,
     activeColor,
@@ -29,7 +47,7 @@ export const fromFEN = FEN => {
     enPassant,
     halfMoves,
     fullMoves,
-  ] = R.split(' ', FEN);
+  ] = FEN.split(' ');
   return {
     FEN,
     board: boardFromFEN(piecePlacement),
@@ -39,4 +57,4 @@ export const fromFEN = FEN => {
     halfMoves: Number(halfMoves),
     fullMoves: Number(fullMoves),
   };
-};
+}

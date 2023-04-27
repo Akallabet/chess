@@ -1,0 +1,8 @@
+---
+coverage: false
+jobs: 5
+node-arg:
+  - --loader=tsx
+  - --no-warnings=loader
+reporter: spec
+timeout: 120

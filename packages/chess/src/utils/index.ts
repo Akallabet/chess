@@ -3,13 +3,15 @@ import { errorCodes } from '../error-codes.js';
 import { files, ranks } from '../constants.js';
 export { rotate } from './rotate.js';
 
-export const isWhitePiece = piece => new RegExp(/[PNBRQK]+/).test(piece);
-export const isBlackPiece = piece => new RegExp(/[pnbrqk]+/).test(piece);
-export const isActiveColorWhite = activeColor => activeColor === 'w';
-export const isActiveColorBlack = activeColor => activeColor === 'b';
-export const isOpponentPiece = (activeColor, piece) =>
-  (isActiveColorWhite(activeColor) && isBlackPiece(piece)) ||
-  (isActiveColorBlack(activeColor) && isWhitePiece(piece));
+export const isWhitePiece = (piece: string): boolean =>
+  new RegExp(/[PNBRQK]+/).test(piece);
+export const isBlackPiece = (piece: string): boolean =>
+  new RegExp(/[pnbrqk]+/).test(piece);
+export const isActiveColorWhite = (color: string): boolean => color === 'w';
+export const isActiveColorBlack = (color: string): boolean => color === 'b';
+export const isOpponentPiece = (color: string, piece: string): boolean =>
+  (isActiveColorWhite(color) && isBlackPiece(piece)) ||
+  (isActiveColorBlack(color) && isWhitePiece(piece));
 export const isActiveColorPiece = R.complement(isOpponentPiece);
 
 export const areOpponents = (pa, pb) =>

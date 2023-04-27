@@ -14,4 +14,5 @@ export const getCastlingRights = (king, { castlingRights }) => {
       queenSide: R.includes('q', castlingRights),
     };
   }
+  return { kingSide: false, queenSide: false };
 };

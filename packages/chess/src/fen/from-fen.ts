@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { ChessBoardType, FENObject } from '../types.js';
+import { ChessBoardType, EmptySquare, FENState, Square } from '../types.js';
 
 export const emptyCell = {};
 const addEmptyCells = n => {
@@ -27,11 +27,10 @@ function boardFromFEN(FEN: string): ChessBoardType {
     const elements = FENRows[i].split('');
     const row = [];
     for (let j = 0; j < elements.length; j++) {
-      const element = Number(elements[j]);
-      if (isNaN(element)) {
-        row.push({ piece: element });
+      if (isNaN(Number(elements[j]))) {
+        row.push({ piece: elements[j] });
       } else {
-        row.push(...addEmptyCells(element));
+        row.push(...addEmptyCells(Number(elements[j])));
       }
     }
     board.push(row);
@@ -39,7 +38,7 @@ function boardFromFEN(FEN: string): ChessBoardType {
   return board;
 }
 
-export function fromFEN(FEN: string): FENObject {
+export function fromFEN(FEN: string): FENState {
   const [
     piecePlacement,
     activeColor,

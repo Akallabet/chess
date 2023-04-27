@@ -1,6 +1,6 @@
 import { modesList } from './constants.js';
 
-interface Coordinates {
+export interface Coordinates {
   x: number;
   y: number;
 }
@@ -13,11 +13,21 @@ export type Ranks = Rank[];
 export type Address = `${File}${Rank}`;
 export type Position = Coordinates | Address;
 
+export interface EmptySquare {
+  capture?: boolean;
+  move?: boolean;
+  check?: boolean;
+}
+
 export interface Square {
   piece?: string;
   selected?: boolean;
+  capture?: boolean;
+  move?: boolean;
+  check?: boolean;
 }
-export interface Move {
+
+export interface MoveCell {
   origin: Coordinates;
   flags: {
     capture: boolean;
@@ -25,10 +35,15 @@ export interface Move {
     check: boolean;
   };
 }
-export type MoveSquare = Move[];
+
+export interface Move extends MoveCell {
+  coord: Coordinates;
+}
+
+export type MoveSquare = MoveCell[];
 export type MovesBoardType = MoveSquare[][];
 
-export type ChessBoardType = Square[][];
+export type ChessBoardType = Array<Array<Square>>;
 
 export type GameMode = (typeof modesList)[number];
 
@@ -38,7 +53,12 @@ export interface MetaData {
   files: Files;
 }
 
-export interface FENObject {
+export interface ChessInitialState {
+  mode: GameMode;
+  FEN: string;
+}
+
+export interface FENState {
   board: ChessBoardType;
   FEN: string;
   // activeColor: 'w' | 'b';
@@ -47,6 +67,9 @@ export interface FENObject {
   enPassant: string | false;
   halfMoves: number;
   fullMoves: number;
+}
+export interface InternalState extends FENState {
+  mode: GameMode;
 }
 
 export interface ChessState {
@@ -59,7 +82,7 @@ export interface ChessState {
   files?: Files;
 }
 
-export interface ChessStateOutput extends FENObject, MetaData {
+export interface ChessStateOutput extends FENState, MetaData {
   movesBoard: MovesBoardType;
   mode: GameMode;
 }

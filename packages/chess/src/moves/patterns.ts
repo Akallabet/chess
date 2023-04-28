@@ -1,5 +1,5 @@
 import { flags, modesList } from '../constants.js';
-import { Coordinates, InternalState } from '../types.js';
+import { Coordinates, InternalState, MoveState } from '../types.js';
 
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
 import { getCastlingRights } from '../fen/index.js';
@@ -40,13 +40,6 @@ const bottom = ({ x, y }: Coordinates): Coordinates => ({ x, y: y + 1 });
 const right = ({ x, y }: Coordinates): Coordinates => ({ x: x + 1, y });
 const left = ({ x, y }: Coordinates): Coordinates => ({ x: x - 1, y });
 
-interface MoveState {
-  step: number;
-  current: Coordinates;
-  origin: Coordinates;
-  state: InternalState;
-}
-
 const stopIfOpponent = ({
   current: { x, y },
   origin,
@@ -79,7 +72,7 @@ const kingsideCastlingMove =
       );
     if (step === 1 && current.y === startRow) {
       const hasCastlingRights = getCastlingRights(
-        state.board[origin.y][origin.x].piece,
+        state.board[origin.y][origin.x].piece || '',
         state
       );
       if (!hasCastlingRights.kingSide) return true;
@@ -104,7 +97,7 @@ const queensideCastlingMove =
       );
     if (step === 1 && current.y === startRow) {
       const hasCastlingghts = getCastlingRights(
-        state.board[origin.y][origin.x].piece,
+        state.board[origin.y][origin.x].piece || '',
         state
       );
       if (!hasCastlingghts.queenSide) return true;
@@ -171,7 +164,9 @@ export function getPatternsForMoves(): PiecesPatterns {
   return patterns;
 }
 
-export function getPatterns(rejectMove: () => boolean): PiecesPatterns {
+export function getPatterns(
+  rejectMove: (args: MoveState) => boolean
+): PiecesPatterns {
   return {
     p: [
       {

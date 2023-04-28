@@ -9,7 +9,7 @@ export function clearBoard(state: ChessState): ChessState {
     for (let x = 0; x < state.board[y].length; x++) {
       if (state.board[y][x].piece)
         board[y][x] = { piece: state.board[y][x].piece };
-      board[y][x] = {};
+      else board[y][x] = {};
     }
   }
   return {

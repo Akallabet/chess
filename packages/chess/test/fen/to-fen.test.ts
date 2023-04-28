@@ -14,7 +14,7 @@ const emptyBoard = [
   emptyRow,
 ];
 
-t.skip('FEN string from object with empty board', t => {
+t.test('FEN string from object with empty board', t => {
   const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
   const FENObj: FENState = {
     FEN,

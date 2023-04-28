@@ -1,7 +1,7 @@
-import { FENState, MovesBoardType } from '../types.js';
+import { InternalState, MovesBoardType } from '../types.js';
 import { generateLegalMovesForAllPieces } from './generate-moves.js';
 
-export function createMovesBoard(state: FENState): MovesBoardType {
+export function createMovesBoard(state: InternalState): MovesBoardType {
   const moves = generateLegalMovesForAllPieces(state);
 
   const movesBoard: MovesBoardType = state.board.map(row => {

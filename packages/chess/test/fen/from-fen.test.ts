@@ -1,5 +1,5 @@
 import t from 'tap';
-import { fromFEN } from '../../src/fen/from-fen.js';
+import { fromFEN, rowFromFEN } from '../../src/fen/from-fen.js';
 
 const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}];
 const emptyBoard = [
@@ -28,24 +28,24 @@ t.test('Return object from FEN string', t => {
   t.end();
 });
 
-// t.test('Create board rows from piece placement', t => {
-//   t.plan(2);
-//   t.test('Empty row', t => {
-//     t.same(rowFromFEN('8'), emptyRow);
-//     t.end();
-//   });
-//   t.test('Row with two pawns', t => {
-//     t.same(rowFromFEN('2pp4'), [
-//       {},
-//       {},
-//       { piece: 'p' },
-//       { piece: 'p' },
-//       {},
-//       {},
-//       {},
-//       {},
-//     ]);
-//     t.end();
-//   });
-//   t.end();
-// });
+t.test('Create board rows from piece placement', t => {
+  t.plan(2);
+  t.test('Empty row', t => {
+    t.same(rowFromFEN('8'), emptyRow);
+    t.end();
+  });
+  t.test('Row with two pawns', t => {
+    t.same(rowFromFEN('2pp4'), [
+      {},
+      {},
+      { piece: 'p' },
+      { piece: 'p' },
+      {},
+      {},
+      {},
+      {},
+    ]);
+    t.end();
+  });
+  t.end();
+});

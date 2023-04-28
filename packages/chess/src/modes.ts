@@ -4,14 +4,14 @@ import { isCellUnderCheck } from './moves/index.js';
 import { moveAndUpdateState } from './move.js';
 import { getKingPiece, getPieceColor, getPieceCoord } from './utils/index.js';
 import { canPieceMoveToTarget } from './moves/is-cell-under-check.js';
-import { Coordinates, InternalState, Move } from './types.js';
+import { Coordinates, InternalState, Move, MoveState } from './types.js';
 import { errorCodes } from './error-codes.js';
 
-const isKingUnderAttack = (
-  origin: Coordinates,
-  state: InternalState,
-  target: Coordinates
-) => {
+const isKingUnderAttack = ({
+  origin,
+  state,
+  current: target,
+}: MoveState): boolean => {
   const kingCoord = getPieceCoord(getKingPiece(state), state.board);
   if (!kingCoord) throw new Error(errorCodes.king_not_found);
 
@@ -27,6 +27,8 @@ const addCheckFlag =
   (origin: Coordinates, state: InternalState) => (moveData: Move) => {
     const moveState = moveAndUpdateState(origin, moveData.coord, state);
     const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
+    if (!kingCoord) throw new Error(errorCodes.king_not_found);
+
     const isUnderCheck = canPieceMoveToTarget(
       moveData.coord,
       kingCoord,
@@ -39,6 +41,9 @@ const addCheckFlag =
 
 export const modesMap = {
   [modes.standard]: { rejectMove: isKingUnderAttack, addCheckFlag },
-  [modes.demo]: { rejectMove: R.F, addCheckFlag: () => R.identity },
-  [modes.practice]: { rejectMove: R.F, addCheckFlag: () => R.identity },
+  [modes.demo]: {
+    rejectMove: () => false,
+    addCheckFlag: () => R.identity,
+  },
+  [modes.practice]: { rejectMove: () => false, addCheckFlag: () => R.identity },
 };

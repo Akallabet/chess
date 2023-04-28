@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import { Coordinates, InternalState } from '../types.js';
 import { isActiveColorPiece, isOpponentPiece } from '../utils/index.js';
 import { generateMoves } from './generate-moves.js';
 //Loop through each row
@@ -10,7 +11,11 @@ import { generateMoves } from './generate-moves.js';
 //        then return true
 //return false otherwise
 
-export const canPieceMoveToTarget = (origin, target, state) => {
+export const canPieceMoveToTarget = (
+  origin: Coordinates,
+  target: Coordinates,
+  state: InternalState
+): boolean => {
   const moves = generateMoves(origin, state);
   const targetMove = moves.find(
     ({ coord }) => coord.x === target.x && coord.y === target.y
@@ -18,15 +23,19 @@ export const canPieceMoveToTarget = (origin, target, state) => {
   return !!targetMove;
 };
 
-export const getOriginsForTargetCell = (target, activeColor, state) => {
+export const getOriginsForTargetCell = (
+  target: Coordinates,
+  activeColor: string,
+  state: InternalState
+) => {
   const { board } = state;
   const origins = [];
 
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (
-        R.hasPath([y, x, 'piece'], board) &&
-        isActiveColorPiece(activeColor, R.path([y, x, 'piece'], board)) &&
+        board[y][x].piece &&
+        isActiveColorPiece(activeColor, board[y][x].piece || '') &&
         canPieceMoveToTarget({ y, x }, target, state)
       ) {
         origins.push({ y, x });
@@ -42,8 +51,8 @@ export const isCellUnderCheck = R.curry((state, activeColor, target) => {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (
-        R.hasPath([y, x, 'piece'], board) &&
-        isOpponentPiece(activeColor, R.path([y, x, 'piece'], board)) &&
+        board[y][x].piece &&
+        isOpponentPiece(activeColor, board[y][x].piece) &&
         canPieceMoveToTarget({ y, x }, target, state)
       ) {
         return true;

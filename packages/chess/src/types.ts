@@ -24,6 +24,13 @@ export interface Square extends EmptySquare {
   selected?: boolean;
 }
 
+export interface MoveState {
+  step: number;
+  current: Coordinates;
+  origin: Coordinates;
+  state: InternalState;
+}
+
 export interface MoveCell {
   origin: Coordinates;
   flags: {
@@ -51,7 +58,7 @@ export interface MetaData {
 }
 
 export interface ChessInitialState {
-  mode: GameMode;
+  mode?: GameMode;
   FEN: string;
 }
 

@@ -1,13 +1,14 @@
-import * as R from 'ramda';
 import { rowFromFEN } from './from-fen.js';
 
-const checkPiecePlacement = R.pipe(
-  R.split(' '),
-  R.head,
-  R.split('/'),
-  R.all(row => rowFromFEN(row).length === 8)
-);
 const FENRegExp = new RegExp(
   /^((([pnbrqkPNBRQK1-8]{1,8})\/?){8})\s+(b|w)\s+(-|K?Q?k?q)\s+(-|[a-h][3-6])\s+(\d+)\s+(\d+)\s*$/
 );
-export const isFEN = R.both(FEN => FENRegExp.test(FEN), checkPiecePlacement);
+
+export function isFEN(FEN: string) {
+  return (
+    FENRegExp.test(FEN) &&
+    FEN.split(' ')[0]
+      .split('/')
+      .every(row => rowFromFEN(row).length === 8)
+  );
+}

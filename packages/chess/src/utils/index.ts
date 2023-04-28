@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
 import { files, ranks } from '../constants.js';
+import { Address, ChessBoardType, Coordinates } from '../types.js';
 export { rotate } from './rotate.js';
 
 export const isWhitePiece = (piece: string): boolean =>
@@ -22,7 +23,7 @@ export const getPieceColor = piece => (isWhitePiece(piece) ? 'w' : 'b');
 export const getKingPiece = ({ activeColor }) =>
   activeColor === 'w' ? 'K' : 'k';
 
-export const getPieceCoord = (piece, board) => {
+export const getPieceCoord = (piece: string, board: ChessBoardType) => {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (R.pathEq([y, x, 'piece'], piece, board)) return { y, x };
@@ -33,9 +34,9 @@ export const getPieceCoord = (piece, board) => {
 //   new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(addr);
 export const isAddress = addr => new RegExp(/([a-h]+[1-9]+)/).test(addr);
 
-export const fromPositionToCoordinates = pos => {
+export const fromPositionToCoordinates = (pos: Address | Coordinates) => {
   if (isAddress(pos)) {
-    const [file, rank] = R.split('', pos);
+    const [file, rank] = pos.split('');
     return {
       x: files.indexOf(file),
       y: ranks.indexOf(Number(rank)),

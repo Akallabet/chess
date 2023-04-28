@@ -10,7 +10,7 @@ type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 export type Files = File[];
 export type Ranks = Rank[];
 
-export type Address = `${File}${Rank}`;
+export type Address = `${string & keyof File}${string & keyof Rank}`;
 export type Position = Coordinates | Address;
 
 export interface EmptySquare {
@@ -19,12 +19,9 @@ export interface EmptySquare {
   check?: boolean;
 }
 
-export interface Square {
+export interface Square extends EmptySquare {
   piece?: string;
   selected?: boolean;
-  capture?: boolean;
-  move?: boolean;
-  check?: boolean;
 }
 
 export interface MoveCell {
@@ -68,21 +65,11 @@ export interface FENState {
   halfMoves: number;
   fullMoves: number;
 }
-export interface InternalState extends FENState {
+
+export interface InternalState extends ChessInitialState, FENState {
   mode: GameMode;
 }
 
-export interface ChessState {
-  board?: ChessBoardType;
-  movesBoard?: MovesBoardType;
-  FEN: string;
-  mode: GameMode;
-  positions?: Address[][];
-  ranks?: Ranks;
-  files?: Files;
-}
-
-export interface ChessStateOutput extends FENState, MetaData {
+export interface ChessState extends InternalState, MetaData {
   movesBoard: MovesBoardType;
-  mode: GameMode;
 }

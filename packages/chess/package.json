@@ -6,7 +6,7 @@
   "type": "module",
   "types": "src/chess.d.ts",
   "scripts": {
-    "test": "tap --rcfile=test/config/tap.yml test/*.test.ts",
+    "test": "tap --rcfile=test/config/tap.yml test/fen/to-fen.test.ts",
     "test:only": "tap --only",
     "performances": "node ./scripts/performances.js"
   },

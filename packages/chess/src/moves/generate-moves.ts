@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { Coordinates } from '../chess.js';
 import { flags, modesList } from '../constants.js';
 import { modesMap } from '../modes.js';

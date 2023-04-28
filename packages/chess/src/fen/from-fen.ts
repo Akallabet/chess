@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { ChessBoardType, EmptySquare, FENState, Square } from '../types.js';
+import { ChessBoardType, FENState } from '../types.js';
 
 export const emptyCell = {};
 const addEmptyCells = n => {
@@ -9,16 +9,6 @@ const addEmptyCells = n => {
   }
   return cells;
 };
-
-const addCell = piece => ({ piece });
-
-export const rowFromFEN = R.pipe(
-  R.split(''),
-  R.map(
-    R.ifElse(R.pipe(Number, isNaN), addCell, R.pipe(Number, addEmptyCells))
-  ),
-  R.flatten
-);
 
 function boardFromFEN(FEN: string): ChessBoardType {
   const FENRows = R.split('/', FEN);

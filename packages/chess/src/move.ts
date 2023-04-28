@@ -3,11 +3,22 @@ import { colours } from './constants.js';
 import { clearBoard } from './clear-board.js';
 import { fromPositionToCoordinates } from './utils/index.js';
 import { createMovesBoard } from './moves/index.js';
+import {
+  ChessBoardType,
+  ChessState,
+  Coordinates,
+  FENState,
+  InternalState,
+} from './types.js';
 
-const changeActiveColor = activeColour =>
-  activeColour === colours.white ? colours.black : colours.white;
+const changeActiveColor = (state: FENState) =>
+  state.activeColor === colours.white ? colours.black : colours.white;
 
-const boardWithMove = (origin, target, board) => {
+const boardWithMove = (
+  origin: Coordinates,
+  target: Coordinates,
+  board: ChessBoardType
+) => {
   return board.map((row, y) =>
     row.map(
       (cell, x) => {
@@ -20,9 +31,13 @@ const boardWithMove = (origin, target, board) => {
   );
 };
 
-export const moveAndUpdateState = (origin, target, state) => {
+export const moveAndUpdateState = (
+  origin: Coordinates,
+  target: Coordinates,
+  state: InternalState
+) => {
   const board = boardWithMove(origin, target, state.board);
-  const activeColor = changeActiveColor(state.activeColor);
+  const activeColor = changeActiveColor(state);
   const FEN = toFEN({ ...state, board, activeColor });
 
   return {
@@ -33,7 +48,11 @@ export const moveAndUpdateState = (origin, target, state) => {
   };
 };
 
-export const move = (origin, target, initialState) => {
+export const move = (
+  origin: Coordinates,
+  target: Coordinates,
+  initialState: ChessState
+) => {
   const state = moveAndUpdateState(
     fromPositionToCoordinates(origin),
     fromPositionToCoordinates(target),

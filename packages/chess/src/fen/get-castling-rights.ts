@@ -1,8 +1,10 @@
 import * as R from 'ramda';
-import { FENState } from '../types.js';
 import { isWhitePiece, isBlackPiece } from '../utils/index.js';
 
-export const getCastlingRights = (king: string, state: FENState) => {
+export const getCastlingRights = (
+  king: string,
+  state: { castlingRights: '-' | string[] }
+) => {
   const { castlingRights } = state;
   if (!castlingRights.length) return { kingSide: false, queenSide: false };
   if (isWhitePiece(king))

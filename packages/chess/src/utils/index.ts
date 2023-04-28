@@ -2,7 +2,6 @@ import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
 import { files, ranks } from '../constants.js';
 import { Address, ChessBoardType, Coordinates } from '../types.js';
-export { rotate } from './rotate.js';
 
 export const isWhitePiece = (piece: string): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);

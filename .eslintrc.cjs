@@ -18,5 +18,7 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     'import/no-unresolved': 'off',
+    "import/extensions": [2, "always", { ignorePackages: true }], // This is required for proper ESM use
+    "@typescript-eslint/no-non-null-assertion": 0,
   },
 };

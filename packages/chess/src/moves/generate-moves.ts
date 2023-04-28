@@ -93,22 +93,24 @@ export const generateMoves = (
 };
 
 export function generateLegalMoves(
-  coord: Coordinates,
+  origin: Coordinates,
   state: InternalState
 ): Array<Move> {
   const { addCheckFlag } = modesMap[state.mode || modesList[0]];
-  const { piece } = state.board[coord.y][coord.x];
+  const { piece } = state.board[origin.y][origin.x];
 
   if (!piece) return [];
 
-  const patterns = getPatternsForLegalMoves(state);
+  const allPatterns = getPatternsForLegalMoves(state);
+  const patterns = allPatterns[piece] || allPatterns[piece.toLowerCase()];
 
   const moves = generateMovesFromPatterns({
-    patterns: patterns[piece] || patterns[piece.toLowerCase()],
+    patterns,
     state,
-    origin: { ...coord },
+    origin,
     moves: [],
-  }).map(addCheckFlag(coord, state));
+  }).map(addCheckFlag(origin, state));
+
   return moves;
 }
 

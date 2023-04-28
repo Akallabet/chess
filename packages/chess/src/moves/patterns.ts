@@ -15,8 +15,9 @@ const F = () => false;
 
 const lte =
   (n: number) =>
-  ({ step }: MoveState) =>
-    step <= n;
+  ({ step }: MoveState) => {
+    return n <= step;
+  };
 
 const topLeft = ({ x, y }: Coordinates): Coordinates => ({
   x: x - 1,
@@ -157,7 +158,7 @@ export function getPatternsForMoves(): PiecesPatterns {
     { advance: bottomLeft, shallStop: lte(1), rejectMove: F },
   ];
 
-  const patterns = getPatterns(() => false);
+  const patterns = getPatterns(F);
   patterns.k = kingMoves;
   patterns.K = kingMoves;
 

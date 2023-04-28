@@ -1,5 +1,6 @@
 import t from 'tap';
 import { modes } from '../../src/constants.js';
+import { fromFEN } from '../../src/fen/from-fen.js';
 import { generateLegalMoves } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/start.js';
 import { fromPositionToCoordinates } from '../../src/utils/index.js';
@@ -28,7 +29,7 @@ const addOrigin = origin => move => {
   return move;
 };
 
-t.only('Get moves - Black pawn - rank 7', t => {
+t.test('Get moves - Black pawn - rank 7', t => {
   const state = start({
     mode: modes.demo,
     FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1',
@@ -131,11 +132,12 @@ t.test('Select pawn on file h', t => {
 });
 t.test('Select knight', t => {
   const origin = { x: 4, y: 3 };
+  const actual = generateLegalMoves(origin, {
+    ...fromFEN('8/8/8/4n3/8/8/8/8 b KQkq - 0 1'),
+    mode: 'demo',
+  }).sort(compareByMove);
   t.same(
-    generateLegalMoves(
-      origin,
-      start({ mode: 'demo', FEN: '8/8/8/4n3/8/8/8/8 b KQkq - 0 1' })
-    ).sort(compareByMove),
+    actual,
     [
       { coord: { x: 6, y: 4 }, flags: { move: true } },
       { coord: { x: 5, y: 5 }, flags: { move: true } },

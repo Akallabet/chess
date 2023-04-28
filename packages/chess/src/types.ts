@@ -30,9 +30,9 @@ export interface Square {
 export interface MoveCell {
   origin: Coordinates;
   flags: {
-    capture: boolean;
-    move: boolean;
-    check: boolean;
+    capture?: boolean;
+    move?: boolean;
+    check?: boolean;
   };
 }
 

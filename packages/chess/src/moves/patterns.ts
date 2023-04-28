@@ -12,7 +12,11 @@ import {
 import { modesMap } from '../modes.js';
 
 const F = () => false;
-const lte = (n: number) => (count: number) => count <= n;
+
+const lte =
+  (n: number) =>
+  ({ step }: MoveState) =>
+    step <= n;
 
 const topLeft = ({ x, y }: Coordinates): Coordinates => ({
   x: x - 1,
@@ -30,108 +34,134 @@ const bottomght = ({ x, y }: Coordinates): Coordinates => ({
   x: x + 1,
   y: y + 1,
 });
+
 const top = ({ x, y }: Coordinates): Coordinates => ({ x, y: y - 1 });
 const bottom = ({ x, y }: Coordinates): Coordinates => ({ x, y: y + 1 });
 const right = ({ x, y }: Coordinates): Coordinates => ({ x: x + 1, y });
 const left = ({ x, y }: Coordinates): Coordinates => ({ x: x - 1, y });
 
-const stopIfOpponent = (_, { x, y }, start, { board }) => {
+interface MoveState {
+  step: number;
+  current: Coordinates;
+  origin: Coordinates;
+  state: InternalState;
+}
+
+const stopIfOpponent = ({
+  current: { x, y },
+  origin,
+  state,
+}: MoveState): boolean => {
   if (
-    board[y][x].piece &&
-    areOpponents(board[y][x].piece, board[start.y][start.x].piece)
+    state.board[y][x].piece &&
+    areOpponents(state.board[y][x].piece, state.board[origin.y][origin.x].piece)
   )
     return false;
   return true;
 };
 
-const shouldKingStop = (count, current, origin, state) =>
-  count > 0 ||
+const shouldKingStop = ({ step, current, origin, state }: MoveState): boolean =>
+  step > 0 ||
   isCellUnderCheck(
     state,
     getPieceColor(state.board[origin.y][origin.x].piece),
     current
   );
 
-const kingsideCastlingMove = startRow => (count, current, origin, state) => {
-  if (count === 0)
-    return isCellUnderCheck(
-      state,
-      getPieceColor(state.board[origin.y][origin.x].piece),
-      current
-    );
-  if (count === 1 && current.y === startRow) {
-    const hasCastlingRights = getCastlingRights(
-      state.board[origin.y][origin.x].piece,
-      state
-    );
-    if (!hasCastlingRights.kingSide) return true;
-    return (
-      isCellUnderCheck(
+const kingsideCastlingMove =
+  (startRow: number) =>
+  ({ step, current, origin, state }: MoveState): boolean => {
+    if (step === 0)
+      return isCellUnderCheck(
         state,
         getPieceColor(state.board[origin.y][origin.x].piece),
         current
-      ) || isCellOccupied(state, current)
-    );
-  }
-  return true;
-};
-const queensideCastlingMove = startRow => (count, current, origin, state) => {
-  if (count === 0)
-    return isCellUnderCheck(
-      state,
-      getPieceColor(state.board[origin.y][origin.x].piece),
-      current
-    );
-  if (count === 1 && current.y === startRow) {
-    const hasCastlingRights = getCastlingRights(
-      state.board[origin.y][origin.x].piece,
-      state
-    );
-    if (!hasCastlingRights.queenSide) return true;
-    return (
-      anyCellUnderCheck(
+      );
+    if (step === 1 && current.y === startRow) {
+      const hasCastlingRights = getCastlingRights(
+        state.board[origin.y][origin.x].piece,
+        state
+      );
+      if (!hasCastlingRights.kingSide) return true;
+      return (
+        isCellUnderCheck(
+          state,
+          getPieceColor(state.board[origin.y][origin.x].piece),
+          current
+        ) || isCellOccupied(state, current)
+      );
+    }
+    return true;
+  };
+const queensideCastlingMove =
+  (startRow: number) =>
+  ({ step, current, origin, state }: MoveState): boolean => {
+    if (step === 0)
+      return isCellUnderCheck(
         state,
         getPieceColor(state.board[origin.y][origin.x].piece),
-        [current, { y: current.y, x: current.x - 1 }]
-      ) || anyCellOccupied(state, [current, { y: current.y, x: current.x - 1 }])
-    );
-  }
-  return true;
-};
+        current
+      );
+    if (step === 1 && current.y === startRow) {
+      const hasCastlingghts = getCastlingRights(
+        state.board[origin.y][origin.x].piece,
+        state
+      );
+      if (!hasCastlingghts.queenSide) return true;
+      return (
+        anyCellUnderCheck(
+          state,
+          getPieceColor(state.board[origin.y][origin.x].piece),
+          [current, { y: current.y, x: current.x - 1 }]
+        ) ||
+        anyCellOccupied(state, [current, { y: current.y, x: current.x - 1 }])
+      );
+    }
+    return true;
+  };
 
-export function getPatternsForLegalMoves(state: InternalState) {
+export interface Pattern {
+  advance: (args: Coordinates) => Coordinates;
+  shallStop: (args: MoveState) => boolean;
+  flag?: string;
+  rejectMove: (args: MoveState) => boolean;
+}
+
+type PiecesPatterns = Record<string, Array<Pattern>>;
+
+export function getPatternsForLegalMoves(state: InternalState): PiecesPatterns {
   const { rejectMove } = modesMap[state.mode || modesList[0]];
 
   const kingMoves = [
-    { step: top, shallStop: shouldKingStop, rejectMove: F },
-    { step: bottom, shallStop: shouldKingStop, rejectMove: F },
-    { step: bottomght, shallStop: shouldKingStop, rejectMove: F },
-    { step: topght, shallStop: shouldKingStop, rejectMove: F },
-    { step: topLeft, shallStop: shouldKingStop, rejectMove: F },
-    { step: bottomLeft, shallStop: shouldKingStop, rejectMove: F },
+    { advance: top, shallStop: shouldKingStop, rejectMove: F },
+    { advance: bottom, shallStop: shouldKingStop, rejectMove: F },
+    { advance: bottomght, shallStop: shouldKingStop, rejectMove: F },
+    { advance: topght, shallStop: shouldKingStop, rejectMove: F },
+    { advance: topLeft, shallStop: shouldKingStop, rejectMove: F },
+    { advance: bottomLeft, shallStop: shouldKingStop, rejectMove: F },
   ];
   const patterns = getPatterns(rejectMove);
   patterns.k = kingMoves.concat([
-    { step: right, shallStop: kingsideCastlingMove(0), rejectMove: F },
-    { step: left, shallStop: queensideCastlingMove(0), rejectMove: F },
+    { advance: right, shallStop: kingsideCastlingMove(0), rejectMove: F },
+    { advance: left, shallStop: queensideCastlingMove(0), rejectMove: F },
   ]);
   patterns.K = kingMoves.concat([
-    { step: right, shallStop: kingsideCastlingMove(7), rejectMove: F },
-    { step: left, shallStop: queensideCastlingMove(7), rejectMove: F },
+    { advance: right, shallStop: kingsideCastlingMove(7), rejectMove: F },
+    { advance: left, shallStop: queensideCastlingMove(7), rejectMove: F },
   ]);
   return patterns;
 }
 
-export function getPatternsForMoves() {
+export function getPatternsForMoves(): PiecesPatterns {
   const kingMoves = [
-    { step: right, shallStop: lte(1), rejectMove: F },
-    { step: left, shallStop: lte(1), rejectMove: F },
-    { step: top, shallStop: lte(1), rejectMove: F },
-    { step: bottom, shallStop: lte(1), rejectMove: F },
-    { step: bottomght, shallStop: lte(1), rejectMove: F },
-    { step: topght, shallStop: lte(1), rejectMove: F },
-    { step: topLeft, shallStop: lte(1), rejectMove: F },
-    { step: bottomLeft, shallStop: lte(1), rejectMove: F },
+    { advance: right, shallStop: lte(1), rejectMove: F },
+    { advance: left, shallStop: lte(1), rejectMove: F },
+    { advance: top, shallStop: lte(1), rejectMove: F },
+    { advance: bottom, shallStop: lte(1), rejectMove: F },
+    { advance: bottomght, shallStop: lte(1), rejectMove: F },
+    { advance: topght, shallStop: lte(1), rejectMove: F },
+    { advance: topLeft, shallStop: lte(1), rejectMove: F },
+    { advance: bottomLeft, shallStop: lte(1), rejectMove: F },
   ];
 
   const patterns = getPatterns(() => false);
@@ -141,115 +171,144 @@ export function getPatternsForMoves() {
   return patterns;
 }
 
-export function getPatterns(rejectMove: () => boolean) {
+export function getPatterns(rejectMove: () => boolean): PiecesPatterns {
   return {
     p: [
       {
-        step: bottom,
-        shallStop: (count: number, _: any, start: Coordinates) => {
-          if (start.y > 1 && count >= 1) return true;
-          if (start.y === 1 && count >= 2) return true;
+        advance: bottom,
+        shallStop: ({ step, origin }: MoveState) => {
+          if (origin.y > 1 && step >= 1) return true;
+          if (origin.y === 1 && step >= 2) return true;
+          return false;
         },
         rejectMove,
       },
       {
-        step: bottomght,
+        advance: bottomght,
         shallStop: stopIfOpponent,
-        flags: flags.capture,
+        flag: flags.capture,
         rejectMove,
       },
       {
-        step: topght,
+        advance: topght,
         shallStop: stopIfOpponent,
-        flags: flags.capture,
+        flag: flags.capture,
         rejectMove,
       },
     ],
     n: [
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x + 2, y: y + 1 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x + 2,
+          y: y + 1,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x + 1, y: y + 2 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x + 1,
+          y: y + 2,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x - 1, y: y + 2 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x - 1,
+          y: y + 2,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x - 2, y: y + 1 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x - 2,
+          y: y + 1,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x - 2, y: y - 1 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x - 2,
+          y: y - 1,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x - 1, y: y - 2 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x - 1,
+          y: y - 2,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x + 1, y: y - 2 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x + 1,
+          y: y - 2,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x + 2, y: y - 1 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x + 2,
+          y: y - 1,
+        }),
         shallStop: lte(1),
         rejectMove,
       },
     ],
     b: [
-      { step: bottomght, shallStop: F, rejectMove },
-      { step: topght, shallStop: F, rejectMove },
-      { step: topLeft, shallStop: F, rejectMove },
-      { step: bottomLeft, shallStop: F, rejectMove },
+      { advance: bottomght, shallStop: F, rejectMove },
+      { advance: topght, shallStop: F, rejectMove },
+      { advance: topLeft, shallStop: F, rejectMove },
+      { advance: bottomLeft, shallStop: F, rejectMove },
     ],
     r: [
-      { step: right, shallStop: F, rejectMove },
-      { step: left, shallStop: F, rejectMove },
-      { step: top, shallStop: F, rejectMove },
-      { step: bottom, shallStop: F, rejectMove },
+      { advance: right, shallStop: F, rejectMove },
+      { advance: left, shallStop: F, rejectMove },
+      { advance: top, shallStop: F, rejectMove },
+      { advance: bottom, shallStop: F, rejectMove },
     ],
     q: [
-      { step: right, shallStop: F, rejectMove },
-      { step: left, shallStop: F, rejectMove },
-      { step: top, shallStop: F, rejectMove },
-      { step: bottom, shallStop: F, rejectMove },
-      { step: bottomght, shallStop: F, rejectMove },
-      { step: topght, shallStop: F, rejectMove },
-      { step: topLeft, shallStop: F, rejectMove },
-      { step: bottomLeft, shallStop: F, rejectMove },
+      { advance: right, shallStop: F, rejectMove },
+      { advance: left, shallStop: F, rejectMove },
+      { advance: top, shallStop: F, rejectMove },
+      { advance: bottom, shallStop: F, rejectMove },
+      { advance: bottomght, shallStop: F, rejectMove },
+      { advance: topght, shallStop: F, rejectMove },
+      { advance: topLeft, shallStop: F, rejectMove },
+      { advance: bottomLeft, shallStop: F, rejectMove },
     ],
     k: [],
     K: [],
     P: [
       {
-        step: top,
-        shallStop: (count: number, _: any, start: Coordinates) => {
-          if (start.y < 6 && count >= 1) return true;
-          if (start.y === 6 && count >= 2) return true;
+        advance: top,
+        shallStop: ({ step, origin }: MoveState) => {
+          if (origin.y < 6 && step >= 1) return true;
+          if (origin.y === 6 && step >= 2) return true;
+          return false;
         },
         rejectMove,
       },
       {
-        step: bottomLeft,
+        advance: bottomLeft,
         shallStop: stopIfOpponent,
-        flags: flags.capture,
+        flag: flags.capture,
         rejectMove,
       },
       {
-        step: ({ x, y }: Coordinates): Coordinates => ({ x: x - 1, y: y - 1 }),
+        advance: ({ x, y }: Coordinates): Coordinates => ({
+          x: x - 1,
+          y: y - 1,
+        }),
         shallStop: stopIfOpponent,
-        flags: flags.capture,
+        flag: flags.capture,
         rejectMove,
       },
     ],

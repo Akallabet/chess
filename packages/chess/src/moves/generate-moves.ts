@@ -4,37 +4,56 @@ import { flags, modesList } from '../constants.js';
 import { modesMap } from '../modes.js';
 import { InternalState, Move } from '../types.js';
 import { areOpponents, isActiveColorPiece } from '../utils/index.js';
-import { getPatternsForMoves, getPatternsForLegalMoves } from './patterns.js';
+import {
+  getPatternsForMoves,
+  getPatternsForLegalMoves,
+  Pattern,
+} from './patterns.js';
 
-const isNotInvalid = move => !move.invalid;
-const deleteInvalid = move => {
+interface MovePattern extends Move {
+  invalid?: boolean;
+}
+
+const isNotInvalid = (move: MovePattern): boolean => !move.invalid;
+const removeInvalidProp = (move: MovePattern): MovePattern => {
   delete move.invalid;
   return move;
 };
 
-const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
+const generateMovesFromPatterns = ({
+  patterns,
+  origin,
+  state,
+  moves = [],
+}: {
+  patterns: Array<Pattern>;
+  origin: Coordinates;
+  state: InternalState;
+  moves: Array<MovePattern>;
+}) => {
   for (let i = 0; i < patterns.length; i++) {
-    const { step, shallStop, flag, rejectMove } = patterns[i];
-    let proceed = true;
-    let stepsCount = 0;
+    const { advance, shallStop, flag, rejectMove } = patterns[i];
+    const proceed = true;
+    let step = 0;
     let prevMove = { coord: origin };
     while (proceed) {
-      const currentCoord = step(prevMove.coord, state);
+      const current = advance(prevMove.coord);
       if (
-        currentCoord.y >= state.board.length ||
-        currentCoord.x >= state.board[0].length ||
-        currentCoord.y < 0 ||
-        currentCoord.x < 0
+        current.y >= state.board.length ||
+        current.x >= state.board[0].length ||
+        current.y < 0 ||
+        current.x < 0
       )
         break;
-      if (shallStop(stepsCount, currentCoord, origin, state)) break;
-      const invalid = rejectMove(origin, state, currentCoord);
+      if (shallStop({ step, current, origin, state })) break;
+      const invalid = rejectMove({ step, origin, state, current });
 
-      const cell = state.board[currentCoord.y][currentCoord.x];
+      const cell = state.board[current.y][current.x];
       if (cell.piece) {
         if (areOpponents(cell.piece, state.board[origin.y][origin.x].piece)) {
           moves.push({
-            coord: currentCoord,
+            origin,
+            coord: current,
             flags: { [flag || flags.capture]: true },
             invalid,
           });
@@ -42,17 +61,18 @@ const generateMovesFromPatterns = ({ patterns, origin, state, moves = [] }) => {
         break;
       }
       moves.push({
-        coord: currentCoord,
+        origin,
+        coord: current,
         flags: {
           [flag || flags.move]: true,
         },
         invalid,
       });
-      stepsCount++;
+      step++;
       prevMove = moves[moves.length - 1];
     }
   }
-  return moves.filter(isNotInvalid).map(deleteInvalid);
+  return moves.filter(isNotInvalid).map(removeInvalidProp);
 };
 
 export const generateMoves = (
@@ -89,12 +109,7 @@ export function generateLegalMoves(
     state,
     origin: { ...coord },
     moves: [],
-  })
-    .map(addCheckFlag(coord, state))
-    .map(move => {
-      move.origin = coord;
-      return move;
-    });
+  }).map(addCheckFlag(coord, state));
   return moves;
 }
 

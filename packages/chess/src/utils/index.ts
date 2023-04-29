@@ -34,7 +34,7 @@ export const getPieceCoord = (piece: string, board: ChessBoardType) => {
 export const isAddress = addr => new RegExp(/([a-h]+[1-9]+)/).test(addr);
 
 export const fromPositionToCoordinates = (pos: Address | Coordinates) => {
-  if (isAddress(pos)) {
+  if (typeof pos === 'string' && isAddress(pos)) {
     const [file, rank] = pos.split('');
     return {
       x: files.indexOf(file),

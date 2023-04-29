@@ -5,12 +5,12 @@ export interface Coordinates {
   y: number;
 }
 
-type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+type Rank = number; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type File = string; // 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 export type Files = File[];
 export type Ranks = Rank[];
 
-export type Address = `${string & keyof File}${string & keyof Rank}`;
+export type Address = string;
 export type Position = Coordinates | Address;
 
 export interface EmptySquare {

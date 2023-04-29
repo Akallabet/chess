@@ -1,7 +1,6 @@
-import { Coordinates } from '../chess.js';
 import { flags, modesList } from '../constants.js';
 import { modesMap } from '../modes.js';
-import { InternalState, Move } from '../types.js';
+import { Coordinates, InternalState, Move } from '../types.js';
 import { areOpponents, isActiveColorPiece } from '../utils/index.js';
 import {
   getPatternsForMoves,

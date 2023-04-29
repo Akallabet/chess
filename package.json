@@ -6,6 +6,7 @@
     "test": "npm test --workspace=@chess/chess",
     "test:only": "npm run test:only --workspace=@chess/chess",
     "tap": "tap",
+    "build:chess": "npm run build --workspace=@chess/chess",
     "build": "npm run build --workspace=@chess/chessboard",
     "dev": "npm run dev --workspace=@chess/chessboard",
     "dev:backup": "npm run dev --workspace=@chess/chessboard-backup",

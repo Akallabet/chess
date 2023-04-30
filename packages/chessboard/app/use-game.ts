@@ -1,43 +1,44 @@
 import { useEffect, useState } from 'react';
-import chess from '@chess/chess';
-import type { Position, GameMode, ChessStateOutput } from '@chess/chess';
+import type { Address, ChessState, GameMode } from '@chess/chess';
+import { start, move, clear, highlight } from '@chess/chess';
 
 type GameAction = (
-  pos: Position,
-  meta: { piece: String; move: Boolean; capture: Boolean }
+  pos: Address,
+  meta: { piece: string; move: boolean; capture: boolean }
 ) => void;
 
-type GameOutput =
-  | (ChessStateOutput & {
-      action: GameAction;
-    })
-  | undefined;
+interface GameOutput extends ChessState {
+  action: GameAction;
+}
 
-export const useGame = (FEN: string, mode: GameMode): GameOutput => {
-  const [game, setGame] = useState<undefined | ChessStateOutput>();
-  const [selected, setSelected] = useState<undefined | Position>();
+export const useGame = (
+  FEN: string,
+  mode: GameMode
+): GameOutput | undefined => {
+  const [game, setGame] = useState<undefined | ChessState>();
+  const [selected, setSelected] = useState<undefined | Address>();
 
   useEffect(() => {
-    setGame(chess('start', { mode, FEN }));
+    setGame(start({ mode, FEN }));
   }, [FEN, mode]);
 
   if (!game) return undefined;
 
   return {
     ...game,
-    action: (addr, { piece, move, capture }) => {
-      if (selected && (capture || move)) {
-        setGame(chess('move', selected, addr, game));
+    action: (addr, { piece, move: moveType, capture }) => {
+      if (selected && (capture || moveType)) {
+        setGame(move(selected, addr, game));
         setSelected(undefined);
         return;
       }
       if (!piece) {
-        setGame(chess('clear', game));
+        setGame(clear(game));
         setSelected(undefined);
         return;
       }
       if (piece) {
-        setGame(chess('highlight', addr, game));
+        setGame(highlight(addr, game));
         setSelected(addr);
         return;
       }

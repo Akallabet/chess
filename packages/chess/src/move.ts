@@ -4,6 +4,7 @@ import { clearBoard } from './clear-board.js';
 import { fromPositionToCoordinates } from './utils/index.js';
 import { createMovesBoard } from './moves/index.js';
 import {
+  Address,
   ChessBoardType,
   ChessState,
   Coordinates,
@@ -49,8 +50,8 @@ export const moveAndUpdateState = (
 };
 
 export const move = (
-  origin: Coordinates,
-  target: Coordinates,
+  origin: Coordinates | Address,
+  target: Coordinates | Address,
   initialState: ChessState
 ) => {
   const state = moveAndUpdateState(

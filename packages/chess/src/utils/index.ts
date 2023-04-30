@@ -14,12 +14,13 @@ export const isOpponentPiece = (color: string, piece: string): boolean =>
   (isActiveColorBlack(color) && isWhitePiece(piece));
 export const isActiveColorPiece = R.complement(isOpponentPiece);
 
-export const areOpponents = (pa, pb) =>
+export const areOpponents = (pa: string, pb: string) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));
 
-export const getPieceColor = piece => (isWhitePiece(piece) ? 'w' : 'b');
-export const getKingPiece = ({ activeColor }) =>
+export const getPieceColor = (piece: string) =>
+  isWhitePiece(piece) ? 'w' : 'b';
+export const getKingPiece = ({ activeColor }: { activeColor: string }) =>
   activeColor === 'w' ? 'K' : 'k';
 
 export const getPieceCoord = (piece: string, board: ChessBoardType) => {
@@ -31,7 +32,8 @@ export const getPieceCoord = (piece: string, board: ChessBoardType) => {
 };
 // export const isAddress = addr =>
 //   new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(addr);
-export const isAddress = addr => new RegExp(/([a-h]+[1-9]+)/).test(addr);
+export const isAddress = (addr: Address) =>
+  new RegExp(/([a-h]+[1-9]+)/).test(addr);
 
 export const fromPositionToCoordinates = (pos: Address | Coordinates) => {
   if (typeof pos === 'string' && isAddress(pos)) {
@@ -52,14 +54,6 @@ export const isCellEmpty = R.curry((state, { y, x }) =>
 
 export const isCellOccupied = R.curry((state, { y, x }) =>
   R.hasPath([y, x, 'piece'], state.board)
-);
-
-export const areCellsEmpty = R.curry((state, cells) =>
-  R.all(
-    ({ y, x }) =>
-      isCellEmpty(state, getPieceColor(R.path([y, x, 'piece'], state.board))),
-    cells
-  )
 );
 
 export const anyCellOccupied = R.curry((state, cells) =>

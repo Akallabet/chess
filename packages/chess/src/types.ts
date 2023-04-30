@@ -1,5 +1,6 @@
-import { modesList } from './constants.js';
+import { modesList, piecesMap } from './constants.js';
 
+const piecesList = Object.keys(piecesMap);
 export interface Coordinates {
   x: number;
   y: number;
@@ -9,6 +10,8 @@ type Rank = number; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 type File = string; // 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 export type Files = File[];
 export type Ranks = Rank[];
+
+export type Piece = (typeof piecesList)[number];
 
 export type Address = string;
 export type Position = Coordinates | Address;
@@ -20,7 +23,7 @@ export interface EmptySquare {
 }
 
 export interface Square extends EmptySquare {
-  piece?: string;
+  piece?: Piece;
   selected?: boolean;
 }
 

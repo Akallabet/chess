@@ -2,7 +2,6 @@ import t from 'tap';
 import { fromFEN } from '../../src/fen/index.js';
 import {
   anyCellOccupied,
-  areCellsEmpty,
   getPieceCoord,
   isActiveColorPiece,
   isCellEmpty,
@@ -52,20 +51,6 @@ t.test('Cell is occupied', t => {
   const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
   const state = fromFEN(FEN);
   t.same(isCellOccupied(state, { x: 3, y: 2 }), true);
-  t.end();
-});
-
-t.test('List of cells are all empty', t => {
-  const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
-  const state = fromFEN(FEN);
-  t.same(
-    areCellsEmpty(state, [
-      { x: 3, y: 0 },
-      { x: 2, y: 0 },
-      { x: 3, y: 5 },
-    ]),
-    true
-  );
   t.end();
 });
 

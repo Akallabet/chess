@@ -6,6 +6,7 @@ import {
   getPatternsForMoves,
   getPatternsForLegalMoves,
   Pattern,
+  patterns,
 } from './patterns.js';
 
 interface MovePattern extends Move {
@@ -48,7 +49,12 @@ const generateMovesFromPatterns = ({
 
       const cell = state.board[current.y][current.x];
       if (cell.piece) {
-        if (areOpponents(cell.piece, state.board[origin.y][origin.x].piece)) {
+        if (
+          areOpponents(
+            cell.piece,
+            state.board[origin.y][origin.x].piece as string
+          )
+        ) {
           moves.push({
             origin,
             coord: current,
@@ -81,9 +87,11 @@ export const generateMoves = (
 
   if (!piece) return [];
 
-  const patterns = getPatternsForMoves();
+  const allPatterns = getPatternsForMoves();
+  const patterns = allPatterns[piece] || allPatterns[piece.toLowerCase()];
+
   const moves = generateMovesFromPatterns({
-    patterns: patterns[piece] || patterns[piece.toLowerCase()],
+    patterns,
     state,
     origin: coord,
     moves: [],
@@ -95,20 +103,22 @@ export function generateLegalMoves(
   origin: Coordinates,
   state: InternalState
 ): Array<Move> {
-  const { addCheckFlag } = modesMap[state.mode || modesList[0]];
+  const { addCheckFlag, rejectMove } = modesMap[state.mode || modesList[0]];
   const { piece } = state.board[origin.y][origin.x];
 
   if (!piece) return [];
 
-  const allPatterns = getPatternsForLegalMoves(state);
-  const patterns = allPatterns[piece] || allPatterns[piece.toLowerCase()];
+  // const allPatterns = getPatternsForLegalMoves(rejectMove);
+  // const patterns = allPatterns[piece] || allPatterns[piece.toLowerCase()];
 
   const moves = generateMovesFromPatterns({
-    patterns,
+    patterns:
+      patterns[state.mode || modesList[0]][piece] ||
+      patterns[state.mode || modesList[0]][piece.toLowerCase()],
     state,
     origin,
     moves: [],
-  }).map(addCheckFlag(origin, state));
+  }).map(move => addCheckFlag({ origin, state, move }));
 
   return moves;
 }

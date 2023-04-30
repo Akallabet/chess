@@ -1,11 +1,9 @@
 import { performance } from 'node:perf_hooks';
-import { createMovesBoard } from '../src/moves/index.js';
-import { start } from '../src/start.js';
+import { start } from '../dist/start.js';
 
 function generateMoves(FEN) {
-  const state = start({ FEN });
   performance.measure('generateLegalMoves');
-  createMovesBoard(state);
+  start({ FEN });
   console.log(performance.measure('generateLegalMoves'));
 }
 

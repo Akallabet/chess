@@ -261,7 +261,7 @@ t.test('Highlight King moves', t => {
   t.end();
 });
 
-t.test('Highligh moves with king under check', t => {
+t.only('Highligh moves with king under check', t => {
   const expected = [{ coord: { x: 3, y: 3 }, flags: { move: true } }];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   const origin = { x: 3, y: 1 };

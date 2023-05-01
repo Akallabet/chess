@@ -1,4 +1,4 @@
-import { flags, modes } from '../constants.js';
+import { flags } from '../constants.js';
 import { Coordinates, MoveState } from '../types.js';
 
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
@@ -130,51 +130,7 @@ export interface Pattern extends BasePattern {
   rejectMove: (args: MoveState) => boolean;
 }
 
-// type PiecesPatterns = Record<string, Array<Pattern>>;
-//
-// export function getPatternsForLegalMoves(
-//   rejectMove: (args: MoveState) => boolean
-// ): PiecesPatterns {
-//   const kingMoves = [
-//     { advance: top, shallStop: shouldKingStop, rejectMove: F },
-//     { advance: bottom, shallStop: shouldKingStop, rejectMove: F },
-//     { advance: bottomght, shallStop: shouldKingStop, rejectMove: F },
-//     { advance: topght, shallStop: shouldKingStop, rejectMove: F },
-//     { advance: topLeft, shallStop: shouldKingStop, rejectMove: F },
-//     { advance: bottomLeft, shallStop: shouldKingStop, rejectMove: F },
-//   ];
-//   const patterns = getPatterns(rejectMove);
-//   patterns.k = kingMoves.concat([
-//     { advance: right, shallStop: kingsideCastlingMove(0), rejectMove: F },
-//     { advance: left, shallStop: queensideCastlingMove(0), rejectMove: F },
-//   ]);
-//   patterns.K = kingMoves.concat([
-//     { advance: right, shallStop: kingsideCastlingMove(7), rejectMove: F },
-//     { advance: left, shallStop: queensideCastlingMove(7), rejectMove: F },
-//   ]);
-//   return patterns;
-// }
-//
-// export function getPatternsForMoves(): PiecesPatterns {
-//   const kingMoves = [
-//     { advance: right, shallStop: lte(1), rejectMove: F },
-//     { advance: left, shallStop: lte(1), rejectMove: F },
-//     { advance: top, shallStop: lte(1), rejectMove: F },
-//     { advance: bottom, shallStop: lte(1), rejectMove: F },
-//     { advance: bottomght, shallStop: lte(1), rejectMove: F },
-//     { advance: topght, shallStop: lte(1), rejectMove: F },
-//     { advance: topLeft, shallStop: lte(1), rejectMove: F },
-//     { advance: bottomLeft, shallStop: lte(1), rejectMove: F },
-//   ];
-//
-//   const patterns = getPatterns(F);
-//   patterns.k = kingMoves;
-//   patterns.K = kingMoves;
-//
-//   return patterns;
-// }
-
-const basePatterns = {
+const basePatterns: Record<string, Array<BasePattern>> = {
   p: [
     {
       advance: bottom,
@@ -342,172 +298,73 @@ function addRejection(fn: (args: MoveState) => boolean) {
     rejectMove: fn,
   });
 }
+const addProp =
+  <K extends string, T>(prop: K, value: T) =>
+  <U>(obj: U) => ({
+    ...obj,
+    [prop]: value,
+  });
 
-export const patterns = {
+const identity = <T>(x: T): T => x;
+
+export const patterns: Record<string, Record<string, Array<Pattern>>> = {
   standard: {
     p: basePatterns.p.map(addRejection(isKingUnderAttack)),
     P: basePatterns.P.map(addRejection(isKingUnderAttack)),
     r: basePatterns.r.map(addRejection(isKingUnderAttack)),
+    R: basePatterns.r.map(addRejection(isKingUnderAttack)),
     b: basePatterns.b.map(addRejection(isKingUnderAttack)),
+    B: basePatterns.b.map(addRejection(isKingUnderAttack)),
     n: basePatterns.n.map(addRejection(isKingUnderAttack)),
+    N: basePatterns.n.map(addRejection(isKingUnderAttack)),
     q: basePatterns.q.map(addRejection(isKingUnderAttack)),
-    k: basePatterns.k.map(addRejection(isKingUnderAttack)),
-    K: basePatterns.K.map(addRejection(isKingUnderAttack)),
+    Q: basePatterns.q.map(addRejection(isKingUnderAttack)),
+    k: basePatterns.k.map(addRejection(F)),
+    K: basePatterns.K.map(addRejection(F)),
   },
   demo: {
     p: basePatterns.p.map(addRejection(F)),
     P: basePatterns.P.map(addRejection(F)),
     r: basePatterns.r.map(addRejection(F)),
+    R: basePatterns.r.map(addRejection(F)),
     b: basePatterns.b.map(addRejection(F)),
+    B: basePatterns.b.map(addRejection(F)),
     n: basePatterns.n.map(addRejection(F)),
+    N: basePatterns.n.map(addRejection(F)),
     q: basePatterns.q.map(addRejection(F)),
+    Q: basePatterns.q.map(addRejection(F)),
     k: basePatterns.k.map(addRejection(F)),
     K: basePatterns.K.map(addRejection(F)),
   },
 };
 
-// export function getPatterns(
-//   rejectMove: (args: MoveState) => boolean
-// ): PiecesPatterns {
-//   return {
-//     p: [
-//       {
-//         advance: bottom,
-//         shallStop: ({ step, origin }: MoveState) => {
-//           if (origin.y > 1 && step >= 1) return true;
-//           if (origin.y === 1 && step >= 2) return true;
-//           return false;
-//         },
-//         rejectMove,
-//       },
-//       {
-//         advance: bottomght,
-//         shallStop: stopIfOpponent,
-//         flag: flags.capture,
-//         rejectMove,
-//       },
-//       {
-//         advance: topght,
-//         shallStop: stopIfOpponent,
-//         flag: flags.capture,
-//         rejectMove,
-//       },
-//     ],
-//     n: [
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x + 2,
-//           y: y + 1,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x + 1,
-//           y: y + 2,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x - 1,
-//           y: y + 2,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x - 2,
-//           y: y + 1,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x - 2,
-//           y: y - 1,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x - 1,
-//           y: y - 2,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x + 1,
-//           y: y - 2,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x + 2,
-//           y: y - 1,
-//         }),
-//         shallStop: lte(1),
-//         rejectMove,
-//       },
-//     ],
-//     b: [
-//       { advance: bottomght, shallStop: F, rejectMove },
-//       { advance: topght, shallStop: F, rejectMove },
-//       { advance: topLeft, shallStop: F, rejectMove },
-//       { advance: bottomLeft, shallStop: F, rejectMove },
-//     ],
-//     r: [
-//       { advance: right, shallStop: F, rejectMove },
-//       { advance: left, shallStop: F, rejectMove },
-//       { advance: top, shallStop: F, rejectMove },
-//       { advance: bottom, shallStop: F, rejectMove },
-//     ],
-//     q: [
-//       { advance: right, shallStop: F, rejectMove },
-//       { advance: left, shallStop: F, rejectMove },
-//       { advance: top, shallStop: F, rejectMove },
-//       { advance: bottom, shallStop: F, rejectMove },
-//       { advance: bottomght, shallStop: F, rejectMove },
-//       { advance: topght, shallStop: F, rejectMove },
-//       { advance: topLeft, shallStop: F, rejectMove },
-//       { advance: bottomLeft, shallStop: F, rejectMove },
-//     ],
-//     k: [],
-//     K: [],
-//     P: [
-//       {
-//         advance: top,
-//         shallStop: ({ step, origin }: MoveState) => {
-//           if (origin.y < 6 && step >= 1) return true;
-//           if (origin.y === 6 && step >= 2) return true;
-//           return false;
-//         },
-//         rejectMove,
-//       },
-//       {
-//         advance: bottomLeft,
-//         shallStop: stopIfOpponent,
-//         flag: flags.capture,
-//         rejectMove,
-//       },
-//       {
-//         advance: ({ x, y }: Coordinates): Coordinates => ({
-//           x: x - 1,
-//           y: y - 1,
-//         }),
-//         shallStop: stopIfOpponent,
-//         flag: flags.capture,
-//         rejectMove,
-//       },
-//     ],
-//   };
-// }
+export const patternsCheck: Record<string, Record<string, Array<Pattern>>> = {
+  standard: {
+    p: patterns.demo.p.map(identity),
+    P: patterns.demo.P.map(identity),
+    r: patterns.demo.r.map(identity),
+    R: patterns.demo.r.map(identity),
+    b: patterns.demo.b.map(identity),
+    B: patterns.demo.b.map(identity),
+    n: patterns.demo.n.map(identity),
+    N: patterns.demo.n.map(identity),
+    q: patterns.demo.q.map(identity),
+    Q: patterns.demo.q.map(identity),
+    k: patterns.standard.k.map(addProp('shallStop', lte(1))),
+    K: patterns.standard.K.map(addProp('shallStop', lte(1))),
+  },
+  demo: {
+    p: patterns.demo.p.map(identity),
+    P: patterns.demo.P.map(identity),
+    r: patterns.demo.r.map(identity),
+    R: patterns.demo.r.map(identity),
+    b: patterns.demo.b.map(identity),
+    B: patterns.demo.b.map(identity),
+    n: patterns.demo.n.map(identity),
+    N: patterns.demo.n.map(identity),
+    q: patterns.demo.q.map(identity),
+    Q: patterns.demo.q.map(identity),
+    k: patterns.standard.k.map(addProp('shallStop', lte(1))),
+    K: patterns.standard.K.map(addProp('shallStop', lte(1))),
+  },
+};

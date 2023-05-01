@@ -7,6 +7,7 @@ import {
   getPatternsForLegalMoves,
   Pattern,
   patterns,
+  patternsCheck,
 } from './patterns.js';
 
 interface MovePattern extends Move {
@@ -87,11 +88,12 @@ export const generateMoves = (
 
   if (!piece) return [];
 
-  const allPatterns = getPatternsForMoves();
-  const patterns = allPatterns[piece] || allPatterns[piece.toLowerCase()];
+  const mode = state.mode || modesList[0];
+
+  const piecesPatterns = patternsCheck[mode][piece as string];
 
   const moves = generateMovesFromPatterns({
-    patterns,
+    patterns: piecesPatterns,
     state,
     origin: coord,
     moves: [],
@@ -103,18 +105,14 @@ export function generateLegalMoves(
   origin: Coordinates,
   state: InternalState
 ): Array<Move> {
-  const { addCheckFlag, rejectMove } = modesMap[state.mode || modesList[0]];
+  const { addCheckFlag } = modesMap[state.mode || modesList[0]];
   const { piece } = state.board[origin.y][origin.x];
 
   if (!piece) return [];
-
-  // const allPatterns = getPatternsForLegalMoves(rejectMove);
-  // const patterns = allPatterns[piece] || allPatterns[piece.toLowerCase()];
+  const mode = state.mode || modesList[0];
 
   const moves = generateMovesFromPatterns({
-    patterns:
-      patterns[state.mode || modesList[0]][piece] ||
-      patterns[state.mode || modesList[0]][piece.toLowerCase()],
+    patterns: patterns[mode][piece as string],
     state,
     origin,
     moves: [],

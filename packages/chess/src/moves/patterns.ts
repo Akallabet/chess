@@ -14,6 +14,16 @@ import {
 import { errorCodes } from 'src/error-codes.js';
 import { moveAndUpdateState } from 'src/move.js';
 
+const addProp =
+  <T, K extends string>(prop: K, value: T) =>
+  <U>(obj: U): U & Record<K, T> =>
+    ({
+      ...obj,
+      [prop]: value,
+    } as U & Record<K, T>);
+
+const identity = <T>(x: T): T => x;
+
 const F = () => false;
 
 const lte =
@@ -292,49 +302,34 @@ const isKingUnderAttack = ({
   return isUnderCheck;
 };
 
-function addRejection(fn: (args: MoveState) => boolean) {
-  return (pattern: BasePattern): Pattern => ({
-    ...pattern,
-    rejectMove: fn,
-  });
-}
-const addProp =
-  <K extends string, T>(prop: K, value: T) =>
-  <U>(obj: U) => ({
-    ...obj,
-    [prop]: value,
-  });
-
-const identity = <T>(x: T): T => x;
-
 export const patterns: Record<string, Record<string, Array<Pattern>>> = {
   standard: {
-    p: basePatterns.p.map(addRejection(isKingUnderAttack)),
-    P: basePatterns.P.map(addRejection(isKingUnderAttack)),
-    r: basePatterns.r.map(addRejection(isKingUnderAttack)),
-    R: basePatterns.r.map(addRejection(isKingUnderAttack)),
-    b: basePatterns.b.map(addRejection(isKingUnderAttack)),
-    B: basePatterns.b.map(addRejection(isKingUnderAttack)),
-    n: basePatterns.n.map(addRejection(isKingUnderAttack)),
-    N: basePatterns.n.map(addRejection(isKingUnderAttack)),
-    q: basePatterns.q.map(addRejection(isKingUnderAttack)),
-    Q: basePatterns.q.map(addRejection(isKingUnderAttack)),
-    k: basePatterns.k.map(addRejection(F)),
-    K: basePatterns.K.map(addRejection(F)),
+    p: basePatterns.p.map(addProp('rejectMove', isKingUnderAttack)),
+    P: basePatterns.P.map(addProp('rejectMove', isKingUnderAttack)),
+    r: basePatterns.r.map(addProp('rejectMove', isKingUnderAttack)),
+    R: basePatterns.r.map(addProp('rejectMove', isKingUnderAttack)),
+    b: basePatterns.b.map(addProp('rejectMove', isKingUnderAttack)),
+    B: basePatterns.b.map(addProp('rejectMove', isKingUnderAttack)),
+    n: basePatterns.n.map(addProp('rejectMove', isKingUnderAttack)),
+    N: basePatterns.n.map(addProp('rejectMove', isKingUnderAttack)),
+    q: basePatterns.q.map(addProp('rejectMove', isKingUnderAttack)),
+    Q: basePatterns.q.map(addProp('rejectMove', isKingUnderAttack)),
+    k: basePatterns.k.map(addProp('rejectMove', F)),
+    K: basePatterns.K.map(addProp('rejectMove', F)),
   },
   demo: {
-    p: basePatterns.p.map(addRejection(F)),
-    P: basePatterns.P.map(addRejection(F)),
-    r: basePatterns.r.map(addRejection(F)),
-    R: basePatterns.r.map(addRejection(F)),
-    b: basePatterns.b.map(addRejection(F)),
-    B: basePatterns.b.map(addRejection(F)),
-    n: basePatterns.n.map(addRejection(F)),
-    N: basePatterns.n.map(addRejection(F)),
-    q: basePatterns.q.map(addRejection(F)),
-    Q: basePatterns.q.map(addRejection(F)),
-    k: basePatterns.k.map(addRejection(F)),
-    K: basePatterns.K.map(addRejection(F)),
+    p: basePatterns.p.map(addProp('rejectMove', F)),
+    P: basePatterns.P.map(addProp('rejectMove', F)),
+    r: basePatterns.r.map(addProp('rejectMove', F)),
+    R: basePatterns.r.map(addProp('rejectMove', F)),
+    b: basePatterns.b.map(addProp('rejectMove', F)),
+    B: basePatterns.b.map(addProp('rejectMove', F)),
+    n: basePatterns.n.map(addProp('rejectMove', F)),
+    N: basePatterns.n.map(addProp('rejectMove', F)),
+    q: basePatterns.q.map(addProp('rejectMove', F)),
+    Q: basePatterns.q.map(addProp('rejectMove', F)),
+    k: basePatterns.k.map(addProp('rejectMove', F)),
+    K: basePatterns.K.map(addProp('rejectMove', F)),
   },
 };
 

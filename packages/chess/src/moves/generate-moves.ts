@@ -2,13 +2,7 @@ import { flags, modesList } from '../constants.js';
 import { modesMap } from '../modes.js';
 import { Coordinates, InternalState, Move } from '../types.js';
 import { areOpponents, isActiveColorPiece } from '../utils/index.js';
-import {
-  getPatternsForMoves,
-  getPatternsForLegalMoves,
-  Pattern,
-  patterns,
-  patternsCheck,
-} from './patterns.js';
+import { Pattern, patterns, patternsCheck } from './patterns.js';
 
 interface MovePattern extends Move {
   invalid?: boolean;
@@ -30,7 +24,7 @@ const generateMovesFromPatterns = ({
   origin: Coordinates;
   state: InternalState;
   moves: Array<MovePattern>;
-}) => {
+}): Array<Move> => {
   for (let i = 0; i < patterns.length; i++) {
     const { advance, shallStop, flag, rejectMove } = patterns[i];
     const proceed = true;

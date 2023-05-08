@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import type { Position, ChessStateOutput } from '@chess/chess';
+import type { ChessState } from '@chess/chess';
 import Bishop from './bishop';
 import King from './king';
 import Knight from './knight';
@@ -7,6 +7,7 @@ import Pawn from './pawn';
 import Queen from './queen';
 import Rook from './rook';
 import { FENForm } from '../fen';
+import type { GameAction } from '~/use-game';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
@@ -39,11 +40,8 @@ const Piece = ({
   return <Component fill={fill} stroke={stroke} />;
 };
 
-type ChessBoardProps = ChessStateOutput & {
-  onCellClick: (
-    addr: Position,
-    { piece, move, capture }: { piece: String; move: Boolean; capture: Boolean }
-  ) => void;
+type ChessBoardProps = ChessState & {
+  onCellClick: GameAction;
 };
 
 export const ChessBoard = ({
@@ -82,7 +80,7 @@ export const ChessBoard = ({
                   onClick={handleClick}
                 >
                   {j === 0 && (
-                    <span className="leading-1 absolute top-0 left-0.5 text-xs">
+                    <span className="leading-1 absolute left-0.5 top-0 text-xs">
                       {ranks[i]}
                     </span>
                   )}

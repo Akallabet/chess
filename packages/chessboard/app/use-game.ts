@@ -2,9 +2,13 @@ import { useEffect, useState } from 'react';
 import type { Address, ChessState, GameMode } from '@chess/chess';
 import { start, move, clear, highlight } from '@chess/chess';
 
-type GameAction = (
+export type GameAction = (
   pos: Address,
-  meta: { piece: string; move: boolean; capture: boolean }
+  meta: {
+    piece: string | undefined;
+    move: boolean | undefined;
+    capture: boolean | undefined;
+  }
 ) => void;
 
 interface GameOutput extends ChessState {

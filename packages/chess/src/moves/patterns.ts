@@ -11,8 +11,8 @@ import {
   getPieceCoord,
   getKingPiece,
 } from '../utils/index.js';
+import { moveAndUpdateState } from './move-and-update-state.js';
 import { errorCodes } from 'src/error-codes.js';
-import { moveAndUpdateState } from 'src/move.js';
 
 const addProp =
   <T, K extends string>(prop: K, value: T) =>

@@ -1,12 +1,15 @@
-import * as R from 'ramda';
 import { errorCodes } from './error-codes.js';
+import { Address, ChessState } from './types.js';
 import { fromPositionToCoordinates } from './utils/index.js';
 
-export const highlightMoves = (addr, state) => {
+export const highlightMoves = (
+  addr: Address,
+  state: ChessState
+): ChessState => {
   const coord = fromPositionToCoordinates(addr);
-  const hasNoPiece = !R.hasPath([coord.y, coord.x, 'piece'], state.board);
 
-  if (hasNoPiece) throw new Error(errorCodes.no_piece_selected);
+  if (!state.board[coord.y][coord.x].piece)
+    throw new Error(errorCodes.no_piece_selected);
 
   const { board, movesBoard } = state;
 

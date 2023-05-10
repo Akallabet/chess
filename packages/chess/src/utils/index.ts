@@ -1,26 +1,29 @@
 import * as R from 'ramda';
 import { errorCodes } from '../error-codes.js';
 import { files, ranks } from '../constants.js';
-export { rotate } from './rotate.js';
+import { Address, ChessBoardType, Coordinates } from '../types.js';
 
-export const isWhitePiece = piece => new RegExp(/[PNBRQK]+/).test(piece);
-export const isBlackPiece = piece => new RegExp(/[pnbrqk]+/).test(piece);
-export const isActiveColorWhite = activeColor => activeColor === 'w';
-export const isActiveColorBlack = activeColor => activeColor === 'b';
-export const isOpponentPiece = (activeColor, piece) =>
-  (isActiveColorWhite(activeColor) && isBlackPiece(piece)) ||
-  (isActiveColorBlack(activeColor) && isWhitePiece(piece));
+export const isWhitePiece = (piece: string): boolean =>
+  new RegExp(/[PNBRQK]+/).test(piece);
+export const isBlackPiece = (piece: string): boolean =>
+  new RegExp(/[pnbrqk]+/).test(piece);
+export const isActiveColorWhite = (color: string): boolean => color === 'w';
+export const isActiveColorBlack = (color: string): boolean => color === 'b';
+export const isOpponentPiece = (color: string, piece: string): boolean =>
+  (isActiveColorWhite(color) && isBlackPiece(piece)) ||
+  (isActiveColorBlack(color) && isWhitePiece(piece));
 export const isActiveColorPiece = R.complement(isOpponentPiece);
 
-export const areOpponents = (pa, pb) =>
+export const areOpponents = (pa: string, pb: string) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));
 
-export const getPieceColor = piece => (isWhitePiece(piece) ? 'w' : 'b');
-export const getKingPiece = ({ activeColor }) =>
+export const getPieceColor = (piece: string) =>
+  isWhitePiece(piece) ? 'w' : 'b';
+export const getKingPiece = ({ activeColor }: { activeColor: string }) =>
   activeColor === 'w' ? 'K' : 'k';
 
-export const getPieceCoord = (piece, board) => {
+export const getPieceCoord = (piece: string, board: ChessBoardType) => {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (R.pathEq([y, x, 'piece'], piece, board)) return { y, x };
@@ -29,11 +32,12 @@ export const getPieceCoord = (piece, board) => {
 };
 // export const isAddress = addr =>
 //   new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(addr);
-export const isAddress = addr => new RegExp(/([a-h]+[1-9]+)/).test(addr);
+export const isAddress = (addr: Address) =>
+  new RegExp(/([a-h]+[1-9]+)/).test(addr);
 
-export const fromPositionToCoordinates = pos => {
-  if (isAddress(pos)) {
-    const [file, rank] = R.split('', pos);
+export const fromPositionToCoordinates = (pos: Address | Coordinates) => {
+  if (typeof pos === 'string' && isAddress(pos)) {
+    const [file, rank] = pos.split('');
     return {
       x: files.indexOf(file),
       y: ranks.indexOf(Number(rank)),
@@ -50,14 +54,6 @@ export const isCellEmpty = R.curry((state, { y, x }) =>
 
 export const isCellOccupied = R.curry((state, { y, x }) =>
   R.hasPath([y, x, 'piece'], state.board)
-);
-
-export const areCellsEmpty = R.curry((state, cells) =>
-  R.all(
-    ({ y, x }) =>
-      isCellEmpty(state, getPieceColor(R.path([y, x, 'piece'], state.board))),
-    cells
-  )
 );
 
 export const anyCellOccupied = R.curry((state, cells) =>

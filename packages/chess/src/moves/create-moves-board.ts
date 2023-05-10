@@ -1,9 +1,10 @@
+import { InternalState, MovesBoardType } from '../types.js';
 import { generateLegalMovesForAllPieces } from './generate-moves.js';
 
-export const createMovesBoard = state => {
+export function createMovesBoard(state: InternalState): MovesBoardType {
   const moves = generateLegalMovesForAllPieces(state);
 
-  const movesBoard = state.board.map(row => {
+  const movesBoard: MovesBoardType = state.board.map(row => {
     return row.map(() => []);
   });
   for (let i = 0; i < moves.length; i++) {
@@ -12,4 +13,4 @@ export const createMovesBoard = state => {
     movesBoard[y][x].push(move);
   }
   return movesBoard;
-};
+}

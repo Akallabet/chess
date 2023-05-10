@@ -1,13 +1,15 @@
 {
-  "include": ["**/*.js", "**/*.ts"],
-  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
-    "lib": ["ES2021"],
+    "lib": ["ESNext", "DOM"],
     "esModuleInterop": true,
-    "moduleResolution": "node16",
-    "target": "ES2019",
+    "moduleResolution": "nodenext",
+    "target": "ESNext",
+    "module": "ESNext",
     "strict": true,
     "allowJs": true,
-    "noEmit": true
+    "outDir": "dist",
+    "declaration": true,
+    "noEmit": false
   }
 }

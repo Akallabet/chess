@@ -1,7 +1,11 @@
 import * as R from 'ramda';
 import { isWhitePiece, isBlackPiece } from '../utils/index.js';
 
-export const getCastlingRights = (king, { castlingRights }) => {
+export const getCastlingRights = (
+  king: string,
+  state: { castlingRights: '-' | string[] }
+) => {
+  const { castlingRights } = state;
   if (!castlingRights.length) return { kingSide: false, queenSide: false };
   if (isWhitePiece(king))
     return {
@@ -14,4 +18,5 @@ export const getCastlingRights = (king, { castlingRights }) => {
       queenSide: R.includes('q', castlingRights),
     };
   }
+  return { kingSide: false, queenSide: false };
 };

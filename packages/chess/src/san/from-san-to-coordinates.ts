@@ -3,6 +3,7 @@ import { files, pieces, piecesMap, ranks } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
 import { generateLegalMoves } from '../moves/generate-moves.js';
 import { getOriginsForTargetCell } from '../moves/is-cell-under-check.js';
+import { InternalState } from '../types.js';
 import { getPieceCoord } from '../utils/index.js';
 
 const filesString = R.join('', files);
@@ -29,7 +30,7 @@ const SANOptions = [
   // ],
   {
     expr: new RegExp(`^[${filesString}]{1}[${ranksString}]{1}$`),
-    parse: (SAN, state) => {
+    parse: (SAN: string, state: InternalState) => {
       const [file, rank] = R.split('', SAN);
       const target = {
         x: R.indexOf(file, files),
@@ -39,7 +40,7 @@ const SANOptions = [
 
       if (origins.length > 1) throw new Error(errorCodes.wrongMove);
 
-      const origin = R.head(origins);
+      const origin = origins[0];
       const piece = R.path([origin.y, origin.x, 'piece'], state.board);
 
       if (piece !== piecesMap.P && piece !== piecesMap.p)
@@ -56,7 +57,7 @@ const SANOptions = [
     expr: new RegExp(
       `^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}[${filesString}]{1}[${ranksString}]{1}$`
     ),
-    parse: SAN => {
+    parse: (SAN: string) => {
       const [piece, fileOrigin, rankOrigin, fileTarget, rankTarget] = R.split(
         '',
         SAN
@@ -76,13 +77,15 @@ const SANOptions = [
   },
   {
     expr: new RegExp(`^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}$`),
-    parse: (SAN, state) => {
+    parse: (SAN: string, state: InternalState) => {
       const [piece, fileTarget, rankTarget] = R.split('', SAN);
       const target = {
         x: R.indexOf(fileTarget, files),
         y: R.indexOf(Number(rankTarget), ranks),
       };
       const origin = getPieceCoord(piece, state.board);
+
+      if (!origin) throw new Error(errorCodes.wrongMove);
 
       const hasTargetMove = R.find(
         ({ coord: { x, y } }) => x === target.x && y === target.y,
@@ -144,7 +147,7 @@ const SANOptions = [
   //   }),
   // ],
 ];
-export const fromSANToCoordinates = (SAN, state) => {
+export const fromSANToCoordinates = (SAN: string, state: InternalState) => {
   const option = R.find(({ expr }) => {
     return R.test(expr, SAN);
   }, SANOptions);

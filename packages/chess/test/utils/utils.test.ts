@@ -2,31 +2,12 @@ import t from 'tap';
 import { fromFEN } from '../../src/fen/index.js';
 import {
   anyCellOccupied,
-  areCellsEmpty,
   getPieceCoord,
   isActiveColorPiece,
   isCellEmpty,
   isCellOccupied,
-  rotate,
 } from '../../src/utils/index.js';
 import { getBoard } from '../../test-utils.js';
-
-t.test('Rotate an 4 x 4 matrix', t => {
-  const matrix = [
-    [1, 2, 3, 4],
-    [5, 6, 7, 8],
-    [9, 10, 11, 12],
-    [13, 14, 15, 16],
-  ];
-  const rotated = [
-    [16, 15, 14, 13],
-    [12, 11, 10, 9],
-    [8, 7, 6, 5],
-    [4, 3, 2, 1],
-  ];
-  t.same(rotate(matrix), rotated);
-  t.end();
-});
 
 t.test('Get coordinated for black king in e8', t => {
   const coord = getPieceCoord(
@@ -70,20 +51,6 @@ t.test('Cell is occupied', t => {
   const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
   const state = fromFEN(FEN);
   t.same(isCellOccupied(state, { x: 3, y: 2 }), true);
-  t.end();
-});
-
-t.test('List of cells are all empty', t => {
-  const FEN = '8/8/3q4/8/8/8/8/8 b KQkq - 0 1';
-  const state = fromFEN(FEN);
-  t.same(
-    areCellsEmpty(state, [
-      { x: 3, y: 0 },
-      { x: 2, y: 0 },
-      { x: 3, y: 5 },
-    ]),
-    true
-  );
   t.end();
 });
 

@@ -1,7 +1,14 @@
-import { flags, modesList } from '../constants.js';
-import { modesMap } from '../modes.js';
+import { flags, modesList, modes } from '../constants.js';
+import { errorCodes } from '../error-codes.js';
 import { Coordinates, InternalState, Move } from '../types.js';
-import { areOpponents, isActiveColorPiece } from '../utils/index.js';
+import {
+  areOpponents,
+  getKingPiece,
+  getPieceCoord,
+  isActiveColorPiece,
+} from '../utils/index.js';
+import { canPieceMoveToTarget } from './is-cell-under-check.js';
+import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns, patternsCheck } from './patterns.js';
 
 interface MovePattern extends Move {
@@ -95,11 +102,33 @@ export const generateMoves = (
   return moves;
 };
 
+const addCheckFlag = ({
+  origin,
+  state,
+  move: moveData,
+}: {
+  origin: Coordinates;
+  state: InternalState;
+  move: Move;
+}): Move => {
+  const moveState = moveAndUpdateState(origin, moveData.coord, state);
+  const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
+  if (!kingCoord) throw new Error(errorCodes.king_not_found);
+
+  const isUnderCheck = canPieceMoveToTarget(
+    moveData.coord,
+    kingCoord,
+    moveState
+  );
+
+  if (isUnderCheck) moveData.flags.check = true;
+  return moveData;
+};
+
 export function generateLegalMoves(
   origin: Coordinates,
   state: InternalState
 ): Array<Move> {
-  const { addCheckFlag } = modesMap[state.mode || modesList[0]];
   const { piece } = state.board[origin.y][origin.x];
 
   if (!piece) return [];
@@ -110,7 +139,11 @@ export function generateLegalMoves(
     state,
     origin,
     moves: [],
-  }).map(move => addCheckFlag({ origin, state, move }));
+  });
+
+  if (state.mode === modes.standard) {
+    return moves.map(move => addCheckFlag({ origin, state, move }));
+  }
 
   return moves;
 }

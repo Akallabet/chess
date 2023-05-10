@@ -9,7 +9,6 @@
     "strict": true,
     "allowJs": true,
     "outDir": "dist",
-    "baseUrl": ".",
     "declaration": true,
     "noEmit": false
   }

@@ -8,7 +8,7 @@
     "tap": "tap",
     "build:chess": "npm run build --workspace=@chess/chess",
     "build:chessboard": "npm run build --workspace=@chess/chessboard",
-    "build:all": "npm run build:chess && npm run build:chessboard",
+    "build": "npm run build:chess && npm run build:chessboard",
     "dev": "npm run dev --workspace=@chess/chessboard",
     "dev:backup": "npm run dev --workspace=@chess/chessboard-backup",
     "start": "npm start --workspace=@chess/chessboard",

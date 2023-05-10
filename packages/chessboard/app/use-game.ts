@@ -42,7 +42,7 @@ export const useGame = (
         return;
       }
       if (piece) {
-        setGame(highlight(addr, game));
+        setGame(highlight(addr, clear(game)));
         setSelected(addr);
         return;
       }

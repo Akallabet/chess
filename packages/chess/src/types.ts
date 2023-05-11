@@ -1,4 +1,4 @@
-import { modesList, piecesMap } from './constants.js';
+import { modes, piecesMap } from './constants.js';
 
 const piecesList = Object.keys(piecesMap);
 export interface Coordinates {
@@ -52,7 +52,7 @@ export type MovesBoardType = MoveSquare[][];
 
 export type ChessBoardType = Array<Array<Square>>;
 
-export type GameMode = (typeof modesList)[number];
+export type GameMode = keyof typeof modes;
 
 export interface MetaData {
   positions: Address[][];
@@ -61,7 +61,7 @@ export interface MetaData {
 }
 
 export interface ChessInitialState {
-  mode?: GameMode;
+  mode: GameMode;
   FEN: string;
 }
 
@@ -76,9 +76,7 @@ export interface FENState {
   fullMoves: number;
 }
 
-export interface InternalState extends ChessInitialState, FENState {
-  mode: GameMode;
-}
+export interface InternalState extends ChessInitialState, FENState {}
 
 export interface ChessState extends InternalState, MetaData {
   movesBoard: MovesBoardType;

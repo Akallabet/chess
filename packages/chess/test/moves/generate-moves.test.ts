@@ -31,7 +31,7 @@ const addOrigin = origin => move => {
 
 t.test('Get moves - Black pawn - rank 7', t => {
   const state = start({
-    mode: modes.demo,
+    mode: 'demo',
     FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1',
   });
   const origin = { x: 4, y: 1 };
@@ -171,7 +171,7 @@ t.test('Highlight Bishop moves', t => {
   t.same(
     generateLegalMoves(
       origin,
-      start({ mode: modes.demo, FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' })
+      start({ mode: 'demo', FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' })
     ).sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
   );
@@ -196,7 +196,7 @@ t.test('Highlight Rook moves', t => {
   t.same(
     generateLegalMoves(
       origin,
-      start({ mode: modes.demo, FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' })
+      start({ mode: 'demo', FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' })
     ).sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
   );
@@ -233,7 +233,7 @@ t.test('Highlight Queen moves', t => {
   t.same(
     generateLegalMoves(
       origin,
-      start({ mode: modes.demo, FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' })
+      start({ mode: 'demo', FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' })
     ).sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
   );
@@ -254,7 +254,7 @@ t.test('Highlight King moves', t => {
   t.same(
     generateLegalMoves(
       origin,
-      start({ mode: modes.demo, FEN: '8/8/8/4k3/8/8/8/8 b KQkq - 0 1' })
+      start({ mode: 'demo', FEN: '8/8/8/4k3/8/8/8/8 b KQkq - 0 1' })
     ).sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
   );
@@ -265,7 +265,10 @@ t.only('Highligh moves with king under check', t => {
   const expected = [{ coord: { x: 3, y: 3 }, flags: { move: true } }];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   const origin = { x: 3, y: 1 };
-  const input = generateLegalMoves(origin, start(start({ FEN })));
+  const input = generateLegalMoves(
+    origin,
+    start(start({ FEN, mode: 'standard' }))
+  );
   t.same(
     input.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
@@ -278,7 +281,9 @@ t.test('Highligh moves with king under check', t => {
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   const origin = { x: 3, y: 1 };
   t.same(
-    generateLegalMoves(origin, start({ FEN })).sort(compareByMove),
+    generateLegalMoves(origin, start({ FEN, mode: 'standard' })).sort(
+      compareByMove
+    ),
     expected.sort(compareByMove).map(addOrigin(origin))
   );
   t.end();
@@ -288,7 +293,7 @@ t.test('Highlight moves of king under check', t => {
   const FEN = 'rnbqkbnr/ppp2ppp/8/1B1pp3/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 1';
   const expected = [{ coord: { x: 4, y: 1 }, flags: { move: true } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateLegalMoves(origin, start({ FEN }));
+  const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
@@ -306,7 +311,7 @@ t.test(
       { coord: { x: 4, y: 1 }, flags: { move: true } },
     ];
     const origin = { x: 4, y: 0 };
-    const actual = generateLegalMoves(origin, start({ FEN }));
+    const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
     t.same(
       actual.sort(compareByMove),
       expected.sort(compareByMove).map(addOrigin(origin))
@@ -327,7 +332,7 @@ t.test(
       { coord: { x: 4, y: 1 }, flags: { move: true } },
     ];
     const origin = { x: 4, y: 0 };
-    const actual = generateLegalMoves(origin, start({ FEN }));
+    const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
     t.same(
       actual.sort(compareByMove),
       expected.sort(compareByMove).map(addOrigin(origin))
@@ -340,7 +345,7 @@ t.test('No castling moves if one of the cells is under check', t => {
   const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const expected = [{ coord: { x: 3, y: 0 }, flags: { move: true } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateLegalMoves(origin, start({ FEN }));
+  const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
@@ -352,7 +357,7 @@ t.test('No castling moves if one of the cells is occupied', t => {
   const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const expected = [{ coord: { x: 3, y: 0 }, flags: { move: true } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateLegalMoves(origin, start({ FEN }));
+  const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))
@@ -370,7 +375,7 @@ t.test('Highlight check', t => {
     { coord: { x: 4, y: 6 }, flags: { move: true } },
   ];
   const origin = { x: 5, y: 7 };
-  const actual = generateLegalMoves(origin, start({ FEN }));
+  const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin))

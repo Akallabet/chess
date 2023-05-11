@@ -8,7 +8,7 @@ import {
 } from '../types.js';
 
 const changeActiveColor = (state: FENState) =>
-  state.activeColor === colours.white ? colours.black : colours.white;
+  state.activeColor === colours.w ? colours.b : colours.w;
 
 const boardWithMove = (
   origin: Coordinates,

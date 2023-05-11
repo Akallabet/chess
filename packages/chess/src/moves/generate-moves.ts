@@ -1,4 +1,4 @@
-import { flags, modesList, modes } from '../constants.js';
+import { flags, modes } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
 import { Coordinates, InternalState, Move } from '../types.js';
 import {
@@ -83,18 +83,15 @@ const generateMovesFromPatterns = ({
 
 export const generateMoves = (
   coord: Coordinates,
-  state: InternalState
+  state: InternalState,
+  patterns: Record<string, Record<string, Array<Pattern>>> = patternsCheck
 ): Array<Move> => {
   const { piece } = state.board[coord.y][coord.x];
 
   if (!piece) return [];
 
-  const mode = state.mode || modesList[0];
-
-  const piecesPatterns = patternsCheck[mode][piece as string];
-
   const moves = generateMovesFromPatterns({
-    patterns: piecesPatterns,
+    patterns: patterns[state.mode][piece as string],
     state,
     origin: coord,
     moves: [],
@@ -129,17 +126,7 @@ export function generateLegalMoves(
   origin: Coordinates,
   state: InternalState
 ): Array<Move> {
-  const { piece } = state.board[origin.y][origin.x];
-
-  if (!piece) return [];
-  const mode = state.mode || modesList[0];
-
-  const moves = generateMovesFromPatterns({
-    patterns: patterns[mode][piece as string],
-    state,
-    origin,
-    moves: [],
-  });
+  const moves = generateMoves(origin, state, patterns);
 
   if (state.mode === modes.standard) {
     return moves.map(move => addCheckFlag({ origin, state, move }));

@@ -1,6 +1,6 @@
 import { flags, modes } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
-import { Coordinates, InternalState, Move } from '../types.js';
+import { Coordinates, InternalState, Move, MoveCell } from '../types.js';
 import {
   areOpponents,
   getKingPiece,
@@ -11,27 +11,29 @@ import { canPieceMoveToTarget } from './is-cell-under-check.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns, patternsCheck } from './patterns.js';
 
-interface MovePattern extends Move {
+interface MovePattern extends MoveCell {
+  piece: string;
+  coord: Coordinates;
   invalid?: boolean;
+}
+interface MovePatternResult extends MoveCell {
+  coord: Coordinates;
 }
 
 const isNotInvalid = (move: MovePattern): boolean => !move.invalid;
-const removeInvalidProp = (move: MovePattern): MovePattern => {
-  delete move.invalid;
-  return move;
-};
 
 const generateMovesFromPatterns = ({
   patterns,
   origin,
   state,
-  moves = [],
+  piece,
 }: {
   patterns: Array<Pattern>;
   origin: Coordinates;
   state: InternalState;
-  moves: Array<MovePattern>;
-}): Array<Move> => {
+  piece: string;
+}): Array<MovePatternResult> => {
+  const moves: Array<MovePattern> = [];
   for (let i = 0; i < patterns.length; i++) {
     const { advance, shallStop, flag, rejectMove } = patterns[i];
     const proceed = true;
@@ -58,6 +60,7 @@ const generateMovesFromPatterns = ({
           )
         ) {
           moves.push({
+            piece,
             origin,
             coord: current,
             flags: { [flag || flags.capture]: true },
@@ -67,6 +70,7 @@ const generateMovesFromPatterns = ({
         break;
       }
       moves.push({
+        piece,
         origin,
         coord: current,
         flags: {
@@ -78,14 +82,20 @@ const generateMovesFromPatterns = ({
       prevMove = moves[moves.length - 1];
     }
   }
-  return moves.filter(isNotInvalid).map(removeInvalidProp);
+  const validMoves = moves.filter(isNotInvalid);
+
+  for (let i = 0; i < validMoves.length; i++) {
+    delete validMoves[i].invalid;
+  }
+
+  return validMoves;
 };
 
 export const generateMoves = (
   coord: Coordinates,
   state: InternalState,
   patterns: Record<string, Record<string, Array<Pattern>>> = patternsCheck
-): Array<Move> => {
+): Array<MovePatternResult> => {
   const { piece } = state.board[coord.y][coord.x];
 
   if (!piece) return [];
@@ -94,7 +104,7 @@ export const generateMoves = (
     patterns: patterns[state.mode][piece as string],
     state,
     origin: coord,
-    moves: [],
+    piece,
   });
   return moves;
 };
@@ -125,7 +135,7 @@ export function generateLegalMoves(
   origin: Coordinates,
   state: InternalState
 ): Array<Move> {
-  const moves = generateMoves(origin, state, patterns);
+  const moves = generateMoves(origin, state, patterns) as Array<Move>;
 
   if (state.mode === modes.standard) {
     for (let i = 0; i < moves.length; i++) {
@@ -138,8 +148,14 @@ export function generateLegalMoves(
 
   return moves;
 }
+interface LegalMove extends MoveCell {
+  piece: string;
+  coord: Coordinates;
+}
 
-export function generateLegalMovesForAllPieces(state: InternalState): Move[] {
+export function generateLegalMovesForAllPieces(
+  state: InternalState
+): Array<LegalMove> {
   const moves = [];
   for (let y = 0; y < state.board.length; y++) {
     for (let x = 0; x < state.board[y].length; x++) {

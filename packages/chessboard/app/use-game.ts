@@ -23,10 +23,13 @@ export const useGame = (
   const [selected, setSelected] = useState<undefined | Address>();
 
   useEffect(() => {
-    setGame(start({ mode, FEN }));
-  }, [FEN, mode]);
+    if (!game) {
+      setGame(start({ mode, FEN }));
+    }
+  }, [FEN, mode, game]);
 
   if (!game) return undefined;
+  console.log(game);
 
   return {
     ...game,

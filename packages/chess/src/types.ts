@@ -44,7 +44,9 @@ export interface MoveCell {
 }
 
 export interface Move extends MoveCell {
+  piece: Piece;
   coord: Coordinates;
+  san: string;
 }
 
 export type MoveSquare = MoveCell[];

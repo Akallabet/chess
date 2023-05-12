@@ -27,6 +27,7 @@ const addOrigin = origin => move => {
   move.origin = origin;
   return move;
 };
+const addPiece = piece => move => ({ ...move, piece });
 
 t.test('Get moves - Black pawn - rank 7', t => {
   const state = start({
@@ -36,8 +37,8 @@ t.test('Get moves - Black pawn - rank 7', t => {
   const origin = { x: 4, y: 1 };
   const input = generateLegalMoves(origin, state);
   const expected = [
-    { coord: { x: 4, y: 2 }, flags: { move: true } },
-    { coord: { x: 4, y: 3 }, flags: { move: true } },
+    { coord: { x: 4, y: 2 }, flags: { move: true }, piece: 'p' },
+    { coord: { x: 4, y: 3 }, flags: { move: true }, piece: 'p' },
   ].map(addOrigin(origin));
 
   t.same(input, expected);
@@ -49,7 +50,14 @@ t.test('Get moves - Black pawn - after rank 7', t => {
       { x: 4, y: 2 },
       start({ mode: 'demo', FEN: '8/8/4p3/8/8/8/8/8 b KQkq - 0 1' })
     ),
-    [{ coord: { x: 4, y: 3 }, flags: { move: true }, origin: { x: 4, y: 2 } }]
+    [
+      {
+        coord: { x: 4, y: 3 },
+        flags: { move: true },
+        origin: { x: 4, y: 2 },
+        piece: 'p',
+      },
+    ]
   );
   t.end();
 });
@@ -72,11 +80,12 @@ t.test('Get moves - Black pawn - moves and captures', t => {
       start({ mode: 'demo', FEN: '8/4p3/3P4/8/8/8/8/8 b KQkq - 0 1' })
     ),
     [
-      { coord: { x: 4, y: 2 }, flags: { move: true } },
-      { coord: { x: 4, y: 3 }, flags: { move: true } },
+      { coord: { x: 4, y: 2 }, flags: { move: true }, piece: 'p' },
+      { coord: { x: 4, y: 3 }, flags: { move: true }, piece: 'p' },
       {
         coord: { x: 3, y: 2 },
         flags: { capture: true },
+        piece: 'p',
       },
     ].map(addOrigin(origin))
   );
@@ -96,7 +105,9 @@ t.test('Get moves - White pawn - moves and captures', t => {
         coord: { x: 3, y: 5 },
         flags: { capture: true },
       },
-    ].map(addOrigin(origin))
+    ]
+      .map(addOrigin(origin))
+      .map(addPiece('P'))
   );
   t.end();
 });
@@ -110,25 +121,13 @@ t.test('Select pawn on file h', t => {
     [
       { coord: { x: 7, y: 2 }, flags: { move: true } },
       { coord: { x: 7, y: 3 }, flags: { move: true } },
-    ].map(addOrigin(origin))
+    ]
+      .map(addOrigin(origin))
+      .map(addPiece('p'))
   );
   t.end();
 });
 
-t.test('Select pawn on file h', t => {
-  const origin = { x: 7, y: 1 };
-  t.same(
-    generateLegalMoves(
-      origin,
-      start({ mode: 'demo', FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' })
-    ),
-    [
-      { coord: { x: 7, y: 2 }, flags: { move: true } },
-      { coord: { x: 7, y: 3 }, flags: { move: true } },
-    ].map(addOrigin(origin))
-  );
-  t.end();
-});
 t.test('Select knight', t => {
   const origin = { x: 4, y: 3 };
   const actual = generateLegalMoves(origin, {
@@ -149,6 +148,7 @@ t.test('Select knight', t => {
     ]
       .sort(compareByMove)
       .map(addOrigin(origin))
+      .map(addPiece('n'))
   );
   t.end();
 });
@@ -172,7 +172,7 @@ t.test('Highlight Bishop moves', t => {
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' })
     ).sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('b'))
   );
   t.end();
 });
@@ -197,7 +197,7 @@ t.test('Highlight Rook moves', t => {
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' })
     ).sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('r'))
   );
   t.end();
 });
@@ -234,7 +234,7 @@ t.test('Highlight Queen moves', t => {
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' })
     ).sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('q'))
   );
   t.end();
 });
@@ -255,7 +255,7 @@ t.test('Highlight King moves', t => {
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4k3/8/8/8/8 b KQkq - 0 1' })
     ).sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
   );
   t.end();
 });
@@ -270,20 +270,7 @@ t.test('Highligh moves with king under check', t => {
   );
   t.same(
     input.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
-  );
-  t.end();
-});
-
-t.test('Highligh moves with king under check', t => {
-  const expected = [{ coord: { x: 3, y: 3 }, flags: { move: true } }];
-  const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
-  const origin = { x: 3, y: 1 };
-  t.same(
-    generateLegalMoves(origin, start({ FEN, mode: 'standard' })).sort(
-      compareByMove
-    ),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('p'))
   );
   t.end();
 });
@@ -295,7 +282,7 @@ t.test('Highlight moves of king under check', t => {
   const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
   );
   t.end();
 });
@@ -313,7 +300,7 @@ t.test(
     const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
     t.same(
       actual.sort(compareByMove),
-      expected.sort(compareByMove).map(addOrigin(origin))
+      expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
     );
     t.end();
   }
@@ -334,7 +321,7 @@ t.test(
     const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
     t.same(
       actual.sort(compareByMove),
-      expected.sort(compareByMove).map(addOrigin(origin))
+      expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
     );
     t.end();
   }
@@ -347,7 +334,7 @@ t.test('No castling moves if one of the cells is under check', t => {
   const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
   );
   t.end();
 });
@@ -359,7 +346,7 @@ t.test('No castling moves if one of the cells is occupied', t => {
   const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
   );
   t.end();
 });
@@ -377,7 +364,7 @@ t.test('Highlight check', t => {
   const actual = generateLegalMoves(origin, start({ FEN, mode: 'standard' }));
   t.same(
     actual.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin))
+    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('B'))
   );
   t.end();
 });

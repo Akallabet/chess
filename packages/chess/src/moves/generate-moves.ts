@@ -99,7 +99,7 @@ export const generateMoves = (
   return moves;
 };
 
-const addCheckFlag = ({
+const isCheckMove = ({
   origin,
   state,
   move: moveData,
@@ -107,7 +107,7 @@ const addCheckFlag = ({
   origin: Coordinates;
   state: InternalState;
   move: Move;
-}): Move => {
+}): boolean => {
   const moveState = moveAndUpdateState(origin, moveData.coord, state);
   const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
   if (!kingCoord) throw new Error(errorCodes.king_not_found);
@@ -118,8 +118,7 @@ const addCheckFlag = ({
     moveState
   );
 
-  if (isUnderCheck) moveData.flags.check = true;
-  return moveData;
+  return isUnderCheck;
 };
 
 export function generateLegalMoves(
@@ -129,7 +128,12 @@ export function generateLegalMoves(
   const moves = generateMoves(origin, state, patterns);
 
   if (state.mode === modes.standard) {
-    return moves.map(move => addCheckFlag({ origin, state, move }));
+    for (let i = 0; i < moves.length; i++) {
+      const move = moves[i];
+      if (isCheckMove({ origin, state, move })) {
+        move.flags.check = true;
+      }
+    }
   }
 
   return moves;

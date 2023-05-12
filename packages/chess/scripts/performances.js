@@ -1,5 +1,5 @@
 import { performance } from 'node:perf_hooks';
-import { start } from '../dist/start.js';
+import { start } from '../dist/index.js';
 
 function generateMoves(FEN) {
   performance.measure('generateLegalMoves');

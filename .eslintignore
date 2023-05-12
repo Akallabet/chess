@@ -6,6 +6,7 @@ node_modules
 /packages/**/.vercel
 /packages/**/.output
 
+/packages/**/dist/
 /packages/**/build/
 /packages/**/public/build
 /packages/**/api/index.js

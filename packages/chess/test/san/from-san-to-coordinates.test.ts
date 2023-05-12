@@ -67,7 +67,7 @@ t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
   t.end();
 });
 
-t.only('Pawn i.e. "c4"', t => {
+t.test('Pawn i.e. "c4"', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   const san = 'c4';
   const expected = {

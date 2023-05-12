@@ -4,7 +4,7 @@ import { errorCodes } from '../error-codes.js';
 import { generateLegalMoves } from '../moves/generate-moves.js';
 import { getOriginsForTargetCell } from '../moves/is-cell-under-check.js';
 import { InternalState } from '../types.js';
-import { getPieceCoord } from '../utils/index.js';
+import { getPieceCoord } from '../utils.js';
 
 const filesString = R.join('', files);
 const ranksString = R.join('', ranks);

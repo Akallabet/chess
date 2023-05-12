@@ -1,6 +1,6 @@
 import { errorCodes } from './error-codes.js';
 import { Address, ChessState } from './types.js';
-import { fromPositionToCoordinates } from './utils/index.js';
+import { fromPositionToCoordinates } from './utils.js';
 
 export const highlightMoves = (
   addr: Address,

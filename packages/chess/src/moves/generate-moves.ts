@@ -6,7 +6,7 @@ import {
   getKingPiece,
   getPieceCoord,
   isActiveColorPiece,
-} from '../utils/index.js';
+} from '../utils.js';
 import { canPieceMoveToTarget } from './is-cell-under-check.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns, patternsCheck } from './patterns.js';

@@ -2,7 +2,7 @@ import t from 'tap';
 import { fromFEN } from '../../src/fen.js';
 import { generateLegalMoves } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/start.js';
-import { fromPositionToCoordinates } from '../../src/utils/index.js';
+import { fromPositionToCoordinates } from '../../src/utils.js';
 
 const compareByMove = (a, b) => {
   if (a.coord.x > b.coord.x) return 1;
@@ -260,7 +260,7 @@ t.test('Highlight King moves', t => {
   t.end();
 });
 
-t.only('Highligh moves with king under check', t => {
+t.test('Highligh moves with king under check', t => {
   const expected = [{ coord: { x: 3, y: 3 }, flags: { move: true } }];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
   const origin = { x: 3, y: 1 };

@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { Coordinates, InternalState } from '../types.js';
-import { isActiveColorPiece, isOpponentPiece } from '../utils/index.js';
+import { isActiveColorPiece, isOpponentPiece } from '../utils.js';
 import { generateMoves } from './generate-moves.js';
 //Loop through each row
 //Loop through each cell

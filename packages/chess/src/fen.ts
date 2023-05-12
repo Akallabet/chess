@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { ChessBoardType, EmptySquare, FENState, Square } from './types.js';
-import { isBlackPiece, isWhitePiece } from './utils/index.js';
+import { isBlackPiece, isWhitePiece } from './utils.js';
 
 const addEmptyCells = (n: number): Array<EmptySquare> => {
   const cells = [];

@@ -1,13 +1,13 @@
 import t from 'tap';
-import { fromFEN } from '../../src/fen.js';
+import { fromFEN } from '../src/fen.js';
 import {
   anyCellOccupied,
   getPieceCoord,
   isActiveColorPiece,
   isCellEmpty,
   isCellOccupied,
-} from '../../src/utils/index.js';
-import { getBoard } from '../../test-utils.js';
+} from '../src/utils.js';
+import { getBoard } from '../test-utils.js';
 
 t.test('Get coordinated for black king in e8', t => {
   const coord = getPieceCoord(

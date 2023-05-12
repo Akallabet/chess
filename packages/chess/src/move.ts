@@ -1,5 +1,5 @@
 import { clearBoard } from './clear-board.js';
-import { fromPositionToCoordinates } from './utils/index.js';
+import { fromPositionToCoordinates } from './utils.js';
 import { createMovesBoard, moveAndUpdateState } from './moves/index.js';
 import { Address, ChessState, Coordinates } from './types.js';
 import { getMetadata } from './metadata.js';

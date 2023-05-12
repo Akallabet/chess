@@ -10,7 +10,7 @@ import {
   getPieceColor,
   getPieceCoord,
   getKingPiece,
-} from '../utils/index.js';
+} from '../utils.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { errorCodes } from '../error-codes.js';
 

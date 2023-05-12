@@ -1,7 +1,7 @@
 import * as R from 'ramda';
-import { errorCodes } from '../error-codes.js';
-import { files, ranks } from '../constants.js';
-import { Address, ChessBoardType, Coordinates, FENState } from '../types.js';
+import { errorCodes } from './error-codes.js';
+import { files, ranks } from './constants.js';
+import { Address, ChessBoardType, Coordinates } from './types.js';
 
 export const isWhitePiece = (piece: string): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);
@@ -33,8 +33,6 @@ export const getPieceCoord = (piece: string, board: ChessBoardType) => {
     }
   }
 };
-// export const isAddress = addr =>
-//   new RegExp(/([pnbrqkPNBRQK]+[a-h]+[1-9]+)/).test(addr);
 export const isAddress = (addr: Address) =>
   new RegExp(/([a-h]+[1-9]+)/).test(addr);
 

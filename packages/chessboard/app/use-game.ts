@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Address, ChessState, GameMode } from '@chess/chess';
-import { start, move, clear, highlight } from '@chess/chess';
+import { start, move, clearBoard, highlightMoves } from '@chess/chess';
 
 export type GameAction = (
   pos: Address,
@@ -37,12 +37,12 @@ export const useGame = (
         return;
       }
       if (!piece) {
-        setGame(clear(game));
+        setGame(clearBoard(game));
         setSelected(undefined);
         return;
       }
       if (piece) {
-        setGame(highlight(addr, clear(game)));
+        setGame(highlightMoves(addr, clearBoard(game)));
         setSelected(addr);
         return;
       }

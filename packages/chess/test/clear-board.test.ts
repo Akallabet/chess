@@ -1,7 +1,6 @@
 import t from 'tap';
+import { clearBoard, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
-import { clearBoard } from '../src/clear-board.js';
-import { start } from '../src/start.js';
 
 t.test('Clear board', t => {
   const state = start({ FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1', mode: 'demo' });

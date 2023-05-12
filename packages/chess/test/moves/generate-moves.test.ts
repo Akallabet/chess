@@ -1,7 +1,7 @@
 import t from 'tap';
 import { fromFEN } from '../../src/fen.js';
 import { generateLegalMoves } from '../../src/moves/generate-moves.js';
-import { start } from '../../src/start.js';
+import { start } from '../../src/index.js';
 import { fromPositionToCoordinates } from '../../src/utils.js';
 
 const compareByMove = (a, b) => {

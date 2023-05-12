@@ -3,7 +3,7 @@
 
 import t from 'tap';
 import { fromSANToCoordinates } from '../../src/san/from-san-to-coordinates.js';
-import { start } from '../../src/start.js';
+import { start } from '../../src/index.js';
 
 // [
 //   '0-0',

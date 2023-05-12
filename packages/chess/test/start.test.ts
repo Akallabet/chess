@@ -1,5 +1,5 @@
 import t from 'tap';
-import { start } from '../src/start.js';
+import { start } from '../src/index.js';
 
 const emptyCell = {};
 const emptyRow = () => [
@@ -25,7 +25,10 @@ const emptyBoard = [
 ];
 
 t.test('Start', t => {
-  const { board } = start({ FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1' });
+  const { board } = start({
+    FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
+    mode: 'standard',
+  });
   t.same(board, emptyBoard);
   t.end();
 });

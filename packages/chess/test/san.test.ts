@@ -2,8 +2,8 @@
 //import { defaultFiles as files, defaultRanks as ranks, defaultNames as pieces } from '../constants'
 
 import t from 'tap';
-import { fromSANToCoordinates } from '../../src/san/from-san-to-coordinates.js';
-import { start } from '../../src/index.js';
+import { fromSANToCoordinates } from '../src/san.js';
+import { start } from '../src/index.js';
 
 // [
 //   '0-0',

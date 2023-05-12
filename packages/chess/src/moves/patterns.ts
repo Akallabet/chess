@@ -2,7 +2,7 @@ import { flags } from '../constants.js';
 import { Coordinates, MoveState } from '../types.js';
 
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
-import { getCastlingRights } from '../fen/index.js';
+import { getCastlingRights } from '../fen.js';
 import {
   areOpponents,
   anyCellOccupied,

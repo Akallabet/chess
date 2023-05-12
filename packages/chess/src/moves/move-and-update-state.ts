@@ -1,4 +1,4 @@
-import { toFEN } from '../fen/index.js';
+import { toFEN } from '../fen.js';
 import { colours } from '../constants.js';
 import {
   ChessBoardType,

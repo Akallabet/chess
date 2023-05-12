@@ -1,6 +1,5 @@
 import t from 'tap';
-import { modes } from '../../src/constants.js';
-import { fromFEN } from '../../src/fen/from-fen.js';
+import { fromFEN } from '../../src/fen.js';
 import { generateLegalMoves } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/start.js';
 import { fromPositionToCoordinates } from '../../src/utils/index.js';

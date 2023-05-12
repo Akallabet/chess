@@ -1,5 +1,5 @@
 import { modes } from './constants.js';
-import { fromFEN } from './fen/index.js';
+import { fromFEN } from './fen.js';
 import { getMetadata } from './metadata.js';
 import { createMovesBoard } from './moves/create-moves-board.js';
 import { ChessInitialState, ChessState, InternalState } from './types.js';

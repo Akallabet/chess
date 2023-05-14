@@ -2,8 +2,8 @@
 //import { defaultFiles as files, defaultRanks as ranks, defaultNames as pieces } from '../constants'
 
 import t from 'tap';
-import { fromSANToCoordinates } from '../src/san.js';
-import { start } from '../src/index.js';
+import { fromSANToCoordinates, generateSANForMove } from '../src/san.js';
+import { Move, start } from '../src/index.js';
 
 // [
 //   '0-0',
@@ -83,5 +83,41 @@ t.test('SAN - Pawn wrong format i.e. "c3"', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
   const san = 'h5';
   t.throws(() => fromSANToCoordinates(san, start({ FEN, mode: 'standard' })));
+  t.end();
+});
+
+t.test('Generate SAN - only one pawn', t => {
+  const move: Move = {
+    piece: 'P',
+    origin: { x: 2, y: 6 },
+    coord: { x: 2, y: 4 },
+    flags: {},
+    san: '',
+  };
+  const moveSquare = [move];
+  const input = generateSANForMove(moveSquare, 0);
+  t.same(input, 'c4');
+  t.end();
+});
+
+t.test('Generate SAN - two knights', t => {
+  const moveSquare = [
+    {
+      piece: 'K',
+      origin: { x: 2, y: 5 },
+      coord: { x: 4, y: 4 },
+      flags: {},
+      san: '',
+    },
+    {
+      piece: 'K',
+      origin: { x: 3, y: 6 },
+      coord: { x: 2, y: 5 },
+      flags: {},
+      san: '',
+    },
+  ];
+  const input = generateSANForMove(moveSquare, 0);
+  t.same(input, 'Kce4');
   t.end();
 });

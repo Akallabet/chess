@@ -3,11 +3,47 @@ import { files, pieces, piecesMap, ranks } from './constants.js';
 import { errorCodes } from './error-codes.js';
 import { generateLegalMoves } from './moves/generate-moves.js';
 import { getOriginsForTargetCell } from './moves/is-cell-under-check.js';
-import { InternalState } from './types.js';
+import { InternalState, Move } from './types.js';
 import { getPieceCoord } from './utils.js';
 
 const filesString = R.join('', files);
 const ranksString = R.join('', ranks);
+
+// If the piece is sufficient to unambiguously determine the origin square, the whole from square is omitted. Otherwise, if two (or more) pieces of the same kind can move to the same square, the piece's initial is followed by (in descending order of preference)
+//
+// file of departure if different
+// rank of departure if the files are the same but the ranks differ
+// the complete origin square coordinate otherwise
+
+export function generateSANForMove(
+  moveSquare: Array<Move>,
+  moveIndex: number
+): string {
+  // generate unambiguous standard algebraic notation for each move
+  const move = moveSquare[moveIndex];
+  const { flags, coord, piece } = move;
+  // const san = piece !== piecesMap.p && piece !== piecesMap.P ? piece : '';
+  const san = [piece !== piecesMap.p && piece !== piecesMap.P ? piece : ''];
+  // const movesWithSamePiece = [];
+  for (let i = 0; i < moveSquare.length; i++) {
+    if (i !== moveIndex && moveSquare[i].piece === move.piece) {
+      // movesWithSamePiece.push(moveSquare[i]);
+      san.push(files[move.origin.x]);
+    }
+  }
+  const file = files[coord.x];
+  const rank = ranks[coord.y];
+  // const { x: cx, y: cy } = coord;
+  // const pieceName = piece[0].toUpperCase();
+  const capture = flags.capture ? 'x' : '';
+  // const promotion = flags.promotion ? `=${flags.promotion}` : '';
+  const check = flags.check ? '+' : '';
+  // const checkmate = flags.checkmate ? '#' : '';
+  // const disambiguation = getDisambiguation(state, move);
+  san.push(capture, file, String(rank), check);
+  // return `${pieceName}${capture}${file}${rank}${check}`;
+  return san.join('');
+}
 
 const SANOptions = [
   // [

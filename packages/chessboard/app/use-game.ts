@@ -29,7 +29,6 @@ export const useGame = (
   }, [FEN, mode, game]);
 
   if (!game) return undefined;
-  console.log(game);
 
   return {
     ...game,

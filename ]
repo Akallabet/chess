@@ -19,43 +19,53 @@ export function generateSANForMove(
   moveSquare: Array<Move>,
   moveIndex: number
 ): string {
+  // generate unambiguous standard algebraic notation for each move
   const move = moveSquare[moveIndex];
   const { flags, coord, piece } = move;
 
   const file = files[coord.x];
   const rank = ranks[coord.y];
+  // const { x: cx, y: cy } = coord;
+  // const pieceName = piece[0].toUpperCase();
   const capture = flags.capture ? 'x' : '';
+  // const promotion = flags.promotion ? `=${flags.promotion}` : '';
   const check = flags.check ? '+' : '';
-  // const checkmate = flags.checkmate ? '#' : '';
+  // const san = piece !== piecesMap.p && piece !== piecesMap.P ? piece : '';
   const sanOrigin = [
     piece !== piecesMap.p && piece !== piecesMap.P ? piece : '',
   ];
   const sanDestination = [capture, file, String(rank), check];
 
   const ambiguousIndexes = [];
+  // const movesWithSamePiece = [];
   for (let i = 0; i < moveSquare.length; i++) {
     if (i !== moveIndex && moveSquare[i].piece === move.piece) {
       ambiguousIndexes.push(i);
     }
+    // if (i !== moveIndex && moveSquare[i].piece === move.piece) {
+    //   if (move.origin.x !== moveSquare[i].origin.x) {
+    //     san.push(files[move.origin.x]);
+    //   } else if (move.origin.y !== moveSquare[i].origin.y) {
+    //     san.push(String(ranks[move.origin.y]));
+    //   }
+    // }
   }
   if (ambiguousIndexes.length === 0)
     return [...sanOrigin, ...sanDestination].join('');
 
   if (ambiguousIndexes.every(i => move.origin.x !== moveSquare[i].origin.x)) {
-    return [...sanOrigin, files[move.origin.x], ...sanDestination].join('');
+    console.log(ambiguousIndexes.map(i => moveSquare[i]));
+    sanOrigin.push(files[move.origin.x]);
+  } else if (
+    ambiguousIndexes.every(i => move.origin.y !== moveSquare[i].origin.y)
+  ) {
+    sanOrigin.push(String(ranks[move.origin.y]));
   }
-  if (ambiguousIndexes.every(i => move.origin.y !== moveSquare[i].origin.y)) {
-    return [...sanOrigin, String(ranks[move.origin.y]), ...sanDestination].join(
-      ''
-    );
-  }
-
-  return [
-    ...sanOrigin,
-    files[move.origin.x],
-    String(ranks[move.origin.y]),
-    ...sanDestination,
-  ].join('');
+  // const checkmate = flags.checkmate ? '#' : '';
+  // const disambiguation = getDisambiguation(state, move);
+  // san.push(capture, file, String(rank), check);
+  // return `${pieceName}${capture}${file}${rank}${check}`;
+  // return san.reverse().join('');
 }
 
 const SANOptions = [

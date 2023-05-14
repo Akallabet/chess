@@ -143,3 +143,41 @@ t.test('Generate SAN - two rooks with same file and different ranks', t => {
   t.same(input, 'R5d4');
   t.end();
 });
+
+t.test('Generate SAN - two rooks with same rank and different files', t => {
+  const moveSquare = [
+    {
+      piece: 'R',
+      origin: {
+        x: 0,
+        y: 6,
+      },
+      coord: {
+        x: 1,
+        y: 6,
+      },
+      flags: {
+        move: true,
+      },
+      san: '',
+    },
+    {
+      piece: 'R',
+      origin: {
+        x: 7,
+        y: 6,
+      },
+      coord: {
+        x: 1,
+        y: 6,
+      },
+      flags: {
+        move: true,
+      },
+      san: '',
+    },
+  ];
+  const input = generateSANForMove(moveSquare, 0);
+  t.same(input, 'Rab2');
+  t.end();
+});

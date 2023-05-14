@@ -27,8 +27,11 @@ export function generateSANForMove(
   // const movesWithSamePiece = [];
   for (let i = 0; i < moveSquare.length; i++) {
     if (i !== moveIndex && moveSquare[i].piece === move.piece) {
-      // movesWithSamePiece.push(moveSquare[i]);
-      san.push(files[move.origin.x]);
+      if (move.origin.x !== moveSquare[i].origin.x) {
+        san.push(files[move.origin.x]);
+      } else if (move.origin.y !== moveSquare[i].origin.y) {
+        san.push(String(ranks[move.origin.y]));
+      }
     }
   }
   const file = files[coord.x];

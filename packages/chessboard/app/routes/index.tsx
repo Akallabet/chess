@@ -18,17 +18,7 @@ export default function App() {
   return (
     <div>
       <div className="my-5" />
-      {game && (
-        <ChessBoard
-          board={game.board}
-          positions={game.positions}
-          onCellClick={game.action}
-          files={game.files}
-          ranks={game.ranks}
-          FEN={game.FEN}
-          mode={game.mode}
-        />
-      )}
+      {game && <ChessBoard {...game} onCellClick={game.action} />}
     </div>
   );
 }

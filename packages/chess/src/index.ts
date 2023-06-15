@@ -7,11 +7,12 @@ import {
   ChessState,
   InternalState,
   Address,
-  Coordinates,
+  // Coordinates,
 } from './types.js';
 import { fromPositionToCoordinates } from './utils.js';
 import { moveAndUpdateState } from './moves/index.js';
 import { errorCodes } from './error-codes.js';
+import { fromSANToCoordinates } from './san.js';
 
 export function start(
   initialState: ChessInitialState | ChessState
@@ -32,20 +33,21 @@ export function start(
   };
 }
 
-export const move = (
-  origin: Coordinates | Address,
-  target: Coordinates | Address,
-  initialState: ChessState
-): ChessState => {
-  const state = moveAndUpdateState(
-    fromPositionToCoordinates(origin),
-    fromPositionToCoordinates(target),
-    clearBoard(initialState)
-  );
-  const movesBoard = createMovesBoard(state);
-  const metadata = getMetadata();
+export const move = (san: string, initialState: ChessState): ChessState => {
+  try {
+    const { origin, target } = fromSANToCoordinates(san, initialState);
+    const state = moveAndUpdateState(
+      fromPositionToCoordinates(origin),
+      fromPositionToCoordinates(target),
+      clearBoard(initialState)
+    );
+    const movesBoard = createMovesBoard(state);
+    const metadata = getMetadata();
 
-  return { ...state, ...metadata, movesBoard };
+    return { ...state, ...metadata, movesBoard };
+  } catch (e) {
+    return initialState;
+  }
 };
 
 export const highlightMoves = (

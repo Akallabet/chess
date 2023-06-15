@@ -67,13 +67,13 @@ t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
   t.end();
 });
 
-t.test('Pawn i.e. "c4"', t => {
+t.test('Pawn i.e. "c3"', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-  const san = 'c4';
+  const san = 'c3';
   const expected = {
     piece: 'P',
     origin: { x: 2, y: 6 },
-    target: { x: 2, y: 4 },
+    target: { x: 2, y: 5 },
   };
   t.same(fromSANToCoordinates(san, start({ FEN, mode: 'standard' })), expected);
   t.end();

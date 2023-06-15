@@ -49,7 +49,7 @@ export interface Move extends MoveCell {
   san: string;
 }
 
-export type MoveSquare = MoveCell[];
+export type MoveSquare = Move[];
 export type MovesBoardType = MoveSquare[][];
 
 export type ChessBoardType = Array<Array<Square>>;
@@ -78,7 +78,9 @@ export interface FENState {
   fullMoves: number;
 }
 
-export interface InternalState extends ChessInitialState, FENState {}
+export interface InternalState extends ChessInitialState, FENState {
+  error?: string;
+}
 
 export interface ChessState extends InternalState, MetaData {
   movesBoard: MovesBoardType;

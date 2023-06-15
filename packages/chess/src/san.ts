@@ -2,8 +2,13 @@ import * as R from 'ramda';
 import { files, pieces, piecesMap, ranks } from './constants.js';
 import { errorCodes } from './error-codes.js';
 import { generateLegalMoves } from './moves/generate-moves.js';
-import { getOriginsForTargetCell } from './moves/is-cell-under-check.js';
-import { InternalState, Move } from './types.js';
+import {
+  ChessState,
+  Coordinates,
+  InternalState,
+  Move,
+  Piece,
+} from './types.js';
 import { getPieceCoord } from './utils.js';
 
 const filesString = R.join('', files);
@@ -58,6 +63,10 @@ export function generateSANForMove(
   ].join('');
 }
 
+function isPawn(piece: Piece) {
+  return piece === piecesMap.p || piece === piecesMap.P;
+}
+
 const SANOptions = [
   // [
   //   `^[${files.join('')}]{1}[${ranks.join('')}]{1}$`,
@@ -79,17 +88,20 @@ const SANOptions = [
   // ],
   {
     expr: new RegExp(`^[${filesString}]{1}[${ranksString}]{1}$`),
-    parse: (SAN: string, state: InternalState) => {
+    parse: (SAN: string, state: ChessState) => {
       const [file, rank] = R.split('', SAN);
       const target = {
-        x: R.indexOf(file, files),
-        y: R.indexOf(Number(rank), ranks),
+        x: files.indexOf(file),
+        y: ranks.indexOf(Number(rank)),
       };
-      const origins = getOriginsForTargetCell(target, state.activeColor, state);
 
-      if (origins.length > 1) throw new Error(errorCodes.wrongMove);
+      const moves = state.movesBoard[target.y][target.x].filter(move =>
+        isPawn(move.piece)
+      );
 
-      const origin = origins[0];
+      if (moves.length !== 1) throw new Error(errorCodes.wrongMove);
+
+      const origin = moves[0].origin;
       const piece = R.path([origin.y, origin.x, 'piece'], state.board);
 
       if (piece !== piecesMap.P && piece !== piecesMap.p)
@@ -196,11 +208,20 @@ const SANOptions = [
   //   }),
   // ],
 ];
-export const fromSANToCoordinates = (SAN: string, state: InternalState) => {
+
+type MoveCoordinates = {
+  origin: Coordinates;
+  target: Coordinates;
+};
+
+export function fromSANToCoordinates(
+  SAN: string,
+  state: ChessState
+): MoveCoordinates | never {
   const option = R.find(({ expr }) => {
     return R.test(expr, SAN);
   }, SANOptions);
-  if (!option) throw new Error(errorCodes.wrongFormat);
+  if (!option) throw new Error(errorCodes.wrongFormat); // if (!option) return { error: errorCodes.wrongFormat };
   const { parse } = option;
   return parse(SAN, state);
-};
+}

@@ -7,7 +7,6 @@ import {
   ChessState,
   InternalState,
   Address,
-  // Coordinates,
 } from './types.js';
 import { fromPositionToCoordinates } from './utils.js';
 import { moveAndUpdateState } from './moves/index.js';
@@ -33,7 +32,7 @@ export function start(
   };
 }
 
-export const move = (san: string, initialState: ChessState): ChessState => {
+export function move(san: string, initialState: ChessState): ChessState {
   try {
     const { origin, target } = fromSANToCoordinates(san, initialState);
     const state = moveAndUpdateState(
@@ -48,12 +47,9 @@ export const move = (san: string, initialState: ChessState): ChessState => {
   } catch (e) {
     return initialState;
   }
-};
+}
 
-export const highlightMoves = (
-  addr: Address,
-  state: ChessState
-): ChessState => {
+export function highlightMoves(addr: Address, state: ChessState): ChessState {
   const coord = fromPositionToCoordinates(addr);
 
   if (!state.board[coord.y][coord.x].piece)
@@ -79,7 +75,7 @@ export const highlightMoves = (
     ...state,
     board,
   };
-};
+}
 
 export function clearBoard(state: ChessState): ChessState {
   const board = new Array(state.board.length)

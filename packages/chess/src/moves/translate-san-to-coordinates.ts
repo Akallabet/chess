@@ -1,11 +1,10 @@
-import * as R from 'ramda';
 import { files, pieces, piecesMap, ranks } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
 import { generateLegalMoves } from '../moves/generate-moves.js';
 import { ChessState, Coordinates, Piece } from '../types.js';
 
-const filesString = R.join('', files);
-const ranksString = R.join('', ranks);
+const filesString = files.join('');
+const ranksString = ranks.join('');
 
 // If the piece is sufficient to unambiguously determine the origin square, the whole from square is omitted. Otherwise, if two (or more) pieces of the same kind can move to the same square, the piece's initial is followed by (in descending order of preference)
 //
@@ -39,7 +38,7 @@ const SANOptions = [
   {
     expr: new RegExp(`^[${filesString}]{1}[${ranksString}]{1}$`),
     parse: (SAN: string, state: ChessState) => {
-      const [file, rank] = R.split('', SAN);
+      const [file, rank] = SAN.split('');
       const target = {
         x: files.indexOf(file),
         y: ranks.indexOf(Number(rank)),
@@ -52,7 +51,7 @@ const SANOptions = [
       if (moves.length !== 1) throw new Error(errorCodes.wrongMove);
 
       const origin = moves[0].origin;
-      const piece = R.path([origin.y, origin.x, 'piece'], state.board);
+      const piece = state.board[origin.y][origin.x].piece;
 
       if (piece !== piecesMap.P && piece !== piecesMap.p)
         throw new Error(errorCodes.wrongMove);
@@ -69,19 +68,17 @@ const SANOptions = [
       `^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}[${filesString}]{1}[${ranksString}]{1}$`
     ),
     parse: (SAN: string) => {
-      const [piece, fileOrigin, rankOrigin, fileTarget, rankTarget] = R.split(
-        '',
-        SAN
-      );
+      const [piece, fileOrigin, rankOrigin, fileTarget, rankTarget] =
+        SAN.split('');
       return {
         piece,
         origin: {
-          x: R.indexOf(fileOrigin, files),
-          y: R.indexOf(Number(rankOrigin), ranks),
+          x: files.indexOf(fileOrigin),
+          y: ranks.indexOf(Number(rankOrigin)),
         },
         target: {
-          x: R.indexOf(fileTarget, files),
-          y: R.indexOf(Number(rankTarget), ranks),
+          x: files.indexOf(fileTarget),
+          y: ranks.indexOf(Number(rankTarget)),
         },
       };
     },
@@ -89,20 +86,19 @@ const SANOptions = [
   {
     expr: new RegExp(`^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}$`),
     parse: (SAN: string, state: ChessState) => {
-      const [piece, fileTarget, rankTarget] = R.split('', SAN);
+      const [piece, fileTarget, rankTarget] = SAN.split('');
       const target = {
-        x: R.indexOf(fileTarget, files),
-        y: R.indexOf(Number(rankTarget), ranks),
+        x: files.indexOf(fileTarget),
+        y: ranks.indexOf(Number(rankTarget)),
       };
-      const move = state.movesBoard[target.y][target.x].find(
+      const moves = state.movesBoard[target.y][target.x].filter(
         move => move.piece === piece
       );
-      if (!move) throw new Error(errorCodes.wrongMove);
-      const origin = move.origin;
+      if (moves.length !== 1) throw new Error(errorCodes.wrongMove);
+      const origin = moves[0].origin;
 
-      const hasTargetMove = R.find(
-        ({ coord: { x, y } }) => x === target.x && y === target.y,
-        generateLegalMoves(origin, state)
+      const hasTargetMove = generateLegalMoves(origin, state).find(
+        ({ coord: { x, y } }) => x === target.x && y === target.y
       );
 
       if (!hasTargetMove) throw new Error();
@@ -170,9 +166,7 @@ export function translateSANToCoordinates(
   SAN: string,
   state: ChessState
 ): MoveCoordinates | never {
-  const option = R.find(({ expr }) => {
-    return R.test(expr, SAN);
-  }, SANOptions);
+  const option = SANOptions.find(({ expr }) => expr.test(SAN));
   if (!option) throw new Error(errorCodes.wrongFormat); // if (!option) return { error: errorCodes.wrongFormat };
   const { parse } = option;
   return parse(SAN, state);

@@ -90,3 +90,18 @@ t.test('SAN - Pawn wrong format i.e. "c3"', t => {
   );
   t.end();
 });
+
+t.test('SAN - Bishop unique move', t => {
+  const FEN = 'rnbqkbnr/pppp2pp/4pp2/8/8/4PP2/PPPP2PP/RNBQKBNR w KQkq - 0 1';
+  const san = 'Bd3';
+  const expected = {
+    piece: 'B',
+    origin: { x: 5, y: 7 },
+    target: { x: 3, y: 5 },
+  };
+  t.same(
+    translateSANToCoordinates(san, start({ FEN, mode: 'standard' })),
+    expected
+  );
+  t.end();
+});

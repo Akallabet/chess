@@ -1,6 +1,6 @@
-import { generateSANForMove } from '../san.js';
 import { InternalState, Move, MovesBoardType } from '../types.js';
 import { generateLegalMovesForAllPieces } from './generate-moves.js';
+import { translateMoveToSAN } from './translate-move-to-san.js';
 
 export function createMovesBoard(state: InternalState): MovesBoardType {
   const moves = generateLegalMovesForAllPieces(state);
@@ -18,7 +18,7 @@ export function createMovesBoard(state: InternalState): MovesBoardType {
     for (let j = 0; j < movesBoard[i].length; j++) {
       const moveSquare = movesBoard[i][j];
       for (let x = 0; x < moveSquare.length; x++) {
-        moveSquare[x].san = generateSANForMove(moveSquare, x);
+        moveSquare[x].san = translateMoveToSAN(moveSquare, x);
       }
     }
   }

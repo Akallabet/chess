@@ -1,15 +1,8 @@
 import * as R from 'ramda';
-import { files, pieces, piecesMap, ranks } from './constants.js';
-import { errorCodes } from './error-codes.js';
-import { generateLegalMoves } from './moves/generate-moves.js';
-import {
-  ChessState,
-  Coordinates,
-  InternalState,
-  Move,
-  Piece,
-} from './types.js';
-import { getPieceCoord } from './utils.js';
+import { files, pieces, piecesMap, ranks } from '../constants.js';
+import { errorCodes } from '../error-codes.js';
+import { generateLegalMoves } from '../moves/generate-moves.js';
+import { ChessState, Coordinates, Piece } from '../types.js';
 
 const filesString = R.join('', files);
 const ranksString = R.join('', ranks);
@@ -19,49 +12,6 @@ const ranksString = R.join('', ranks);
 // file of departure if different
 // rank of departure if the files are the same but the ranks differ
 // the complete origin square coordinate otherwise
-
-export function generateSANForMove(
-  moveSquare: Array<Move>,
-  moveIndex: number
-): string {
-  const move = moveSquare[moveIndex];
-  const { flags, coord, piece } = move;
-
-  const file = files[coord.x];
-  const rank = ranks[coord.y];
-  const capture = flags.capture ? 'x' : '';
-  const check = flags.check ? '+' : '';
-  // const checkmate = flags.checkmate ? '#' : '';
-  const sanOrigin = [
-    piece !== piecesMap.p && piece !== piecesMap.P ? piece : '',
-  ];
-  const sanDestination = [capture, file, String(rank), check];
-
-  const ambiguousIndexes = [];
-  for (let i = 0; i < moveSquare.length; i++) {
-    if (i !== moveIndex && moveSquare[i].piece === move.piece) {
-      ambiguousIndexes.push(i);
-    }
-  }
-  if (ambiguousIndexes.length === 0)
-    return [...sanOrigin, ...sanDestination].join('');
-
-  if (ambiguousIndexes.every(i => move.origin.x !== moveSquare[i].origin.x)) {
-    return [...sanOrigin, files[move.origin.x], ...sanDestination].join('');
-  }
-  if (ambiguousIndexes.every(i => move.origin.y !== moveSquare[i].origin.y)) {
-    return [...sanOrigin, String(ranks[move.origin.y]), ...sanDestination].join(
-      ''
-    );
-  }
-
-  return [
-    ...sanOrigin,
-    files[move.origin.x],
-    String(ranks[move.origin.y]),
-    ...sanDestination,
-  ].join('');
-}
 
 function isPawn(piece: Piece) {
   return piece === piecesMap.p || piece === piecesMap.P;
@@ -138,15 +88,17 @@ const SANOptions = [
   },
   {
     expr: new RegExp(`^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}$`),
-    parse: (SAN: string, state: InternalState) => {
+    parse: (SAN: string, state: ChessState) => {
       const [piece, fileTarget, rankTarget] = R.split('', SAN);
       const target = {
         x: R.indexOf(fileTarget, files),
         y: R.indexOf(Number(rankTarget), ranks),
       };
-      const origin = getPieceCoord(piece, state.board);
-
-      if (!origin) throw new Error(errorCodes.wrongMove);
+      const move = state.movesBoard[target.y][target.x].find(
+        move => move.piece === piece
+      );
+      if (!move) throw new Error(errorCodes.wrongMove);
+      const origin = move.origin;
 
       const hasTargetMove = R.find(
         ({ coord: { x, y } }) => x === target.x && y === target.y,
@@ -214,7 +166,7 @@ type MoveCoordinates = {
   target: Coordinates;
 };
 
-export function fromSANToCoordinates(
+export function translateSANToCoordinates(
   SAN: string,
   state: ChessState
 ): MoveCoordinates | never {

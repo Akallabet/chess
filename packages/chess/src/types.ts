@@ -40,6 +40,8 @@ export interface MoveCell {
     capture?: boolean;
     move?: boolean;
     check?: boolean;
+    checkmate?: boolean;
+    promotion?: boolean;
   };
 }
 

@@ -9,9 +9,11 @@ import {
   Address,
 } from './types.js';
 import { fromPositionToCoordinates } from './utils.js';
-import { moveAndUpdateState } from './moves/index.js';
+import {
+  moveAndUpdateState,
+  translateSANToCoordinates,
+} from './moves/index.js';
 import { errorCodes } from './error-codes.js';
-import { fromSANToCoordinates } from './san.js';
 
 export function start(
   initialState: ChessInitialState | ChessState
@@ -34,7 +36,7 @@ export function start(
 
 export function move(san: string, initialState: ChessState): ChessState {
   try {
-    const { origin, target } = fromSANToCoordinates(san, initialState);
+    const { origin, target } = translateSANToCoordinates(san, initialState);
     const state = moveAndUpdateState(
       fromPositionToCoordinates(origin),
       fromPositionToCoordinates(target),

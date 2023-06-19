@@ -12,7 +12,6 @@ export type Files = File[];
 export type Ranks = Rank[];
 
 export type Piece = (typeof piecesList)[number];
-
 export type Address = string;
 export type Position = Coordinates | Address;
 

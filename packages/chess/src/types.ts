@@ -45,9 +45,12 @@ export interface MoveCell {
   };
 }
 
-export interface Move extends MoveCell {
+export interface LegalMove extends MoveCell {
   piece: Piece;
-  coord: Coordinates;
+  target: Coordinates;
+}
+
+export interface Move extends LegalMove {
   san: string;
 }
 

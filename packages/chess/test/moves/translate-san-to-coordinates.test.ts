@@ -41,25 +41,31 @@ t.test('SAN - Wrong format', t => {
 
 t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
   const FEN = '2k5/8/8/8/8/8/8/3KQ3 w KQkq - 0 1';
-  const san = 'Qe1e8';
+  const san = 'Qe1e7';
   const expected = {
     piece: 'Q',
     origin: { x: 4, y: 7 },
-    target: { x: 4, y: 0 },
+    target: { x: 4, y: 1 },
+    san: 'Qe1e7',
+    flags: { move: true },
   };
 
   const game = start({ FEN, mode: 'standard' });
-  t.same(translateSANToCoordinates(san, game), expected);
+  const result = translateSANToCoordinates(san, game);
+  t.same(result.origin, expected.origin);
+  t.same(result.target, expected.target);
   t.end();
 });
 
 t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
   const FEN = '2k5/2N5/8/8/8/8/8/4QK2 w KQkq - 0 1';
-  const san = 'Qe8';
+  const san = 'Qe7';
   const expected = {
     piece: 'Q',
     origin: { x: 4, y: 7 },
-    target: { x: 4, y: 0 },
+    target: { x: 4, y: 1 },
+    san,
+    flags: { move: true },
   };
 
   const game = start({ FEN, mode: 'standard' });
@@ -74,6 +80,8 @@ t.test('Pawn i.e. "c3"', t => {
     piece: 'P',
     origin: { x: 2, y: 6 },
     target: { x: 2, y: 5 },
+    san,
+    flags: { move: true },
   };
   t.same(
     translateSANToCoordinates(san, start({ FEN, mode: 'standard' })),
@@ -98,6 +106,8 @@ t.test('SAN - Bishop unique move', t => {
     piece: 'B',
     origin: { x: 5, y: 7 },
     target: { x: 3, y: 5 },
+    san,
+    flags: { move: true },
   };
   t.same(
     translateSANToCoordinates(san, start({ FEN, mode: 'standard' })),

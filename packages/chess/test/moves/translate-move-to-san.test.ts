@@ -6,7 +6,7 @@ t.test('Generate SAN - only one pawn', t => {
   const move: Move = {
     piece: 'P',
     origin: { x: 2, y: 6 },
-    coord: { x: 2, y: 4 },
+    target: { x: 2, y: 4 },
     flags: {},
     san: '',
   };
@@ -21,14 +21,14 @@ t.test('Generate SAN - two knights with different files', t => {
     {
       piece: 'K',
       origin: { x: 2, y: 5 },
-      coord: { x: 4, y: 4 },
+      target: { x: 4, y: 4 },
       flags: {},
       san: '',
     },
     {
       piece: 'K',
       origin: { x: 3, y: 6 },
-      coord: { x: 2, y: 5 },
+      target: { x: 2, y: 5 },
       flags: {},
       san: '',
     },
@@ -43,14 +43,14 @@ t.test('Generate SAN - two rooks with same file and different ranks', t => {
     {
       piece: 'R',
       origin: { x: 3, y: 3 },
-      coord: { x: 3, y: 4 },
+      target: { x: 3, y: 4 },
       flags: {},
       san: '',
     },
     {
       piece: 'R',
       origin: { x: 3, y: 2 },
-      coord: { x: 3, y: 4 },
+      target: { x: 3, y: 4 },
       flags: {},
       san: '',
     },
@@ -68,7 +68,7 @@ t.test('Generate SAN - two rooks with same rank and different files', t => {
         x: 0,
         y: 6,
       },
-      coord: {
+      target: {
         x: 1,
         y: 6,
       },
@@ -83,7 +83,7 @@ t.test('Generate SAN - two rooks with same rank and different files', t => {
         x: 7,
         y: 6,
       },
-      coord: {
+      target: {
         x: 1,
         y: 6,
       },
@@ -102,7 +102,7 @@ t.test('Generate SAN - two rooks with same rank and different files', t => {
 //   const move: Move = {
 //     piece: 'P',
 //     origin: { x: 2, y: 6 },
-//     coord: { x: 2, y: 4 },
+//     target: { x: 2, y: 4 },
 //     flags: { capture: true },
 //     san: '',
 //   };

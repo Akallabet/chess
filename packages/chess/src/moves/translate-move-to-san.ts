@@ -12,10 +12,10 @@ export function translateMoveToSAN(
   moveIndex: number
 ): string {
   const move = moveSquare[moveIndex];
-  const { flags, coord, piece } = move;
+  const { flags, target, piece } = move;
 
-  const file = files[coord.x];
-  const rank = ranks[coord.y];
+  const file = files[target.x];
+  const rank = ranks[target.y];
   const capture = flags.capture ? 'x' : '';
   const check = flags.check ? '+' : '';
   const checkmate = flags.checkmate ? '#' : '';

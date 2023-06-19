@@ -10,7 +10,7 @@ export function createMovesBoard(state: InternalState): MovesBoardType {
   });
 
   for (let i = 0; i < moves.length; i++) {
-    const { x, y } = moves[i].coord;
+    const { x, y } = moves[i].target;
     movesBoard[y][x].push({ ...moves[i], san: '' });
   }
 

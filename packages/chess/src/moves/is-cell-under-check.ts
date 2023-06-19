@@ -10,7 +10,7 @@ export const canPieceMoveToTarget = (
 ): boolean => {
   const moves = generateMoves(origin, state);
   const targetMove = moves.find(
-    ({ coord }) => coord.x === target.x && coord.y === target.y
+    move => move.target.x === target.x && move.target.y === target.y
   );
   return !!targetMove;
 };

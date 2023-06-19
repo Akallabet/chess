@@ -1,7 +1,6 @@
 import { files, pieces, piecesMap, ranks } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
-import { generateLegalMoves } from '../moves/generate-moves.js';
-import { ChessState, Coordinates, Piece } from '../types.js';
+import { ChessState, Move, Piece } from '../types.js';
 
 const filesString = files.join('');
 const ranksString = ranks.join('');
@@ -12,7 +11,7 @@ const ranksString = ranks.join('');
 // rank of departure if the files are the same but the ranks differ
 // the complete origin square coordinate otherwise
 
-function isPawn(piece: Piece) {
+function isPawn(piece: Piece | undefined) {
   return piece === piecesMap.p || piece === piecesMap.P;
 }
 
@@ -51,36 +50,38 @@ const SANOptions = [
       if (moves.length !== 1) throw new Error(errorCodes.wrongMove);
 
       const origin = moves[0].origin;
-      const piece = state.board[origin.y][origin.x].piece;
-
-      if (piece !== piecesMap.P && piece !== piecesMap.p)
+      if (!isPawn(state.board[origin.y][origin.x].piece))
         throw new Error(errorCodes.wrongMove);
 
-      return {
-        piece,
-        origin: origin,
-        target,
-      };
+      return moves[0];
     },
   },
   {
     expr: new RegExp(
       `^[${pieces}]{1}[${filesString}]{1}[${ranksString}]{1}[${filesString}]{1}[${ranksString}]{1}$`
     ),
-    parse: (SAN: string) => {
+    parse: (SAN: string, state: ChessState) => {
       const [piece, fileOrigin, rankOrigin, fileTarget, rankTarget] =
         SAN.split('');
-      return {
-        piece,
-        origin: {
-          x: files.indexOf(fileOrigin),
-          y: ranks.indexOf(Number(rankOrigin)),
-        },
-        target: {
-          x: files.indexOf(fileTarget),
-          y: ranks.indexOf(Number(rankTarget)),
-        },
+      const target = {
+        x: files.indexOf(fileTarget),
+        y: ranks.indexOf(Number(rankTarget)),
       };
+      const origin = {
+        x: files.indexOf(fileOrigin),
+        y: ranks.indexOf(Number(rankOrigin)),
+      };
+
+      const moves = state.movesBoard[target.y][target.x].filter(
+        move =>
+          move.piece === piece &&
+          move.origin.x === origin.x &&
+          move.origin.y === origin.y
+      );
+
+      if (moves.length !== 1) throw new Error(errorCodes.wrongMove);
+
+      return moves[0];
     },
   },
   {
@@ -95,14 +96,8 @@ const SANOptions = [
         move => move.piece === piece
       );
       if (moves.length !== 1) throw new Error(errorCodes.wrongMove);
-      const origin = moves[0].origin;
 
-      const hasTargetMove = generateLegalMoves(origin, state).find(
-        ({ coord: { x, y } }) => x === target.x && y === target.y
-      );
-
-      if (!hasTargetMove) throw new Error();
-      return { piece, origin, target };
+      return moves[0];
     },
   },
   // [
@@ -157,15 +152,10 @@ const SANOptions = [
   // ],
 ];
 
-type MoveCoordinates = {
-  origin: Coordinates;
-  target: Coordinates;
-};
-
 export function translateSANToCoordinates(
   SAN: string,
   state: ChessState
-): MoveCoordinates | never {
+): Move | never {
   const option = SANOptions.find(({ expr }) => expr.test(SAN));
   if (!option) throw new Error(errorCodes.wrongFormat); // if (!option) return { error: errorCodes.wrongFormat };
   const { parse } = option;

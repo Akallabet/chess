@@ -1,6 +1,12 @@
 import { flags, modes } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
-import { Coordinates, InternalState, Move, MoveCell } from '../types.js';
+import {
+  Coordinates,
+  InternalState,
+  LegalMove,
+  Move,
+  MoveCell,
+} from '../types.js';
 import {
   areOpponents,
   getKingPiece,
@@ -11,13 +17,11 @@ import { canPieceMoveToTarget } from './is-cell-under-check.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns, patternsCheck } from './patterns.js';
 
-interface MovePattern extends MoveCell {
-  piece: string;
-  coord: Coordinates;
+interface MovePattern extends LegalMove {
   invalid?: boolean;
 }
 interface MovePatternResult extends MoveCell {
-  coord: Coordinates;
+  target: Coordinates;
 }
 
 const isNotInvalid = (move: MovePattern): boolean => !move.invalid;
@@ -38,9 +42,9 @@ const generateMovesFromPatterns = ({
     const { advance, shallStop, flag, rejectMove } = patterns[i];
     const proceed = true;
     let step = 0;
-    let prevMove = { coord: origin };
+    let prevMove = { target: origin };
     while (proceed) {
-      const current = advance(prevMove.coord);
+      const current = advance(prevMove.target);
       if (
         current.y >= state.board.length ||
         current.x >= state.board[0].length ||
@@ -62,7 +66,7 @@ const generateMovesFromPatterns = ({
           moves.push({
             piece,
             origin,
-            coord: current,
+            target: current,
             flags: { [flag || flags.capture]: true },
             invalid,
           });
@@ -72,7 +76,7 @@ const generateMovesFromPatterns = ({
       moves.push({
         piece,
         origin,
-        coord: current,
+        target: current,
         flags: {
           [flag || flags.move]: true,
         },
@@ -118,12 +122,12 @@ const isCheckMove = ({
   state: InternalState;
   move: Move;
 }): boolean => {
-  const moveState = moveAndUpdateState(origin, moveData.coord, state);
+  const moveState = moveAndUpdateState(origin, moveData.target, state);
   const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
   if (!kingCoord) throw new Error(errorCodes.king_not_found);
 
   const isUnderCheck = canPieceMoveToTarget(
-    moveData.coord,
+    moveData.target,
     kingCoord,
     moveState
   );
@@ -147,10 +151,6 @@ export function generateLegalMoves(
   }
 
   return moves;
-}
-interface LegalMove extends MoveCell {
-  piece: string;
-  coord: Coordinates;
 }
 
 export function generateLegalMovesForAllPieces(

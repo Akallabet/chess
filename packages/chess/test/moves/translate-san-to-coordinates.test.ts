@@ -41,19 +41,18 @@ t.test('SAN - Wrong format', t => {
 
 t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
   const FEN = '2k5/8/8/8/8/8/8/3KQ3 w KQkq - 0 1';
-  const san = 'Qe1e7';
+  const san = 'Qe7';
   const expected = {
     piece: 'Q',
     origin: { x: 4, y: 7 },
     target: { x: 4, y: 1 },
-    san: 'Qe1e7',
+    san: 'Qe7',
     flags: { move: true },
   };
 
   const game = start({ FEN, mode: 'standard' });
   const result = translateSANToCoordinates(san, game);
-  t.same(result.origin, expected.origin);
-  t.same(result.target, expected.target);
+  t.same(result, expected);
   t.end();
 });
 

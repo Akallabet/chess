@@ -1,6 +1,7 @@
 import { flags, modes } from '../constants.js';
 import { errorCodes } from '../error-codes.js';
 import {
+  ChessBoardType,
   Coordinates,
   InternalState,
   LegalMove,
@@ -25,6 +26,11 @@ interface MovePatternResult extends MoveCell {
 }
 
 const isNotInvalid = (move: MovePattern): boolean => !move.invalid;
+const isOutOfBound = (coord: Coordinates, board: ChessBoardType): boolean =>
+  coord.y >= board.length ||
+  coord.x >= board[0].length ||
+  coord.y < 0 ||
+  coord.x < 0;
 
 const generateMovesFromPatterns = ({
   patterns,
@@ -38,28 +44,20 @@ const generateMovesFromPatterns = ({
   piece: string;
 }): Array<MovePatternResult> => {
   const moves: Array<MovePattern> = [];
-  for (let i = 0; i < patterns.length; i++) {
-    const { advance, shallStop, flag, rejectMove } = patterns[i];
+  for (const pattern of patterns) {
     const proceed = true;
     let step = 0;
-    let prevMove = { target: origin };
+    let lastMove = { target: origin };
     while (proceed) {
-      const current = advance(prevMove.target);
-      if (
-        current.y >= state.board.length ||
-        current.x >= state.board[0].length ||
-        current.y < 0 ||
-        current.x < 0
-      )
-        break;
-      if (shallStop({ step, current, origin, state })) break;
-      const invalid = rejectMove({ step, origin, state, current });
+      const current = pattern.advance(lastMove.target);
+      if (isOutOfBound(current, state.board)) break;
+      if (pattern.shallStop({ step, current, origin, state })) break;
 
-      const cell = state.board[current.y][current.x];
-      if (cell.piece) {
+      const targetCell = state.board[current.y][current.x];
+      if (targetCell.piece) {
         if (
           areOpponents(
-            cell.piece,
+            targetCell.piece,
             state.board[origin.y][origin.x].piece as string
           )
         ) {
@@ -67,8 +65,8 @@ const generateMovesFromPatterns = ({
             piece,
             origin,
             target: current,
-            flags: { [flag || flags.capture]: true },
-            invalid,
+            flags: { [pattern.flag || flags.capture]: true },
+            invalid: pattern.rejectMove({ step, origin, state, current }),
           });
         }
         break;
@@ -78,18 +76,18 @@ const generateMovesFromPatterns = ({
         origin,
         target: current,
         flags: {
-          [flag || flags.move]: true,
+          [pattern.flag || flags.move]: true,
         },
-        invalid,
+        invalid: pattern.rejectMove({ step, origin, state, current }),
       });
       step++;
-      prevMove = moves[moves.length - 1];
+      lastMove = moves[moves.length - 1];
     }
   }
   const validMoves = moves.filter(isNotInvalid);
 
-  for (let i = 0; i < validMoves.length; i++) {
-    delete validMoves[i].invalid;
+  for (const move of validMoves) {
+    delete move.invalid;
   }
 
   return validMoves;
@@ -113,39 +111,43 @@ export const generateMoves = (
   return moves;
 };
 
-const isCheckMove = ({
-  origin,
+function isCheck({
+  move,
   state,
-  move: moveData,
 }: {
-  origin: Coordinates;
-  state: InternalState;
   move: Move;
-}): boolean => {
-  const moveState = moveAndUpdateState(origin, moveData.target, state);
+  state: InternalState;
+}): [boolean, Coordinates | undefined, InternalState] {
+  const moveState = moveAndUpdateState(move.origin, move.target, state);
   const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
   if (!kingCoord) throw new Error(errorCodes.king_not_found);
 
-  const isUnderCheck = canPieceMoveToTarget(
-    moveData.target,
+  return [
+    canPieceMoveToTarget(move.target, kingCoord, moveState),
     kingCoord,
-    moveState
-  );
-
-  return isUnderCheck;
-};
+    moveState,
+  ];
+}
 
 export function generateLegalMoves(
   origin: Coordinates,
   state: InternalState
 ): Array<Move> {
   const moves = generateMoves(origin, state, patterns) as Array<Move>;
+  // console.log('Moves for', origin, moves);
 
   if (state.mode === modes.standard) {
-    for (let i = 0; i < moves.length; i++) {
-      const move = moves[i];
-      if (isCheckMove({ origin, state, move })) {
+    for (const move of moves) {
+      const [check, opponentKingCoord, moveState] = isCheck({ state, move });
+      if (check && opponentKingCoord) {
         move.flags.check = true;
+
+        const opponentMoves = generateLegalMovesForAllPieces(
+          moveState
+        ) as Array<Move>;
+        if (opponentMoves.length === 0) {
+          move.flags.checkmate = true;
+        }
       }
     }
   }

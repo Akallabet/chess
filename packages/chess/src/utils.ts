@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { errorCodes } from './error-codes.js';
-import { files, ranks } from './constants.js';
+import { files, piecesMap, ranks } from './constants.js';
 import { Address, ChessBoardType, Coordinates } from './types.js';
 
 export const isWhitePiece = (piece: string): boolean =>
@@ -25,6 +25,12 @@ export const areOpponents = (pa: string, pb: string) =>
 
 export const getKingPiece = ({ activeColor }: { activeColor: string }) =>
   activeColor === 'w' ? 'K' : 'k';
+
+export const isKing = (piece: string) =>
+  piece === piecesMap.k || piece === piecesMap.K;
+// function isPawn(piece: Piece | undefined) {
+//   return piece === piecesMap.p || piece === piecesMap.P;
+// }
 
 export const getPieceCoord = (piece: string, board: ChessBoardType) => {
   for (let y = 0; y < board.length; y++) {

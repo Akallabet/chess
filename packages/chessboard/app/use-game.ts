@@ -32,9 +32,9 @@ export const useGame = (
   useEffect(() => {
     setGame(start({ mode, FEN }));
   }, []);
-  useEffect(() => {
-    setGame(start({ mode, FEN }));
-  }, [FEN, mode]);
+  // useEffect(() => {
+  //   setGame(start({ mode, FEN }));
+  // }, [FEN, mode]);
 
   if (!game) return undefined;
 

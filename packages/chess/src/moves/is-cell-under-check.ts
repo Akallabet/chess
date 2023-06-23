@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { Coordinates, InternalState } from '../types.js';
 import { isOpponentPiece } from '../utils.js';
 import { generateMoves } from './generate-moves.js';
@@ -15,14 +14,18 @@ export const canPieceMoveToTarget = (
   return !!targetMove;
 };
 
-export const isCellUnderCheck = R.curry((state, activeColor, target) => {
+export const isCellUnderCheck = (
+  state: InternalState,
+  activeColor: string,
+  target: Coordinates
+) => {
   const { board } = state;
 
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (
         board[y][x].piece &&
-        isOpponentPiece(activeColor, board[y][x].piece) &&
+        isOpponentPiece(activeColor, board[y][x].piece || '') &&
         canPieceMoveToTarget({ y, x }, target, state)
       ) {
         return true;
@@ -30,8 +33,10 @@ export const isCellUnderCheck = R.curry((state, activeColor, target) => {
     }
   }
   return false;
-});
+};
 
-export const anyCellUnderCheck = R.curry((state, activeColor, coords) =>
-  R.any(coord => isCellUnderCheck(state, activeColor, coord), coords)
-);
+export const anyCellUnderCheck = (
+  state: InternalState,
+  activeColor: string,
+  coords: Array<Coordinates>
+) => coords.some(coord => isCellUnderCheck(state, activeColor, coord));

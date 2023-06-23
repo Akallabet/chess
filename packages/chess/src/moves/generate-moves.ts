@@ -5,7 +5,6 @@ import {
   Coordinates,
   InternalState,
   MoveBase,
-  Move,
 } from '../types.js';
 import {
   areOpponents,
@@ -13,11 +12,13 @@ import {
   getPieceCoord,
   isActiveColorPiece,
 } from '../utils.js';
-import { canPieceMoveToTarget } from './is-cell-under-check.js';
+import {
+  canPieceMoveToTarget,
+  isCellUnderCheck,
+} from './is-cell-under-check.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
-// const isNotInvalid = (move: MovePattern): boolean => !move.invalid;
 const isOutOfBound = (coord: Coordinates, board: ChessBoardType): boolean =>
   coord.y >= board.length ||
   coord.x >= board[0].length ||
@@ -35,18 +36,14 @@ const generateMovesFromPatterns = ({
   state: InternalState;
   piece: string;
 }): Array<MoveBase> => {
-  // const moves: Array<MovePattern> = [];
   const moves: Array<MoveBase> = [];
-  // console.log('patterns from', origin);
   for (const pattern of patterns) {
     const proceed = true;
     let step = 0;
     let lastMove = { target: origin };
     while (proceed) {
       const target = pattern.advance(lastMove.target);
-      // console.log('current move', current);
       const outOfBound = isOutOfBound(target, state.board);
-      // console.log('is out of bound', outOfBound);
       if (outOfBound) break;
       const willStop = pattern.shallStop({
         step,
@@ -54,7 +51,6 @@ const generateMovesFromPatterns = ({
         origin,
         state,
       });
-      // console.log('shall stop?', willStop);
       if (willStop) break;
 
       const targetCell = state.board[target.y][target.x];
@@ -70,12 +66,6 @@ const generateMovesFromPatterns = ({
             origin,
             target: target,
             flags: { [pattern.flag || flags.capture]: true },
-            // invalid: pattern.rejectMove({
-            //   step,
-            //   origin,
-            //   state,
-            //   target,
-            // }),
           });
         }
         break;
@@ -87,35 +77,23 @@ const generateMovesFromPatterns = ({
         flags: {
           [pattern.flag || flags.move]: true,
         },
-        //   invalid: pattern.rejectMove({ step, origin, state, target }),
       });
       step++;
       lastMove = moves[moves.length - 1];
     }
   }
-  // const validMoves = moves.filter(isNotInvalid);
-  //
-  // for (const move of validMoves) {
-  //   delete move.invalid;
-  // }
-  // // console.log('valid moves for', origin, validMoves);
-  //
-  // return validMoves;
   return moves;
 };
 
 export const generateMoves = (
   coord: Coordinates,
   state: InternalState
-  // patterns: Record<string, Record<string, Array<Pattern>>> = patternsCheck
 ): Array<MoveBase> => {
   const { piece } = state.board[coord.y][coord.x];
-  // console.log('generate  moves for', coord, piece);
-
   if (!piece) return [];
 
   const moves = generateMovesFromPatterns({
-    patterns: patterns[state.mode][piece as string],
+    patterns: patterns[piece as string],
     state,
     origin: coord,
     piece,
@@ -137,6 +115,25 @@ function isCheckMove({
   return canPieceMoveToTarget(move.target, kingCoord, moveState);
 }
 
+function isInvalidMove({
+  move,
+  state,
+}: {
+  move: MoveBase;
+  state: InternalState;
+}): boolean {
+  const moveState = moveAndUpdateState(move.origin, move.target, state);
+  const kingCoord = getPieceCoord(getKingPiece(state), moveState.board);
+  if (!kingCoord) throw new Error(errorCodes.king_not_found);
+
+  const isUnderCheck = isCellUnderCheck(
+    moveState,
+    state.activeColor,
+    kingCoord
+  );
+  return isUnderCheck;
+}
+
 export function generateMovesForAllPieces(
   state: InternalState
 ): Array<MoveBase> {
@@ -152,20 +149,21 @@ export function generateMovesForAllPieces(
         const pieceMoves = generateMoves({ x, y }, state);
         if (state.mode === modes.standard) {
           for (const move of pieceMoves) {
-            const check = isCheckMove({
-              state,
-              move,
-            });
-            if (check) {
-              move.flags.check = true;
+            const invalid = isInvalidMove({ move, state });
+            if (!invalid) {
+              const check = isCheckMove({
+                state,
+                move,
+              });
+              if (check) {
+                move.flags.check = true;
+              }
+              moves.push(move);
             }
           }
         }
-        // console.log('legalMoves', { x, y }, legalMoves);
-        moves.push(...pieceMoves);
       }
     }
   }
-  // console.log('moves', moves);
   return moves;
 }

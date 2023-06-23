@@ -3,39 +3,20 @@ import { Coordinates, InternalState } from '../types.js';
 
 import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
 import { getCastlingRights } from '../fen.js';
-import {
-  areOpponents,
-  anyCellOccupied,
-  isCellOccupied,
-  getPieceColor,
-  getPieceCoord,
-  getKingPiece,
-} from '../utils.js';
-import { moveAndUpdateState } from './move-and-update-state.js';
-import { errorCodes } from '../error-codes.js';
+import { areOpponents } from '../utils.js';
 
-interface MoveState {
+interface PatternState {
   step: number;
   target: Coordinates;
   origin: Coordinates;
   state: InternalState;
 }
 
-const addProp =
-  <T, K extends string>(prop: K, value: T) =>
-  <U>(obj: U): U & Record<K, T> =>
-    ({
-      ...obj,
-      [prop]: value,
-    } as U & Record<K, T>);
-
-const identity = <T>(x: T): T => x;
-
 const F = () => false;
 
 const lte =
   (n: number) =>
-  ({ step }: MoveState) => {
+  ({ step }: PatternState) => {
     return n <= step;
   };
 
@@ -65,7 +46,7 @@ const stopIfOpponent = ({
   target: { x, y },
   origin,
   state,
-}: MoveState): boolean => {
+}: PatternState): boolean => {
   if (
     state.board[y][x].piece &&
     areOpponents(
@@ -94,78 +75,74 @@ const stopIfOpponent = ({
 //   );
 // };
 
-const kingsideCastlingMove =
-  (startRow: number) =>
-  ({ step, target, origin, state }: MoveState): boolean => {
-    // console.log('kingside castling move');
-    // if (step === 0) {
-    //   const moveState = moveAndUpdateState(origin, target, state);
-    //   const isKingUnderCheck = isCellUnderCheck(
-    //     moveState,
-    //     state.activeColor,
-    //     target
-    //   );
-    //   console.log('is king under check', isKingUnderCheck);
-    //   return isKingUnderCheck;
-    // }
-    // if (step === 1 && target.y === startRow) {
-    //   const hasCastlingRights = getCastlingRights(
-    //     state.board[origin.y][origin.x].piece || '',
-    //     state
-    //   );
-    //   if (!hasCastlingRights.kingSide) return true;
-    //   const moveState = moveAndUpdateState(origin, target, state);
-    //   return (
-    //     isCellOccupied(state, target) ||
-    //     isCellUnderCheck(moveState, state.activeColor, target)
-    //   );
-    // }
-    // return true;
-  };
+// const kingsideCastlingMove =
+//   (startRow: number) =>
+//   ({ step, target, origin, state }: PatternState): boolean => {
+// console.log('kingside castling move');
+// if (step === 0) {
+//   const moveState = moveAndUpdateState(origin, target, state);
+//   const isKingUnderCheck = isCellUnderCheck(
+//     moveState,
+//     state.activeColor,
+//     target
+//   );
+//   console.log('is king under check', isKingUnderCheck);
+//   return isKingUnderCheck;
+// }
+// if (step === 1 && target.y === startRow) {
+//   const hasCastlingRights = getCastlingRights(
+//     state.board[origin.y][origin.x].piece || '',
+//     state
+//   );
+//   if (!hasCastlingRights.kingSide) return true;
+//   const moveState = moveAndUpdateState(origin, target, state);
+//   return (
+//     isCellOccupied(state, target) ||
+//     isCellUnderCheck(moveState, state.activeColor, target)
+//   );
+// }
+// return true;
+// };
 
-const queensideCastlingMove =
-  (startRow: number) =>
-  ({ step, target, origin, state }: MoveState): boolean => {
-    // console.log('is queenside castling');
-    // if (step === 0)
-    //   return isCellUnderCheck(
-    //     state,
-    //     getPieceColor(state.board[origin.y][origin.x].piece as string),
-    //     target
-    //   );
-    // if (step === 1 && target.y === startRow) {
-    //   const hasCastlingghts = getCastlingRights(
-    //     state.board[origin.y][origin.x].piece || '',
-    //     state
-    //   );
-    //   if (!hasCastlingghts.queenSide) return true;
-    //   return (
-    //     anyCellUnderCheck(
-    //       state,
-    //       getPieceColor(state.board[origin.y][origin.x].piece as string),
-    //       [target, { y: target.y, x: target.x - 1 }]
-    //     ) || anyCellOccupied(state, [target, { y: target.y, x: target.x - 1 }])
-    //   );
-    // }
-    // return true;
-  };
+// const queensideCastlingMove =
+//   (startRow: number) =>
+//   ({ step, target, origin, state }: PatternState): boolean => {
+// console.log('is queenside castling');
+// if (step === 0)
+//   return isCellUnderCheck(
+//     state,
+//     getPieceColor(state.board[origin.y][origin.x].piece as string),
+//     target
+//   );
+// if (step === 1 && target.y === startRow) {
+//   const hasCastlingghts = getCastlingRights(
+//     state.board[origin.y][origin.x].piece || '',
+//     state
+//   );
+//   if (!hasCastlingghts.queenSide) return true;
+//   return (
+//     anyCellUnderCheck(
+//       state,
+//       getPieceColor(state.board[origin.y][origin.x].piece as string),
+//       [target, { y: target.y, x: target.x - 1 }]
+//     ) || anyCellOccupied(state, [target, { y: target.y, x: target.x - 1 }])
+//   );
+// }
+// return true;
+// };
 
-interface BasePattern {
+export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
-  shallStop: (args: MoveState) => boolean;
+  shallStop: (args: PatternState) => boolean;
   flag?: string;
   limit?: number;
 }
 
-export interface Pattern extends BasePattern {
-  rejectMove: (args: MoveState) => boolean;
-}
-
-const basePatterns: Record<string, Array<BasePattern>> = {
+const basePatterns: Record<string, Array<Pattern>> = {
   p: [
     {
       advance: bottom,
-      shallStop: ({ step, origin }: MoveState) => {
+      shallStop: ({ step, origin }: PatternState) => {
         if (origin.y > 1 && step >= 1) return true;
         if (origin.y === 1 && step >= 2) return true;
         return false;
@@ -186,7 +163,7 @@ const basePatterns: Record<string, Array<BasePattern>> = {
   P: [
     {
       advance: top,
-      shallStop: ({ step, origin }: MoveState) => {
+      shallStop: ({ step, origin }: PatternState) => {
         if (origin.y < 6 && step >= 1) return true;
         if (origin.y === 6 && step >= 2) return true;
         return false;
@@ -311,76 +288,20 @@ const basePatterns: Record<string, Array<BasePattern>> = {
     { advance: bottomLeft, shallStop: lte(1) },
   ],
 };
-const isOwnKingUnderCheck = ({ origin, state, target }: MoveState): boolean => {
-  const kingCoord = getPieceCoord(getKingPiece(state), state.board);
-  if (!kingCoord) throw new Error(errorCodes.king_not_found);
 
-  const moveState = moveAndUpdateState(origin, target, state);
-  const pieceColor = getPieceColor(
-    moveState.board[kingCoord.y][kingCoord.x].piece as string
-  );
-  const isUnderCheck = isCellUnderCheck(moveState, pieceColor, kingCoord);
-  return isUnderCheck;
-};
+const identity = <T>(x: T): T => x;
 
-export const patterns: Record<string, Record<string, Array<Pattern>>> = {
-  standard: {
-    p: basePatterns.p.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    P: basePatterns.P.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    r: basePatterns.r.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    R: basePatterns.r.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    b: basePatterns.b.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    B: basePatterns.b.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    n: basePatterns.n.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    N: basePatterns.n.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    q: basePatterns.q.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    Q: basePatterns.q.map(addProp('rejectMove', isOwnKingUnderCheck)),
-    k: basePatterns.k.map(addProp('rejectMove', F)),
-    K: basePatterns.K.map(addProp('rejectMove', F)),
-  },
-  demo: {
-    p: basePatterns.p.map(addProp('rejectMove', F)),
-    P: basePatterns.P.map(addProp('rejectMove', F)),
-    r: basePatterns.r.map(addProp('rejectMove', F)),
-    R: basePatterns.r.map(addProp('rejectMove', F)),
-    b: basePatterns.b.map(addProp('rejectMove', F)),
-    B: basePatterns.b.map(addProp('rejectMove', F)),
-    n: basePatterns.n.map(addProp('rejectMove', F)),
-    N: basePatterns.n.map(addProp('rejectMove', F)),
-    q: basePatterns.q.map(addProp('rejectMove', F)),
-    Q: basePatterns.q.map(addProp('rejectMove', F)),
-    k: basePatterns.k.map(addProp('rejectMove', F)),
-    K: basePatterns.K.map(addProp('rejectMove', F)),
-  },
-};
-
-export const patternsCheck: Record<string, Record<string, Array<Pattern>>> = {
-  standard: {
-    p: patterns.demo.p.map(identity),
-    P: patterns.demo.P.map(identity),
-    r: patterns.demo.r.map(identity),
-    R: patterns.demo.r.map(identity),
-    b: patterns.demo.b.map(identity),
-    B: patterns.demo.b.map(identity),
-    n: patterns.demo.n.map(identity),
-    N: patterns.demo.n.map(identity),
-    q: patterns.demo.q.map(identity),
-    Q: patterns.demo.q.map(identity),
-    k: patterns.standard.k.map(addProp('shallStop', lte(1))),
-    K: patterns.standard.K.map(addProp('shallStop', lte(1))),
-  },
-  demo: {
-    p: patterns.demo.p.map(identity),
-    P: patterns.demo.P.map(identity),
-    r: patterns.demo.r.map(identity),
-    R: patterns.demo.r.map(identity),
-    b: patterns.demo.b.map(identity),
-    B: patterns.demo.b.map(identity),
-    n: patterns.demo.n.map(identity),
-    N: patterns.demo.n.map(identity),
-    q: patterns.demo.q.map(identity),
-    Q: patterns.demo.q.map(identity),
-    k: patterns.standard.k.map(addProp('shallStop', lte(1))),
-    K: patterns.standard.K.map(addProp('shallStop', lte(1))),
-  },
+export const patterns: Record<string, Array<Pattern>> = {
+  p: basePatterns.p.map(identity),
+  P: basePatterns.P.map(identity),
+  r: basePatterns.r.map(identity),
+  R: basePatterns.r.map(identity),
+  b: basePatterns.b.map(identity),
+  B: basePatterns.b.map(identity),
+  n: basePatterns.n.map(identity),
+  N: basePatterns.n.map(identity),
+  q: basePatterns.q.map(identity),
+  Q: basePatterns.q.map(identity),
+  k: basePatterns.k.map(identity),
+  K: basePatterns.K.map(identity),
 };

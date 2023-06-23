@@ -263,15 +263,48 @@ t.test('Highlight King moves', t => {
   t.end();
 });
 
-t.test('Highligh moves with king under check', t => {
-  const expected = [{ target: { x: 3, y: 3 }, flags: { move: true } }];
+t.only('Highligh moves with king under check', t => {
+  const expected = [
+    {
+      piece: 'k',
+      origin: { x: 6, y: 0 },
+      target: { x: 7, y: 0 },
+      flags: { move: true },
+    },
+    {
+      piece: 'k',
+      origin: { x: 6, y: 0 },
+      target: { x: 5, y: 0 },
+      flags: { move: true },
+    },
+    {
+      piece: 'k',
+      origin: { x: 6, y: 0 },
+      target: { x: 6, y: 1 },
+      flags: { move: true },
+    },
+    {
+      piece: 'k',
+      origin: { x: 6, y: 0 },
+      target: { x: 7, y: 1 },
+      flags: { move: true },
+    },
+    {
+      piece: 'p',
+      origin: { x: 3, y: 1 },
+      target: { x: 3, y: 3 },
+      flags: { move: true },
+    },
+    {
+      piece: 'p',
+      origin: { x: 4, y: 1 },
+      target: { x: 4, y: 2 },
+      flags: { move: true },
+    },
+  ];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
-  const origin = { x: 3, y: 1 };
-  const input = generateMoves(origin, start(start({ FEN, mode: 'standard' })));
-  t.same(
-    input.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('p'))
-  );
+  const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
+  t.same(actual, expected);
   t.end();
 });
 
@@ -351,7 +384,7 @@ t.test('No castling moves if one of the cells is occupied', t => {
   t.end();
 });
 
-t.only('Highlight check', t => {
+t.test('Highlight check', t => {
   const FEN = '4k3/8/8/8/8/8/8/4KB2 w - - 0 1';
   const expected = [
     {

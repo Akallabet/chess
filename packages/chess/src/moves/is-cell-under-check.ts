@@ -1,5 +1,5 @@
 import { Coordinates, InternalState } from '../types.js';
-import { isOpponentPiece } from '../utils.js';
+import { isActiveColorPiece } from '../utils.js';
 import { generateMoves } from './generate-moves.js';
 
 export const canPieceMoveToTarget = (
@@ -14,18 +14,15 @@ export const canPieceMoveToTarget = (
   return !!targetMove;
 };
 
-export const isCellUnderCheck = (
-  state: InternalState,
-  activeColor: string,
-  target: Coordinates
-) => {
+export const isCellUnderCheck = (state: InternalState, target: Coordinates) => {
   const { board } = state;
 
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
+      const square = board[y][x];
       if (
-        board[y][x].piece &&
-        isOpponentPiece(activeColor, board[y][x].piece || '') &&
+        square.piece &&
+        isActiveColorPiece(state.activeColor, square.piece as string) && // bad bad bad, please remove coercion :(
         canPieceMoveToTarget({ y, x }, target, state)
       ) {
         return true;
@@ -37,6 +34,5 @@ export const isCellUnderCheck = (
 
 export const anyCellUnderCheck = (
   state: InternalState,
-  activeColor: string,
   coords: Array<Coordinates>
-) => coords.some(coord => isCellUnderCheck(state, activeColor, coord));
+) => coords.some(coord => isCellUnderCheck(state, coord));

@@ -25,14 +25,14 @@ const topLeft = ({ x, y }: Coordinates): Coordinates => ({
   y: y - 1,
 });
 const topRight = ({ x, y }: Coordinates): Coordinates => ({
-  x: x - 1,
-  y: y + 1,
-});
-const bottomLeft = ({ x, y }: Coordinates): Coordinates => ({
   x: x + 1,
   y: y - 1,
 });
-const bottomght = ({ x, y }: Coordinates): Coordinates => ({
+const bottomLeft = ({ x, y }: Coordinates): Coordinates => ({
+  x: x - 1,
+  y: y + 1,
+});
+const bottomRight = ({ x, y }: Coordinates): Coordinates => ({
   x: x + 1,
   y: y + 1,
 });
@@ -47,15 +47,23 @@ const stopIfOpponent = ({
   origin,
   state,
 }: PatternState): boolean => {
-  if (
-    state.board[y][x].piece &&
-    areOpponents(
-      state.board[y][x].piece as string,
-      state.board[origin.y][origin.x].piece as string
-    )
-  )
-    return false;
-  return true;
+  if (!state.board[y][x].piece) return false;
+  return areOpponents(
+    state.board[y][x].piece as string,
+    state.board[origin.y][origin.x].piece as string
+  );
+};
+
+const stopIfNotOpponent = ({
+  target: { x, y },
+  origin,
+  state,
+}: PatternState): boolean => {
+  if (!state.board[y][x].piece) return true;
+  return !areOpponents(
+    state.board[y][x].piece as string,
+    state.board[origin.y][origin.x].piece as string
+  );
 };
 
 // const shouldKingStop = ({
@@ -135,51 +143,46 @@ export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
   shallStop: (args: PatternState) => boolean;
   flag?: string;
-  limit?: number;
 }
 
 const basePatterns: Record<string, Array<Pattern>> = {
   p: [
     {
       advance: bottom,
-      shallStop: ({ step, origin }: PatternState) => {
+      shallStop: ({ step, origin, target, state }: PatternState) => {
         if (origin.y > 1 && step >= 1) return true;
         if (origin.y === 1 && step >= 2) return true;
-        return false;
+        return stopIfOpponent({ step, origin, target, state });
       },
-      limit: 1,
     },
     {
-      advance: bottomght,
-      shallStop: stopIfOpponent,
+      advance: bottomRight,
+      shallStop: stopIfNotOpponent,
       flag: flags.capture,
     },
     {
-      advance: topRight,
-      shallStop: stopIfOpponent,
+      advance: bottomLeft,
+      shallStop: stopIfNotOpponent,
       flag: flags.capture,
     },
   ],
   P: [
     {
       advance: top,
-      shallStop: ({ step, origin }: PatternState) => {
+      shallStop: ({ step, origin, target, state }: PatternState) => {
         if (origin.y < 6 && step >= 1) return true;
         if (origin.y === 6 && step >= 2) return true;
-        return false;
+        return stopIfOpponent({ step, origin, target, state });
       },
     },
     {
-      advance: bottomLeft,
-      shallStop: stopIfOpponent,
+      advance: topRight,
+      shallStop: stopIfNotOpponent,
       flag: flags.capture,
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x - 1,
-        y: y - 1,
-      }),
-      shallStop: stopIfOpponent,
+      advance: topLeft,
+      shallStop: stopIfNotOpponent,
       flag: flags.capture,
     },
   ],
@@ -242,7 +245,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
     },
   ],
   b: [
-    { advance: bottomght, shallStop: F },
+    { advance: bottomRight, shallStop: F },
     { advance: topRight, shallStop: F },
     { advance: topLeft, shallStop: F },
     { advance: bottomLeft, shallStop: F },
@@ -258,7 +261,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: left, shallStop: F },
     { advance: top, shallStop: F },
     { advance: bottom, shallStop: F },
-    { advance: bottomght, shallStop: F },
+    { advance: bottomRight, shallStop: F },
     { advance: topRight, shallStop: F },
     { advance: topLeft, shallStop: F },
     { advance: bottomLeft, shallStop: F },
@@ -270,7 +273,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: left, shallStop: lte(1) },
     { advance: top, shallStop: lte(1) },
     { advance: bottom, shallStop: lte(1) },
-    { advance: bottomght, shallStop: lte(1) },
+    { advance: bottomRight, shallStop: lte(1) },
     { advance: topRight, shallStop: lte(1) },
     { advance: topLeft, shallStop: lte(1) },
     { advance: bottomLeft, shallStop: lte(1) },
@@ -282,26 +285,24 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: left, shallStop: lte(1) },
     { advance: top, shallStop: lte(1) },
     { advance: bottom, shallStop: lte(1) },
-    { advance: bottomght, shallStop: lte(1) },
+    { advance: bottomRight, shallStop: lte(1) },
     { advance: topRight, shallStop: lte(1) },
     { advance: topLeft, shallStop: lte(1) },
     { advance: bottomLeft, shallStop: lte(1) },
   ],
 };
 
-const identity = <T>(x: T): T => x;
-
 export const patterns: Record<string, Array<Pattern>> = {
-  p: basePatterns.p.map(identity),
-  P: basePatterns.P.map(identity),
-  r: basePatterns.r.map(identity),
-  R: basePatterns.r.map(identity),
-  b: basePatterns.b.map(identity),
-  B: basePatterns.b.map(identity),
-  n: basePatterns.n.map(identity),
-  N: basePatterns.n.map(identity),
-  q: basePatterns.q.map(identity),
-  Q: basePatterns.q.map(identity),
-  k: basePatterns.k.map(identity),
-  K: basePatterns.K.map(identity),
+  p: basePatterns.p,
+  P: basePatterns.P,
+  r: basePatterns.r,
+  R: basePatterns.r,
+  b: basePatterns.b,
+  B: basePatterns.b,
+  n: basePatterns.n,
+  N: basePatterns.n,
+  q: basePatterns.q,
+  Q: basePatterns.q,
+  k: basePatterns.k,
+  K: basePatterns.K,
 };

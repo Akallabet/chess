@@ -110,7 +110,7 @@ function isCheckMove({
 }): boolean {
   const moveState = moveAndUpdateState(move.origin, move.target, state);
   const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
-  if (!kingCoord) throw new Error(errorCodes.king_not_found);
+  if (!kingCoord) return false;
 
   return canPieceMoveToTarget(move.target, kingCoord, moveState);
 }
@@ -124,13 +124,9 @@ function isInvalidMove({
 }): boolean {
   const moveState = moveAndUpdateState(move.origin, move.target, state);
   const kingCoord = getPieceCoord(getKingPiece(state), moveState.board);
-  if (!kingCoord) throw new Error(errorCodes.king_not_found);
+  if (!kingCoord) return false;
 
-  const isUnderCheck = isCellUnderCheck(
-    moveState,
-    state.activeColor,
-    kingCoord
-  );
+  const isUnderCheck = isCellUnderCheck(moveState, kingCoord);
   return isUnderCheck;
 }
 

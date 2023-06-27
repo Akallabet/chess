@@ -263,7 +263,7 @@ t.test('Highlight King moves', t => {
   t.end();
 });
 
-t.only('Highligh moves with king under check', t => {
+t.test('Highligh moves with king under check', t => {
   const expected = [
     {
       piece: 'k',
@@ -310,13 +310,95 @@ t.only('Highligh moves with king under check', t => {
 
 t.test('Highlight moves of king under check', t => {
   const FEN = 'rnbqkbnr/ppp2ppp/8/1B1pp3/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 1';
-  const expected = [{ target: { x: 4, y: 1 }, flags: { move: true } }];
-  const origin = { x: 4, y: 0 };
-  const actual = generateMoves(origin, start({ FEN, mode: 'standard' }));
-  t.same(
-    actual.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
-  );
+  // const expected = [{ target: { x: 4, y: 1 }, flags: { move: true } }];
+  const expected = [
+    {
+      piece: 'n',
+      origin: {
+        x: 1,
+        y: 0,
+      },
+      target: {
+        x: 3,
+        y: 1,
+      },
+      flags: {
+        move: true,
+      },
+    },
+    {
+      piece: 'n',
+      origin: {
+        x: 1,
+        y: 0,
+      },
+      target: {
+        x: 2,
+        y: 2,
+      },
+      flags: {
+        move: true,
+      },
+    },
+    {
+      piece: 'b',
+      origin: {
+        x: 2,
+        y: 0,
+      },
+      target: {
+        x: 3,
+        y: 1,
+      },
+      flags: {
+        move: true,
+      },
+    },
+    {
+      piece: 'q',
+      origin: {
+        x: 3,
+        y: 0,
+      },
+      target: {
+        x: 3,
+        y: 1,
+      },
+      flags: {
+        move: true,
+      },
+    },
+    {
+      piece: 'k',
+      origin: {
+        x: 4,
+        y: 0,
+      },
+      target: {
+        x: 4,
+        y: 1,
+      },
+      flags: {
+        move: true,
+      },
+    },
+    {
+      piece: 'p',
+      origin: {
+        x: 2,
+        y: 1,
+      },
+      target: {
+        x: 2,
+        y: 2,
+      },
+      flags: {
+        move: true,
+      },
+    },
+  ];
+  const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
+  t.same(actual, expected);
   t.end();
 });
 
@@ -464,7 +546,6 @@ t.test('Highlight checkmate', t => {
   const expected = [];
   const origin = { x: 0, y: 1 };
   const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
-  console.log('actual', actual);
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))

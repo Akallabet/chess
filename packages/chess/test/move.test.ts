@@ -2,7 +2,7 @@ import t from 'tap';
 import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
-t.only('Move white pawn from e2 to e3', t => {
+t.test('Move white pawn from e2 to e3', t => {
   const expected = getBoard([
     { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
     { coord: { x: 3, y: 0 }, cell: { piece: 'k' } },

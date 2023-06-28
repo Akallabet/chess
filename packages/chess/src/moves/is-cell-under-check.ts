@@ -7,10 +7,18 @@ export const canPieceMoveToTarget = (
   target: Coordinates,
   state: InternalState
 ): boolean => {
+  // console.log(
+  //   'check whether canPieceMoveToTarget',
+  //   origin,
+  //   target,
+  //   state.board[origin.y][origin.x].piece,
+  //   state.FEN
+  // );
   const moves = generateMoves(origin, state);
   const targetMove = moves.find(
     move => move.target.x === target.x && move.target.y === target.y
   );
+  // console.log('canPieceMoveToTarget', !!targetMove);
   return !!targetMove;
 };
 

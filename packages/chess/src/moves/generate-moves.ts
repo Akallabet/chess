@@ -11,6 +11,7 @@ import {
   getKingPiece,
   getPieceCoord,
   isActiveColorPiece,
+  isKing,
 } from '../utils.js';
 import {
   canPieceMoveToTarget,
@@ -101,20 +102,6 @@ export const generateMoves = (
   return moves;
 };
 
-function isCheckMove({
-  move,
-  state,
-}: {
-  move: MoveBase;
-  state: InternalState;
-}): boolean {
-  const moveState = moveAndUpdateState(move.origin, move.target, state);
-  const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
-  if (!kingCoord) return false;
-
-  return canPieceMoveToTarget(move.target, kingCoord, moveState);
-}
-
 function isInvalidMove({
   move,
   state,
@@ -123,11 +110,41 @@ function isInvalidMove({
   state: InternalState;
 }): boolean {
   const moveState = moveAndUpdateState(move.origin, move.target, state);
-  const kingCoord = getPieceCoord(getKingPiece(state), moveState.board);
+  const kingCoord = getPieceCoord(
+    getKingPiece(state.activeColor),
+    moveState.board
+  );
   if (!kingCoord) return false;
 
   const isUnderCheck = isCellUnderCheck(moveState, kingCoord);
   return isUnderCheck;
+}
+
+function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
+  check: boolean;
+  state: InternalState;
+} {
+  const moveState = moveAndUpdateState(move.origin, move.target, state);
+  const kingCoord = getPieceCoord(
+    getKingPiece(moveState.activeColor),
+    moveState.board
+  );
+  if (!kingCoord) return { check: false, state: moveState };
+
+  return {
+    check: canPieceMoveToTarget(move.target, kingCoord, moveState),
+    state: moveState,
+  };
+}
+
+function isCheckMateMove(state: InternalState): boolean {
+  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
+  if (!kingCoord) return false;
+  const kingMoves = generateMoves(kingCoord, state);
+  const legalKingMoves = kingMoves.filter(move => {
+    return !isInvalidMove({ move, state });
+  });
+  return legalKingMoves.length === 0;
 }
 
 export function generateMovesForAllPieces(
@@ -147,12 +164,16 @@ export function generateMovesForAllPieces(
           for (const move of pieceMoves) {
             const invalid = isInvalidMove({ move, state });
             if (!invalid) {
-              const check = isCheckMove({
+              const checkMove = calcCheck({
                 state,
                 move,
               });
-              if (check) {
-                move.flags.check = true;
+              if (checkMove.check) {
+                if (isCheckMateMove(checkMove.state)) {
+                  move.flags.checkmate = true;
+                } else {
+                  move.flags.check = true;
+                }
               }
               moves.push(move);
             }

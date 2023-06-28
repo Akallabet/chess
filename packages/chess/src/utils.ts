@@ -23,8 +23,7 @@ export const areOpponents = (pa: string, pb: string) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));
 
-export const getKingPiece = ({ activeColor }: { activeColor: string }) =>
-  activeColor === 'w' ? 'K' : 'k';
+export const getKingPiece = (color: string) => (color === 'w' ? 'K' : 'k');
 
 export const isKing = (piece: string) =>
   piece === piecesMap.k || piece === piecesMap.K;

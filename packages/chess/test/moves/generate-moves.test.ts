@@ -484,13 +484,25 @@ t.test('Highlight check', t => {
     {
       piece: 'K',
       origin: { x: 4, y: 7 },
-      target: { x: 3, y: 6 },
+      target: { x: 5, y: 6 },
       flags: { move: true },
     },
     {
       piece: 'K',
       origin: { x: 4, y: 7 },
-      target: { x: 5, y: 6 },
+      target: { x: 3, y: 6 },
+      flags: { move: true },
+    },
+    {
+      piece: 'B',
+      origin: { x: 5, y: 7 },
+      target: { x: 6, y: 6 },
+      flags: { move: true },
+    },
+    {
+      piece: 'B',
+      origin: { x: 5, y: 7 },
+      target: { x: 7, y: 5 },
       flags: { move: true },
     },
     {
@@ -523,32 +535,17 @@ t.test('Highlight check', t => {
       target: { x: 0, y: 2 },
       flags: { move: true },
     },
-    {
-      piece: 'B',
-      origin: { x: 5, y: 7 },
-      target: { x: 6, y: 6 },
-      flags: { move: true },
-    },
-    {
-      piece: 'B',
-      origin: { x: 5, y: 7 },
-      target: { x: 7, y: 5 },
-      flags: { move: true },
-    },
   ];
   const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
   t.same(actual, expected);
   t.end();
 });
 
-t.test('Highlight checkmate', t => {
-  const FEN = '1k1Q4/3R4/8/8/8/8/8/4K3 b - - 0 1';
-  const expected = [];
-  const origin = { x: 0, y: 1 };
-  const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
-  t.same(
-    actual.sort(compareByMove),
-    expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
-  );
+t.only('Highlight checkmate', t => {
+  const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
+  const FENState = fromFEN(FEN);
+  const moves = generateMovesForAllPieces({ ...FENState, mode: 'standard' });
+  const checkMateMoves = moves.filter(({ flags }) => flags.checkmate);
+  t.same(checkMateMoves.length, 4);
   t.end();
 });

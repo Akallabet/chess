@@ -26,15 +26,10 @@ export interface Square extends EmptySquare {
   selected?: boolean;
 }
 
-export interface MoveState {
-  step: number;
-  current: Coordinates;
+export interface MoveBase {
+  piece: Piece;
   origin: Coordinates;
-  state: InternalState;
-}
-
-export interface MoveCell {
-  origin: Coordinates;
+  target: Coordinates;
   flags: {
     capture?: boolean;
     move?: boolean;
@@ -44,17 +39,9 @@ export interface MoveCell {
   };
 }
 
-export interface LegalMove extends MoveCell {
-  piece: Piece;
-  target: Coordinates;
-}
-
-export interface Move extends LegalMove {
+export interface Move extends MoveBase {
   san: string;
 }
-
-export type MoveSquare = Move[];
-export type MovesBoardType = MoveSquare[][];
 
 export type ChessBoardType = Array<Array<Square>>;
 
@@ -87,5 +74,5 @@ export interface InternalState extends ChessInitialState, FENState {
 }
 
 export interface ChessState extends InternalState, MetaData {
-  movesBoard: MovesBoardType;
+  movesBoard: Array<Array<Array<Move>>>;
 }

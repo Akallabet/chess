@@ -19,7 +19,6 @@ export const useGame = (
   FEN: string,
   mode: GameMode
 ): GameOutput | undefined => {
-  console.log(FEN);
   const [game, setGame] = useState<undefined | ChessState>();
   const [selected, setSelected] = useState<undefined | Coordinates>();
 
@@ -32,9 +31,9 @@ export const useGame = (
   useEffect(() => {
     setGame(start({ mode, FEN }));
   }, []);
-  useEffect(() => {
-    setGame(start({ mode, FEN }));
-  }, [FEN, mode]);
+  // useEffect(() => {
+  //   setGame(start({ mode, FEN }));
+  // }, [FEN, mode]);
 
   if (!game) return undefined;
 

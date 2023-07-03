@@ -1,9 +1,11 @@
-import { InternalState, Move, MovesBoardType } from '../types.js';
-import { generateLegalMovesForAllPieces } from './generate-moves.js';
+import { InternalState, Move } from '../types.js';
+import { generateMovesForAllPieces } from './generate-moves.js';
 import { translateMoveToSAN } from './translate-move-to-san.js';
 
-export function createMovesBoard(state: InternalState): MovesBoardType {
-  const moves = generateLegalMovesForAllPieces(state);
+export function createMovesBoard(
+  state: InternalState
+): Array<Array<Array<Move>>> {
+  const moves = generateMovesForAllPieces(state);
 
   const movesBoard: Array<Array<Array<Move>>> = state.board.map(row => {
     return row.map(() => []);

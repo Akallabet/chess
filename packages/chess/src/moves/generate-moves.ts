@@ -1,12 +1,9 @@
 import { flags, modes } from '../constants.js';
-import { errorCodes } from '../error-codes.js';
 import {
   ChessBoardType,
   Coordinates,
   InternalState,
-  LegalMove,
-  Move,
-  MoveCell,
+  MoveBase,
 } from '../types.js';
 import {
   areOpponents,
@@ -14,18 +11,13 @@ import {
   getPieceCoord,
   isActiveColorPiece,
 } from '../utils.js';
-import { canPieceMoveToTarget } from './is-cell-under-check.js';
+import {
+  canPieceMoveToTarget,
+  isCellUnderCheck,
+} from './is-cell-under-check.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
-import { Pattern, patterns, patternsCheck } from './patterns.js';
+import { Pattern, patterns } from './patterns.js';
 
-interface MovePattern extends LegalMove {
-  invalid?: boolean;
-}
-interface MovePatternResult extends MoveCell {
-  target: Coordinates;
-}
-
-const isNotInvalid = (move: MovePattern): boolean => !move.invalid;
 const isOutOfBound = (coord: Coordinates, board: ChessBoardType): boolean =>
   coord.y >= board.length ||
   coord.x >= board[0].length ||
@@ -42,18 +34,25 @@ const generateMovesFromPatterns = ({
   origin: Coordinates;
   state: InternalState;
   piece: string;
-}): Array<MovePatternResult> => {
-  const moves: Array<MovePattern> = [];
+}): Array<MoveBase> => {
+  const moves: Array<MoveBase> = [];
   for (const pattern of patterns) {
     const proceed = true;
     let step = 0;
     let lastMove = { target: origin };
     while (proceed) {
-      const current = pattern.advance(lastMove.target);
-      if (isOutOfBound(current, state.board)) break;
-      if (pattern.shallStop({ step, current, origin, state })) break;
+      const target = pattern.advance(lastMove.target);
+      const outOfBound = isOutOfBound(target, state.board);
+      if (outOfBound) break;
+      const willStop = pattern.shallStop({
+        step,
+        target,
+        origin,
+        state,
+      });
+      if (willStop) break;
 
-      const targetCell = state.board[current.y][current.x];
+      const targetCell = state.board[target.y][target.x];
       if (targetCell.piece) {
         if (
           areOpponents(
@@ -64,9 +63,8 @@ const generateMovesFromPatterns = ({
           moves.push({
             piece,
             origin,
-            target: current,
+            target: target,
             flags: { [pattern.flag || flags.capture]: true },
-            invalid: pattern.rejectMove({ step, origin, state, current }),
           });
         }
         break;
@@ -74,100 +72,126 @@ const generateMovesFromPatterns = ({
       moves.push({
         piece,
         origin,
-        target: current,
+        target: target,
         flags: {
           [pattern.flag || flags.move]: true,
         },
-        invalid: pattern.rejectMove({ step, origin, state, current }),
       });
       step++;
       lastMove = moves[moves.length - 1];
     }
   }
-  const validMoves = moves.filter(isNotInvalid);
-
-  for (const move of validMoves) {
-    delete move.invalid;
-  }
-
-  return validMoves;
+  return moves;
 };
 
-export const generateMoves = (
+export function generateMoves(
   coord: Coordinates,
   state: InternalState,
-  patterns: Record<string, Record<string, Array<Pattern>>> = patternsCheck
-): Array<MovePatternResult> => {
+  piecePatterns: Array<Pattern>
+): Array<MoveBase> {
   const { piece } = state.board[coord.y][coord.x];
-
   if (!piece) return [];
 
-  const moves = generateMovesFromPatterns({
-    patterns: patterns[state.mode][piece as string],
+  return generateMovesFromPatterns({
+    patterns: piecePatterns,
     state,
     origin: coord,
     piece,
   });
-  return moves;
-};
+}
 
-function isCheck({
-  move,
+function isMoveValid({
+  origin,
+  target,
   state,
 }: {
-  move: Move;
+  origin: Coordinates;
+  target: Coordinates;
   state: InternalState;
-}): [boolean, Coordinates | undefined, InternalState] {
+}): boolean {
+  const moveState = moveAndUpdateState(origin, target, state);
+  const kingCoord = getPieceCoord(
+    getKingPiece(state.activeColor),
+    moveState.board
+  );
+  if (!kingCoord) return false;
+
+  return !isCellUnderCheck(moveState, kingCoord);
+}
+
+function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
+  check: boolean;
+  state: InternalState;
+} {
   const moveState = moveAndUpdateState(move.origin, move.target, state);
-  const kingCoord = getPieceCoord(getKingPiece(moveState), moveState.board);
-  if (!kingCoord) throw new Error(errorCodes.king_not_found);
+  const kingCoord = getPieceCoord(
+    getKingPiece(moveState.activeColor),
+    moveState.board
+  );
 
-  return [
-    canPieceMoveToTarget(move.target, kingCoord, moveState),
-    kingCoord,
-    moveState,
-  ];
+  return {
+    check: kingCoord
+      ? canPieceMoveToTarget(move.target, kingCoord, moveState)
+      : false,
+    state: moveState,
+  };
 }
 
-export function generateLegalMoves(
-  origin: Coordinates,
-  state: InternalState
-): Array<Move> {
-  const moves = generateMoves(origin, state, patterns) as Array<Move>;
-  // console.log('Moves for', origin, moves);
+function isCheckMateMove(state: InternalState): boolean {
+  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
+  if (!kingCoord) return false;
 
-  if (state.mode === modes.standard) {
-    for (const move of moves) {
-      const [check, opponentKingCoord, moveState] = isCheck({ state, move });
-      if (check && opponentKingCoord) {
-        move.flags.check = true;
-
-        const opponentMoves = generateLegalMovesForAllPieces(
-          moveState
-        ) as Array<Move>;
-        if (opponentMoves.length === 0) {
-          move.flags.checkmate = true;
-        }
-      }
-    }
-  }
-
-  return moves;
+  return (
+    generateMoves(
+      kingCoord,
+      state,
+      patterns[state.board[kingCoord.y][kingCoord.x].piece as string]
+    ).filter(({ origin, target }) => {
+      return isMoveValid({ origin, target, state });
+    }).length === 0
+  );
 }
 
-export function generateLegalMovesForAllPieces(
+export function generateMovesForAllPieces(
   state: InternalState
-): Array<LegalMove> {
-  const moves = [];
+): Array<MoveBase> {
+  const moves: Array<MoveBase> = [];
   for (let y = 0; y < state.board.length; y++) {
-    for (let x = 0; x < state.board[y].length; x++) {
+    const row = state.board[y];
+    for (let x = 0; x < row.length; x++) {
+      const square = row[x];
       if (
-        state.board[y][x].piece &&
-        isActiveColorPiece(state.activeColor, state.board[y][x].piece as string) // bad bad bad, please remove coercion :(
+        square.piece &&
+        isActiveColorPiece(state.activeColor, square.piece as string) // bad bad bad, please remove coercion :(
       ) {
-        const legalMoves = generateLegalMoves({ x, y }, state);
-        for (let i = 0; i < legalMoves.length; i++) {
-          moves.push(legalMoves[i]);
+        const pieceMoves = generateMoves(
+          { y, x },
+          state,
+          patterns[square.piece as string]
+        );
+        if (state.mode === modes.standard) {
+          for (const move of pieceMoves) {
+            if (
+              isMoveValid({
+                origin: move.origin,
+                target: move.target,
+                state,
+              })
+            ) {
+              const checkMove = calcCheck({
+                state,
+                move,
+              });
+              if (checkMove.check) {
+                if (isCheckMateMove(checkMove.state)) {
+                  move.flags.checkmate = true;
+                } else {
+                  move.flags.check = true;
+                }
+              }
+              moves.push(move);
+            }
+          }
         }
       }
     }

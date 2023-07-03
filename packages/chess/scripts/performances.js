@@ -2,9 +2,9 @@ import { performance } from 'node:perf_hooks';
 import { start } from '../dist/index.js';
 
 function generateMoves(FEN) {
-  performance.measure('generateLegalMoves');
+  performance.measure('generateMoves');
   start({ FEN });
-  console.log(performance.measure('generateLegalMoves'));
+  console.log(performance.measure('generateMoves'));
 }
 
 function performances() {

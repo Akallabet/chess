@@ -114,7 +114,7 @@ function isMoveValid({
     getKingPiece(state.activeColor),
     moveState.board
   );
-  if (!kingCoord) return true;
+  if (!kingCoord) return false;
 
   return !isCellUnderCheck(moveState, kingCoord);
 }

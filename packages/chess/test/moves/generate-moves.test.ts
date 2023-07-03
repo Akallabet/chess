@@ -435,7 +435,7 @@ t.test(
   }
 );
 
-t.only(
+t.test(
   'Highlight queenside castling when no cells are in check and empty',
   t => {
     const FEN = 'r3kb1r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
@@ -458,11 +458,30 @@ t.only(
   }
 );
 
-t.skip('No castling moves if one of the cells is under check', t => {
+t.test('Highlight kingside and queenside castling for white', t => {
+  const FEN = 'r3kb1r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1';
+  const origin = { x: 4, y: 7 };
+  const expected = [
+    { piece: 'K', origin, target: { y: 7, x: 3 }, flags: { move: true } },
+    { piece: 'K', origin, target: { y: 7, x: 2 }, flags: { move: true } },
+    { piece: 'K', origin, target: { y: 7, x: 5 }, flags: { move: true } },
+    { piece: 'K', origin, target: { y: 7, x: 6 }, flags: { move: true } },
+  ];
+  const actual = generateMovesForAllPieces({
+    ...fromFEN(FEN),
+    mode: 'standard',
+  }).filter(({ piece }) => piece === 'K');
+  t.same(actual.sort(compareByMove), expected.sort(compareByMove));
+  t.end();
+});
+
+t.test('No castling moves if one of the castling cells is under check', t => {
   const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
-  const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateMoves(origin, start({ FEN, mode: 'standard' }));
+  const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
+  const actual = generateMovesForAllPieces(
+    start({ FEN, mode: 'standard' })
+  ).filter(({ piece }) => piece === 'k');
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
@@ -470,11 +489,13 @@ t.skip('No castling moves if one of the cells is under check', t => {
   t.end();
 });
 
-t.skip('No castling moves if one of the cells is occupied', t => {
+t.test('No castling moves if one of the castling cells is occupied', t => {
   const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateMoves(origin, start({ FEN, mode: 'standard' }));
+  const actual = generateMovesForAllPieces(
+    start({ FEN, mode: 'standard' })
+  ).filter(({ piece }) => piece === 'k');
   t.same(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))

@@ -269,7 +269,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
   ],
   k: [
     {
-      advance: function kingsideCastling({ x, y }: Coordinates): Coordinates {
+      advance: ({ x, y }: Coordinates): Coordinates => {
         return { x: x + 2, y };
       },
       shallStop: ({ step, state, origin, target }) => {
@@ -291,7 +291,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
       recursive: true,
     },
     {
-      advance: function queensideCastling({ x, y }: Coordinates): Coordinates {
+      advance: ({ x, y }: Coordinates): Coordinates => {
         return { x: x - 2, y };
       },
       shallStop: ({ step, state, origin, target }) => {
@@ -323,6 +323,51 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: bottomLeft, shallStop: lte(1) },
   ],
   K: [
+    {
+      advance: ({ x, y }: Coordinates): Coordinates => {
+        return { x: x + 2, y };
+      },
+      shallStop: ({ step, state, origin, target }) => {
+        if (!getCastlingRights('K', state).kingSide) return true;
+        if (origin.y !== state.board.length - 1 && origin.x !== 3) return true;
+        if (lte(1)({ step })) return true;
+        const castlingEmptyCells = [
+          { x: origin.x + 1, y: origin.y },
+          { x: origin.x + 2, y: origin.y },
+        ];
+        const castlingCells = [origin, ...castlingEmptyCells, target];
+        return (
+          castlingCells.some(target =>
+            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+          ) ||
+          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+        );
+      },
+      recursive: true,
+    },
+    {
+      advance: ({ x, y }: Coordinates): Coordinates => {
+        return { x: x - 2, y };
+      },
+      shallStop: ({ step, state, origin, target }) => {
+        if (!getCastlingRights('K', state).queenSide) return true;
+        if (origin.y !== state.board.length - 1 && origin.x !== 3) return true;
+        if (lte(1)({ step })) return true;
+        const castlingEmptyCells = [
+          { x: origin.x - 1, y: origin.y },
+          { x: origin.x - 2, y: origin.y },
+          { x: origin.x - 3, y: origin.y },
+        ];
+        const castlingCells = [origin, ...castlingEmptyCells, target];
+        return (
+          castlingCells.some(target =>
+            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+          ) ||
+          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+        );
+      },
+      recursive: true,
+    },
     { advance: right, shallStop: lte(1) },
     { advance: left, shallStop: lte(1) },
     { advance: top, shallStop: lte(1) },

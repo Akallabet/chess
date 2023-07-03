@@ -15,7 +15,6 @@ import {
   canPieceMoveToTarget,
   isCellUnderCheck,
 } from './is-cell-under-check.js';
-import { isInvalidMove } from './is-move-invalid.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
@@ -85,11 +84,11 @@ const generateMovesFromPatterns = ({
   return moves;
 };
 
-export const generateMoves = (
+export function generateMoves(
   coord: Coordinates,
   state: InternalState,
   piecePatterns: Array<Pattern>
-): Array<MoveBase> => {
+): Array<MoveBase> {
   const { piece } = state.board[coord.y][coord.x];
   if (!piece) return [];
 
@@ -99,7 +98,26 @@ export const generateMoves = (
     origin: coord,
     piece,
   });
-};
+}
+
+function isMoveValid({
+  origin,
+  target,
+  state,
+}: {
+  origin: Coordinates;
+  target: Coordinates;
+  state: InternalState;
+}): boolean {
+  const moveState = moveAndUpdateState(origin, target, state);
+  const kingCoord = getPieceCoord(
+    getKingPiece(state.activeColor),
+    moveState.board
+  );
+  if (!kingCoord) return true;
+
+  return !isCellUnderCheck(moveState, kingCoord);
+}
 
 function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
   check: boolean;
@@ -110,10 +128,11 @@ function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
     getKingPiece(moveState.activeColor),
     moveState.board
   );
-  if (!kingCoord) return { check: false, state: moveState };
 
   return {
-    check: canPieceMoveToTarget(move.target, kingCoord, moveState),
+    check: kingCoord
+      ? canPieceMoveToTarget(move.target, kingCoord, moveState)
+      : false,
     state: moveState,
   };
 }
@@ -121,15 +140,14 @@ function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
 function isCheckMateMove(state: InternalState): boolean {
   const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
   if (!kingCoord) return false;
-  const kingMoves = generateMoves(
-    kingCoord,
-    state,
-    patterns[state.board[kingCoord.y][kingCoord.x].piece as string]
-  );
 
   return (
-    kingMoves.filter(({ origin, target }) => {
-      return !isInvalidMove({ origin, target, state });
+    generateMoves(
+      kingCoord,
+      state,
+      patterns[state.board[kingCoord.y][kingCoord.x].piece as string]
+    ).filter(({ origin, target }) => {
+      return isMoveValid({ origin, target, state });
     }).length === 0
   );
 }
@@ -153,12 +171,13 @@ export function generateMovesForAllPieces(
         );
         if (state.mode === modes.standard) {
           for (const move of pieceMoves) {
-            const invalid = isInvalidMove({
-              origin: move.origin,
-              target: move.target,
-              state,
-            });
-            if (!invalid) {
+            if (
+              isMoveValid({
+                origin: move.origin,
+                target: move.target,
+                state,
+              })
+            ) {
               const checkMove = calcCheck({
                 state,
                 move,

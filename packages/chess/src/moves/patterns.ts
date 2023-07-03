@@ -284,36 +284,35 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) &&
-          castlingEmptyCells.some(coord => !state.board[coord.y][coord.x].piece)
+          ) ||
+          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
         );
       },
       recursive: true,
     },
-    // {
-    //   advance: function queensideCastling({ x, y }: Coordinates): Coordinates {
-    //     return { x: x - 2, y };
-    //   },
-    //   shallStop: ({ step, state, origin, target }) => {
-    //     if (!getCastlingRights('k', state).queenSide) return true;
-    //     if (origin.y !== 0 && origin.x !== 3) return true;
-    //     if (lte(1)({ step })) return true;
-    //     return [
-    //       origin,
-    //       { x: origin.x - 1, y: origin.y },
-    //       { x: origin.x - 2, y: origin.y },
-    //       { x: origin.x - 3, y: origin.y },
-    //       target,
-    //     ].some(target =>
-    //       isInvalidMove({
-    //         origin,
-    //         target,
-    //         state,
-    //       })
-    //     );
-    //   },
-    //   recursive: true,
-    // },
+    {
+      advance: function queensideCastling({ x, y }: Coordinates): Coordinates {
+        return { x: x - 2, y };
+      },
+      shallStop: ({ step, state, origin, target }) => {
+        if (!getCastlingRights('k', state).queenSide) return true;
+        if (origin.y !== 0 && origin.x !== 3) return true;
+        if (lte(1)({ step })) return true;
+        const castlingEmptyCells = [
+          { x: origin.x - 1, y: origin.y },
+          { x: origin.x - 2, y: origin.y },
+          { x: origin.x - 3, y: origin.y },
+        ];
+        const castlingCells = [origin, ...castlingEmptyCells, target];
+        return (
+          castlingCells.some(target =>
+            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+          ) ||
+          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+        );
+      },
+      recursive: true,
+    },
     { advance: right, shallStop: lte(1) },
     { advance: left, shallStop: lte(1) },
     { advance: top, shallStop: lte(1) },

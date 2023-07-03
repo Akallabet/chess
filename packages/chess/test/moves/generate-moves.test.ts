@@ -435,15 +435,15 @@ t.test(
   }
 );
 
-t.skip(
+t.only(
   'Highlight queenside castling when no cells are in check and empty',
   t => {
     const FEN = 'r3kb1r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
     const origin = { x: 4, y: 0 };
     const expected = [
-      { piece: 'k', origin, target: { x: 3, y: 0 }, flags: { move: true } },
-      { piece: 'k', origin, target: { x: 1, y: 0 }, flags: { move: true } },
-      { piece: 'k', origin, target: { x: 4, y: 1 }, flags: { move: true } },
+      { piece: 'k', origin, target: { y: 0, x: 3 }, flags: { move: true } },
+      { piece: 'k', origin, target: { y: 0, x: 2 }, flags: { move: true } },
+      { piece: 'k', origin, target: { y: 1, x: 4 }, flags: { move: true } },
     ];
     const actual = generateMoves(
       origin,
@@ -453,10 +453,7 @@ t.skip(
       },
       patterns.k
     ).filter(({ piece }) => piece === 'k');
-    t.same(
-      actual.sort(compareByMove),
-      expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
-    );
+    t.same(actual.sort(compareByMove), expected.sort(compareByMove));
     t.end();
   }
 );

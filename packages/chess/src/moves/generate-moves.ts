@@ -1,5 +1,4 @@
 import { flags, modes } from '../constants.js';
-import { errorCodes } from '../error-codes.js';
 import {
   ChessBoardType,
   Coordinates,
@@ -11,12 +10,12 @@ import {
   getKingPiece,
   getPieceCoord,
   isActiveColorPiece,
-  isKing,
 } from '../utils.js';
 import {
   canPieceMoveToTarget,
   isCellUnderCheck,
 } from './is-cell-under-check.js';
+import { isInvalidMove } from './is-move-invalid.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
@@ -88,37 +87,19 @@ const generateMovesFromPatterns = ({
 
 export const generateMoves = (
   coord: Coordinates,
-  state: InternalState
+  state: InternalState,
+  piecePatterns: Array<Pattern>
 ): Array<MoveBase> => {
   const { piece } = state.board[coord.y][coord.x];
   if (!piece) return [];
 
-  const moves = generateMovesFromPatterns({
-    patterns: patterns[piece as string],
+  return generateMovesFromPatterns({
+    patterns: piecePatterns,
     state,
     origin: coord,
     piece,
   });
-  return moves;
 };
-
-function isInvalidMove({
-  move,
-  state,
-}: {
-  move: MoveBase;
-  state: InternalState;
-}): boolean {
-  const moveState = moveAndUpdateState(move.origin, move.target, state);
-  const kingCoord = getPieceCoord(
-    getKingPiece(state.activeColor),
-    moveState.board
-  );
-  if (!kingCoord) return false;
-
-  const isUnderCheck = isCellUnderCheck(moveState, kingCoord);
-  return isUnderCheck;
-}
 
 function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
   check: boolean;
@@ -140,11 +121,17 @@ function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
 function isCheckMateMove(state: InternalState): boolean {
   const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
   if (!kingCoord) return false;
-  const kingMoves = generateMoves(kingCoord, state);
-  const legalKingMoves = kingMoves.filter(move => {
-    return !isInvalidMove({ move, state });
-  });
-  return legalKingMoves.length === 0;
+  const kingMoves = generateMoves(
+    kingCoord,
+    state,
+    patterns[state.board[kingCoord.y][kingCoord.x].piece as string]
+  );
+
+  return (
+    kingMoves.filter(({ origin, target }) => {
+      return !isInvalidMove({ origin, target, state });
+    }).length === 0
+  );
 }
 
 export function generateMovesForAllPieces(
@@ -159,10 +146,18 @@ export function generateMovesForAllPieces(
         square.piece &&
         isActiveColorPiece(state.activeColor, square.piece as string) // bad bad bad, please remove coercion :(
       ) {
-        const pieceMoves = generateMoves({ x, y }, state);
+        const pieceMoves = generateMoves(
+          { y, x },
+          state,
+          patterns[square.piece as string]
+        );
         if (state.mode === modes.standard) {
           for (const move of pieceMoves) {
-            const invalid = isInvalidMove({ move, state });
+            const invalid = isInvalidMove({
+              origin: move.origin,
+              target: move.target,
+              state,
+            });
             if (!invalid) {
               const checkMove = calcCheck({
                 state,

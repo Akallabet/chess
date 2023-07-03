@@ -1,9 +1,9 @@
 import { flags } from '../constants.js';
 import { Coordinates, InternalState } from '../types.js';
 
-import { anyCellUnderCheck, isCellUnderCheck } from './is-cell-under-check.js';
+import { isCellUnderCheck } from './is-cell-under-check.js';
 import { getCastlingRights } from '../fen.js';
-import { areOpponents } from '../utils.js';
+import { areOpponents, getOpponentColor } from '../utils.js';
 
 interface PatternState {
   step: number;
@@ -16,31 +16,31 @@ const F = () => false;
 
 const lte =
   (n: number) =>
-  ({ step }: PatternState) => {
+  ({ step }: { step: number }) => {
     return n <= step;
   };
 
 const topLeft = ({ x, y }: Coordinates): Coordinates => ({
-  x: x - 1,
   y: y - 1,
+  x: x - 1,
 });
 const topRight = ({ x, y }: Coordinates): Coordinates => ({
-  x: x + 1,
   y: y - 1,
+  x: x + 1,
 });
 const bottomLeft = ({ x, y }: Coordinates): Coordinates => ({
-  x: x - 1,
   y: y + 1,
+  x: x - 1,
 });
 const bottomRight = ({ x, y }: Coordinates): Coordinates => ({
-  x: x + 1,
   y: y + 1,
+  x: x + 1,
 });
 
-const top = ({ x, y }: Coordinates): Coordinates => ({ x, y: y - 1 });
-const bottom = ({ x, y }: Coordinates): Coordinates => ({ x, y: y + 1 });
-const right = ({ x, y }: Coordinates): Coordinates => ({ x: x + 1, y });
-const left = ({ x, y }: Coordinates): Coordinates => ({ x: x - 1, y });
+const top = ({ y, x }: Coordinates): Coordinates => ({ y: y - 1, x });
+const bottom = ({ y, x }: Coordinates): Coordinates => ({ y: y + 1, x });
+const right = ({ y, x }: Coordinates): Coordinates => ({ y, x: x + 1 });
+const left = ({ y, x }: Coordinates): Coordinates => ({ y, x: x - 1 });
 
 const stopIfOpponent = ({
   target: { x, y },
@@ -143,6 +143,7 @@ export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
   shallStop: (args: PatternState) => boolean;
   flag?: string;
+  recursive?: boolean;
 }
 
 const basePatterns: Record<string, Array<Pattern>> = {
@@ -267,8 +268,52 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: bottomLeft, shallStop: F },
   ],
   k: [
-    // { advance: right, shallStop: kingsideCastlingMove(0) },
-    // { advance: left, shallStop: queensideCastlingMove(0) },
+    {
+      advance: function kingsideCastling({ x, y }: Coordinates): Coordinates {
+        return { x: x + 2, y };
+      },
+      shallStop: ({ step, state, origin, target }) => {
+        if (!getCastlingRights('k', state).kingSide) return true;
+        if (origin.y !== 0 && origin.x !== 3) return true;
+        if (lte(1)({ step })) return true;
+        const castlingEmptyCells = [
+          { x: origin.x + 1, y: origin.y },
+          { x: origin.x + 2, y: origin.y },
+        ];
+        const castlingCells = [origin, ...castlingEmptyCells, target];
+        return (
+          castlingCells.some(target =>
+            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+          ) &&
+          castlingEmptyCells.some(coord => !state.board[coord.y][coord.x].piece)
+        );
+      },
+      recursive: true,
+    },
+    // {
+    //   advance: function queensideCastling({ x, y }: Coordinates): Coordinates {
+    //     return { x: x - 2, y };
+    //   },
+    //   shallStop: ({ step, state, origin, target }) => {
+    //     if (!getCastlingRights('k', state).queenSide) return true;
+    //     if (origin.y !== 0 && origin.x !== 3) return true;
+    //     if (lte(1)({ step })) return true;
+    //     return [
+    //       origin,
+    //       { x: origin.x - 1, y: origin.y },
+    //       { x: origin.x - 2, y: origin.y },
+    //       { x: origin.x - 3, y: origin.y },
+    //       target,
+    //     ].some(target =>
+    //       isInvalidMove({
+    //         origin,
+    //         target,
+    //         state,
+    //       })
+    //     );
+    //   },
+    //   recursive: true,
+    // },
     { advance: right, shallStop: lte(1) },
     { advance: left, shallStop: lte(1) },
     { advance: top, shallStop: lte(1) },
@@ -279,8 +324,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: bottomLeft, shallStop: lte(1) },
   ],
   K: [
-    // { advance: right, shallStop: kingsideCastlingMove(7) },
-    // { advance: left, shallStop: queensideCastlingMove(7) },
     { advance: right, shallStop: lte(1) },
     { advance: left, shallStop: lte(1) },
     { advance: top, shallStop: lte(1) },

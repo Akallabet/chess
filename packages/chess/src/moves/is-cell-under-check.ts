@@ -1,28 +1,31 @@
 import { Coordinates, InternalState } from '../types.js';
 import { isActiveColorPiece } from '../utils.js';
 import { generateMoves } from './generate-moves.js';
+import { patterns } from './patterns.js';
 
 export const canPieceMoveToTarget = (
   origin: Coordinates,
   target: Coordinates,
   state: InternalState
 ): boolean => {
-  // console.log(
-  //   'check whether canPieceMoveToTarget',
-  //   origin,
-  //   target,
-  //   state.board[origin.y][origin.x].piece,
-  //   state.FEN
-  // );
-  const moves = generateMoves(origin, state);
+  const moves = generateMoves(
+    origin,
+    state,
+    patterns[state.board[origin.y][origin.x].piece as string].filter(
+      ({ recursive }) => !recursive
+    )
+  );
   const targetMove = moves.find(
     move => move.target.x === target.x && move.target.y === target.y
   );
-  // console.log('canPieceMoveToTarget', !!targetMove);
   return !!targetMove;
 };
 
-export const isCellUnderCheck = (state: InternalState, target: Coordinates) => {
+export const isCellUnderCheck = (
+  state: InternalState,
+  target: Coordinates,
+  colorOverride?: string
+) => {
   const { board } = state;
 
   for (let y = 0; y < board.length; y++) {
@@ -30,8 +33,11 @@ export const isCellUnderCheck = (state: InternalState, target: Coordinates) => {
       const square = board[y][x];
       if (
         square.piece &&
-        isActiveColorPiece(state.activeColor, square.piece as string) && // bad bad bad, please remove coercion :(
-        canPieceMoveToTarget({ y, x }, target, state)
+        isActiveColorPiece(
+          colorOverride || state.activeColor,
+          square.piece as string
+        ) && // bad bad bad, please remove coercion :(
+        canPieceMoveToTarget({ x, y }, target, state)
       ) {
         return true;
       }

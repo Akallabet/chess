@@ -1,12 +1,10 @@
-import { InternalState, Move } from '../types.js';
-import { generateMovesForAllPieces } from './generate-moves.js';
+import { InternalState, Move, MoveBase } from '../types.js';
 import { translateMoveToSAN } from './translate-move-to-san.js';
 
 export function createMovesBoard(
-  state: InternalState
+  state: InternalState,
+  moves: Array<MoveBase>
 ): Array<Array<Array<Move>>> {
-  const moves = generateMovesForAllPieces(state);
-
   const movesBoard: Array<Array<Array<Move>>> = state.board.map(row => {
     return row.map(() => []);
   });

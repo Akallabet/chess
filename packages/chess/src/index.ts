@@ -10,6 +10,7 @@ import {
 } from './types.js';
 import { fromPositionToCoordinates } from './utils.js';
 import {
+  generateMovesForAllPieces,
   moveAndUpdateState,
   translateSANToCoordinates,
 } from './moves/index.js';
@@ -24,11 +25,14 @@ export function start(
     mode: initialState.mode || modes.standard,
   };
 
-  const movesBoard = createMovesBoard(state);
+  const moves = generateMovesForAllPieces(state);
+  const isGameOver = moves.length === 0;
+  const movesBoard = createMovesBoard(state, moves);
   const metadata = getMetadata();
 
   return {
     ...state,
+    isGameOver,
     ...metadata,
     movesBoard,
   };
@@ -42,10 +46,12 @@ export function move(san: string, initialState: ChessState): ChessState {
       fromPositionToCoordinates(target),
       clearBoard(initialState)
     );
-    const movesBoard = createMovesBoard(state);
+    const moves = generateMovesForAllPieces(state);
+    const movesBoard = createMovesBoard(state, moves);
+    const isGameOver = moves.length === 0;
     const metadata = getMetadata();
 
-    return { ...state, ...metadata, movesBoard };
+    return { ...state, ...metadata, movesBoard, isGameOver };
   } catch (e) {
     return initialState;
   }

@@ -6,6 +6,7 @@ import {
   FENState,
   InternalState,
 } from '../types.js';
+import { isActiveColorBlack } from '../utils.js';
 
 const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
@@ -34,7 +35,14 @@ export const moveAndUpdateState = (
 ): InternalState => {
   const board = boardWithMove(origin, target, state.board);
   const activeColor = changeActiveColor(state);
-  const FEN = toFEN({ ...state, board, activeColor });
+  const FEN = toFEN({
+    ...state,
+    board,
+    activeColor,
+    fullMoves: isActiveColorBlack(state.activeColor)
+      ? state.fullMoves + 1
+      : state.fullMoves,
+  });
 
   return {
     ...state,

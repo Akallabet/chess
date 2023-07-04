@@ -1,4 +1,5 @@
 import { flags, modes } from '../constants.js';
+import { errorCodes } from '../error-codes.js';
 import {
   ChessBoardType,
   Coordinates,
@@ -135,6 +136,13 @@ function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
       : false,
     state: moveState,
   };
+}
+
+//detect if king is under check
+export function isKingUnderCheck(state: InternalState): boolean {
+  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
+  if (!kingCoord) throw new Error(errorCodes.king_not_found);
+  return isCellUnderCheck(state, kingCoord);
 }
 
 function isCheckMateMove(state: InternalState): boolean {

@@ -29,7 +29,7 @@ t.test('Start', t => {
   t.test('Empty board', t => {
     const { board } = start({
       FEN: '8/8/8/8/8/8/8/8 w KQkq - 0 1',
-      mode: 'standard',
+      mode: 'demo',
     });
     t.same(board, emptyBoard);
     t.end();

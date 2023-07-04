@@ -11,6 +11,7 @@ import {
 import { fromPositionToCoordinates } from './utils.js';
 import {
   generateMovesForAllPieces,
+  isKingUnderCheck,
   moveAndUpdateState,
   translateSANToCoordinates,
 } from './moves/index.js';
@@ -27,12 +28,14 @@ export function start(
 
   const moves = generateMovesForAllPieces(state);
   const isGameOver = moves.length === 0;
+  const isDraw = state.mode === 'standard' && !isKingUnderCheck(state);
   const movesBoard = createMovesBoard(state, moves);
   const metadata = getMetadata();
 
   return {
     ...state,
     isGameOver,
+    isDraw,
     ...metadata,
     movesBoard,
   };
@@ -49,9 +52,11 @@ export function move(san: string, initialState: ChessState): ChessState {
     const moves = generateMovesForAllPieces(state);
     const movesBoard = createMovesBoard(state, moves);
     const isGameOver = moves.length === 0;
+    const isDraw =
+      state.mode === 'standard' && isGameOver && !isKingUnderCheck(state);
     const metadata = getMetadata();
 
-    return { ...state, ...metadata, movesBoard, isGameOver };
+    return { ...state, ...metadata, movesBoard, isGameOver, isDraw };
   } catch (e) {
     return initialState;
   }

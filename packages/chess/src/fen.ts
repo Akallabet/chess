@@ -75,7 +75,9 @@ export const toFEN = ({
     .join('/');
 
   return `${piecePlacement} ${activeColor} ${
-    Array.isArray(castlingRights) ? castlingRights.join('') : '-'
+    Array.isArray(castlingRights) && castlingRights.length > 0
+      ? castlingRights.join('')
+      : '-'
   } ${enPassant || '-'} ${halfMoves} ${fullMoves}`;
 };
 

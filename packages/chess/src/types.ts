@@ -76,4 +76,5 @@ export interface InternalState extends ChessInitialState, FENState {
 export interface ChessState extends InternalState, MetaData {
   movesBoard: Array<Array<Array<Move>>>;
   isGameOver: boolean;
+  isDraw: boolean;
 }

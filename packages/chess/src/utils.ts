@@ -33,9 +33,10 @@ export const getKingPiece = (color: string) => (color === 'w' ? 'K' : 'k');
 
 export const isKing = (piece: string) =>
   piece === piecesMap.k || piece === piecesMap.K;
-// function isPawn(piece: Piece | undefined) {
-//   return piece === piecesMap.p || piece === piecesMap.P;
-// }
+
+export const isPawn = (piece: string): boolean => {
+  return piece === piecesMap.p || piece === piecesMap.P;
+};
 
 export const getPieceCoord = (piece: string, board: ChessBoardType) => {
   for (let y = 0; y < board.length; y++) {

@@ -1,12 +1,13 @@
-import { toFEN } from '../fen.js';
+import { fromFEN, toFEN } from '../fen.js';
 import { colours } from '../constants.js';
 import {
   ChessBoardType,
   Coordinates,
   FENState,
   InternalState,
+  MoveBase,
 } from '../types.js';
-import { isActiveColorBlack } from '../utils.js';
+import { isActiveColorBlack, isPawn } from '../utils.js';
 
 const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
@@ -28,6 +29,27 @@ const boardWithMove = (
   );
 };
 
+export const moveAndUpdateStateV2 = (
+  move: MoveBase,
+  state: InternalState
+): InternalState => {
+  const { origin, target, piece, flags } = move;
+
+  return {
+    ...state,
+    ...fromFEN(
+      toFEN({
+        ...state,
+        board: boardWithMove(origin, target, state.board),
+        activeColor: changeActiveColor(state),
+        halfMoves: isPawn(piece) || flags.capture ? 0 : state.halfMoves + 1,
+        fullMoves: isActiveColorBlack(state.activeColor)
+          ? state.fullMoves + 1
+          : state.fullMoves,
+      })
+    ),
+  };
+};
 export const moveAndUpdateState = (
   origin: Coordinates,
   target: Coordinates,
@@ -35,19 +57,18 @@ export const moveAndUpdateState = (
 ): InternalState => {
   const board = boardWithMove(origin, target, state.board);
   const activeColor = changeActiveColor(state);
+  const fullMoves = isActiveColorBlack(state.activeColor)
+    ? state.fullMoves + 1
+    : state.fullMoves;
   const FEN = toFEN({
     ...state,
     board,
     activeColor,
-    fullMoves: isActiveColorBlack(state.activeColor)
-      ? state.fullMoves + 1
-      : state.fullMoves,
+    fullMoves,
   });
 
   return {
     ...state,
-    board,
-    activeColor,
-    FEN,
+    ...fromFEN(FEN),
   };
 };

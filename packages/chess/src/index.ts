@@ -12,7 +12,7 @@ import { fromPositionToCoordinates } from './utils.js';
 import {
   generateMovesForAllPieces,
   isKingUnderCheck,
-  moveAndUpdateState,
+  moveAndUpdateStateV2,
   translateSANToCoordinates,
 } from './moves/index.js';
 import { errorCodes } from './error-codes.js';
@@ -43,12 +43,8 @@ export function start(
 
 export function move(san: string, initialState: ChessState): ChessState {
   try {
-    const { origin, target } = translateSANToCoordinates(san, initialState);
-    const state = moveAndUpdateState(
-      fromPositionToCoordinates(origin),
-      fromPositionToCoordinates(target),
-      clearBoard(initialState)
-    );
+    const move = translateSANToCoordinates(san, initialState);
+    const state = moveAndUpdateStateV2(move, initialState);
     const moves = generateMovesForAllPieces(state);
     const movesBoard = createMovesBoard(state, moves);
     const isGameOver = moves.length === 0;

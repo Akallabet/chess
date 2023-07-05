@@ -29,10 +29,10 @@ const boardWithMove = (
   );
 };
 
-export const moveAndUpdateStateV2 = (
+export function moveAndUpdateState(
   move: MoveBase,
   state: InternalState
-): InternalState => {
+): InternalState {
   const { origin, target, piece, flags } = move;
 
   return {
@@ -49,26 +49,4 @@ export const moveAndUpdateStateV2 = (
       })
     ),
   };
-};
-export const moveAndUpdateState = (
-  origin: Coordinates,
-  target: Coordinates,
-  state: InternalState
-): InternalState => {
-  const board = boardWithMove(origin, target, state.board);
-  const activeColor = changeActiveColor(state);
-  const fullMoves = isActiveColorBlack(state.activeColor)
-    ? state.fullMoves + 1
-    : state.fullMoves;
-  const FEN = toFEN({
-    ...state,
-    board,
-    activeColor,
-    fullMoves,
-  });
-
-  return {
-    ...state,
-    ...fromFEN(FEN),
-  };
-};
+}

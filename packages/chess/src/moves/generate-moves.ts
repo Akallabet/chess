@@ -101,16 +101,8 @@ export function generateMoves(
   });
 }
 
-function isMoveValid({
-  origin,
-  target,
-  state,
-}: {
-  origin: Coordinates;
-  target: Coordinates;
-  state: InternalState;
-}): boolean {
-  const moveState = moveAndUpdateState(origin, target, state);
+function isMoveValid(move: MoveBase, state: InternalState): boolean {
+  const moveState = moveAndUpdateState(move, state);
   const kingCoord = getPieceCoord(
     getKingPiece(state.activeColor),
     moveState.board
@@ -124,7 +116,7 @@ function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
   check: boolean;
   state: InternalState;
 } {
-  const moveState = moveAndUpdateState(move.origin, move.target, state);
+  const moveState = moveAndUpdateState(move, state);
   const kingCoord = getPieceCoord(
     getKingPiece(moveState.activeColor),
     moveState.board
@@ -154,9 +146,7 @@ function isCheckMateMove(state: InternalState): boolean {
       kingCoord,
       state,
       patterns[state.board[kingCoord.y][kingCoord.x].piece as string]
-    ).filter(({ origin, target }) => {
-      return isMoveValid({ origin, target, state });
-    }).length === 0
+    ).filter(move => isMoveValid(move, state)).length === 0
   );
 }
 
@@ -179,13 +169,7 @@ export function generateMovesForAllPieces(
         );
         if (state.mode === modes.standard) {
           for (const move of pieceMoves) {
-            if (
-              isMoveValid({
-                origin: move.origin,
-                target: move.target,
-                state,
-              })
-            ) {
+            if (isMoveValid(move, state)) {
               const checkMove = calcCheck({
                 state,
                 move,

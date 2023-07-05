@@ -27,17 +27,20 @@ export function start(
   };
 
   const moves = generateMovesForAllPieces(state);
-  const isGameOver = moves.length === 0;
-  const isDraw = state.mode === 'standard' && !isKingUnderCheck(state);
   const movesBoard = createMovesBoard(state, moves);
+  const isDraw =
+    state.mode === 'standard' &&
+    (state.halfMoves === 50 ||
+      (moves.length === 0 && !isKingUnderCheck(state)));
+  const isGameOver = moves.length === 0 || isDraw;
   const metadata = getMetadata();
 
   return {
     ...state,
-    isGameOver,
-    isDraw,
     ...metadata,
     movesBoard,
+    isGameOver,
+    isDraw,
   };
 }
 
@@ -47,9 +50,11 @@ export function move(san: string, initialState: ChessState): ChessState {
     const state = moveAndUpdateStateV2(move, initialState);
     const moves = generateMovesForAllPieces(state);
     const movesBoard = createMovesBoard(state, moves);
-    const isGameOver = moves.length === 0;
     const isDraw =
-      state.mode === 'standard' && isGameOver && !isKingUnderCheck(state);
+      state.mode === 'standard' &&
+      (state.halfMoves === 50 ||
+        (moves.length === 0 && !isKingUnderCheck(state)));
+    const isGameOver = moves.length === 0 || isDraw;
     const metadata = getMetadata();
 
     return { ...state, ...metadata, movesBoard, isGameOver, isDraw };

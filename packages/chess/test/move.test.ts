@@ -2,8 +2,8 @@ import t from 'tap';
 import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
-t.test('Move', t => {
-  t.plan(5);
+t.only('Move', t => {
+  t.plan(6);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
@@ -64,6 +64,21 @@ t.test('Move', t => {
       fourthMove.FEN,
       'rnbqkbnr/1ppp1ppp/p7/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3'
     );
+
+    t.end();
+  });
+
+  t.only('Draw by 50 moves rule', t => {
+    const FEN =
+      'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
+    const state = start({ FEN, mode: 'standard' });
+    const firstMove = move('nc6', state);
+    t.same(
+      firstMove.FEN,
+      'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 50 100'
+    );
+    t.same(firstMove.isGameOver, true);
+    t.same(firstMove.isDraw, true);
 
     t.end();
   });

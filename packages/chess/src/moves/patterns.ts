@@ -95,7 +95,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.capture]: true,
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
           : {}),
       }),
     },
@@ -105,7 +105,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.capture]: true,
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
           : {}),
       }),
     },
@@ -121,7 +121,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.move]: true,
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '') }
+          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
           : {}),
       }),
     },
@@ -131,7 +131,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.capture]: true,
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '') }
+          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
           : {}),
       }),
     },
@@ -141,7 +141,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.capture]: true,
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '') }
+          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
           : {}),
       }),
     },

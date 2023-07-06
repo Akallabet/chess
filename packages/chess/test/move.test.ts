@@ -90,4 +90,8 @@ t.test('Move', t => {
     t.same(state.FEN, 'Q7/8/7k/8/8/8/8/4K3 b - - 0 1');
     t.end();
   });
+  // Move can be check even if it does not directly attack the king
+  // e.g. moving a piece that is pinned
+  // r2qkbnr/pp2pppp/2Pp4/1B2N3/4P1b1/8/PPP2PPP/RNB1K2R w - - 0 1
+  // 1. cxb7+
 });

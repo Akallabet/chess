@@ -7,6 +7,8 @@ import {
   ChessState,
   InternalState,
   Address,
+  Coordinates,
+  Move,
 } from './types.js';
 import { fromPositionToCoordinates } from './utils.js';
 import {
@@ -61,6 +63,20 @@ export function move(san: string, initialState: ChessState): ChessState {
   } catch (e) {
     return initialState;
   }
+}
+
+export function moves(coord: Coordinates, state: ChessState): Array<Move> {
+  const moves = [];
+  for (const row of state.movesBoard) {
+    for (const cell of row) {
+      for (const move of cell) {
+        if (move.origin.x === coord.x && move.origin.y === coord.y) {
+          moves.push(move);
+        }
+      }
+    }
+  }
+  return moves;
 }
 
 export function highlightMoves(addr: Address, state: ChessState): ChessState {

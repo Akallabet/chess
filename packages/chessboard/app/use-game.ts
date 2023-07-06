@@ -1,17 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { ChessState, Coordinates, GameMode, Move } from '@chess/chess';
-import { start, move, clearBoard, highlightMoves } from '@chess/chess';
+import * as chess from '@chess/chess';
 
-export type GameAction = (
-  pos: Coordinates,
-  meta: {
-    piece: string | undefined;
-    move: boolean | undefined;
-    capture: boolean | undefined;
-  }
-) => void;
+export type GameAction = (pos: Coordinates, move: Move) => void;
 
 interface GameOutput extends ChessState {
+  selected?: Coordinates;
+  highlightedMoves: Array<Move>;
+  promotionMoves?: Array<Move>;
+  promote: (move: Move) => void;
   action: GameAction;
 }
 
@@ -20,7 +17,11 @@ export const useGame = (
   mode: GameMode
 ): GameOutput | undefined => {
   const [game, setGame] = useState<undefined | ChessState>();
+  // const [highlightedMoves, setHighlitedMoves] = useState<Array<Move>>([]);
   const [selected, setSelected] = useState<undefined | Coordinates>();
+  const [promotionPieces, setPromotionPieces] = useState<
+    undefined | Array<Move>
+  >();
 
   // useEffect(() => {
   //   if (!game) {
@@ -29,7 +30,7 @@ export const useGame = (
   // }, [FEN, mode, game]);
 
   useEffect(() => {
-    setGame(start({ mode, FEN }));
+    setGame(chess.start({ mode, FEN }));
   }, []);
   // useEffect(() => {
   //   setGame(start({ mode, FEN }));
@@ -37,34 +38,50 @@ export const useGame = (
 
   if (!game) return undefined;
 
+  const highlightedMoves = selected ? chess.moves(selected, game) : [];
+
   return {
     ...game,
-    action: (pos, { piece, move: moveType, capture }) => {
-      if (selected && (capture || moveType)) {
-        const originMove = game.movesBoard[pos.y][pos.x].find(
-          (move: Move) =>
-            move &&
-            move.origin &&
-            move.origin.y === selected.y &&
-            move.origin.x === selected.x
-        );
-
-        if (originMove) {
-          setGame(move(originMove.san, game));
+    selected,
+    highlightedMoves,
+    promotionMoves: promotionPieces,
+    promote: move => {
+      setGame(chess.move(move.san[0], game));
+      setSelected(undefined);
+      setPromotionPieces(undefined);
+    },
+    action: (pos, move) => {
+      if (move && selected) {
+        if (move.flags.promotion) {
+          setPromotionPieces(
+            game.movesBoard[pos.y][pos.x].filter(m => m.flags.promotion)
+          );
+          return;
         }
+        setGame(chess.move(move.san[0], game));
         setSelected(undefined);
         return;
       }
-      if (!piece) {
-        setGame(clearBoard(game));
-        setSelected(undefined);
-        return;
-      }
-      if (piece) {
-        setGame(highlightMoves(game.positions[pos.y][pos.x], clearBoard(game)));
-        setSelected(pos);
-        return;
-      }
+      setSelected(pos);
+      // if (selected && move.flags.capture) {
+      //   if (move) {
+      //     setGame(move(move.san[0], game));
+      //   }
+      //   setSelected(undefined);
+      //   return;
+      // }
+      // if (!move) {
+      //   setGame(clearBoard(game));
+      //   setSelected(undefined);
+      //   setHighlitedMoves([]);
+      //   return;
+      // }
+      // if (move) {
+      //   // setGame(highlightMoves(game.positions[pos.y][pos.x], clearBoard(game)));
+      //   setSelected(pos);
+      //   setHighlitedMoves(moves(pos, game));
+      //   return;
+      // }
     },
   };
 };

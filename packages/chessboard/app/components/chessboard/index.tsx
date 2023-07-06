@@ -1,75 +1,56 @@
 import * as R from 'ramda';
-import Bishop from './bishop';
-import King from './king';
-import Knight from './knight';
-import Pawn from './pawn';
-import Queen from './queen';
-import Rook from './rook';
 import { FENForm } from '../fen';
 import type { GameAction } from '~/use-game';
-import type { ChessBoardType, Files, Ranks } from '@chess/chess';
+import type { ChessBoardType, Files, Ranks, Move } from '@chess/chess';
+import { Promotion } from './promotion';
+import { Piece } from './piece';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
 
 const isWhitePiece = R.test(/[PRBNQK]/);
 
-type MapOfComponents = {
-  [key: string]: React.FC<any>;
-};
-
-const Pieces: MapOfComponents = {
-  p: Pawn,
-  b: Bishop,
-  r: Rook,
-  n: Knight,
-  k: King,
-  q: Queen,
-};
-
-const Piece = ({
-  fill,
-  stroke,
-  piece,
-}: {
-  fill: string;
-  stroke: string;
-  piece: string;
-}) => {
-  const Component = Pieces[R.toLower(piece)];
-  return <Component fill={fill} stroke={stroke} />;
-};
-
 interface ChessBoardProps {
   board: ChessBoardType;
+  highlightedMoves: Array<Move>;
+  promotionMoves: Array<Move>;
   files: Files;
   ranks: Ranks;
   FEN: string;
+  onPromotion: (move: Move) => void;
   onCellClick: GameAction;
 }
 
 export const ChessBoard = ({
   board,
+  highlightedMoves,
+  promotionMoves,
   files,
   ranks,
   FEN,
+  onPromotion,
   onCellClick,
 }: ChessBoardProps) => (
   <div className="h-auto w-auto">
+    {promotionMoves && promotionMoves.length > 0 && (
+      <Promotion moves={promotionMoves} onSelect={move => onPromotion(move)} />
+    )}
     <div className="border-1 border-black relative mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
       {board.map((row, y) => (
         <div key={y} className="flex h-1/8 w-full flex-row">
-          {row.map(({ piece, move, selected, capture }, x) => {
-            const highlight = move || selected || capture;
+          {row.map(({ piece }, x) => {
+            const move = highlightedMoves.find(
+              move => move.target.x === x && move.target.y === y
+            );
             const isWhiteSquare =
               (isEven(y) && isEven(x)) || (isOdd(y) && isOdd(x));
             const bg =
-              (isWhiteSquare && highlight && 'bg-primary-dark') ||
+              (isWhiteSquare && move && 'bg-primary-dark') ||
               (isWhiteSquare && 'bg-primary') ||
-              (highlight && 'bg-secondary-dark') ||
+              (move && 'bg-secondary-dark') ||
               'bg-secondary';
             const handleClick = () => {
-              onCellClick({ x, y }, { piece, move, capture });
+              onCellClick({ x, y }, move);
             };
             return (
               <div

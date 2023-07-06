@@ -15,23 +15,19 @@ export type Piece = (typeof piecesList)[number];
 export type Address = string;
 export type Position = Coordinates | Address;
 
-export interface EmptySquare {
-  capture?: boolean;
-  move?: boolean;
-  check?: boolean;
-}
-
-export interface Square extends EmptySquare {
-  piece?: Piece;
-  selected?: boolean;
-}
-
 export interface Flags {
   capture?: boolean;
   move?: boolean;
   check?: boolean;
   checkmate?: boolean;
   promotion?: string;
+}
+
+export type EmptySquare = Flags;
+
+export interface Square extends EmptySquare {
+  piece?: Piece;
+  selected?: boolean;
 }
 
 export interface MoveBase {

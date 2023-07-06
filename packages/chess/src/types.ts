@@ -23,11 +23,10 @@ export interface Flags {
   promotion?: string;
 }
 
-export type EmptySquare = Flags;
+export type EmptySquare = Record<string, never>;
 
-export interface Square extends EmptySquare {
+export interface Square {
   piece?: Piece;
-  selected?: boolean;
 }
 
 export interface MoveBase {

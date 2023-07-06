@@ -17,7 +17,6 @@ export const useGame = (
   mode: GameMode
 ): GameOutput | undefined => {
   const [game, setGame] = useState<undefined | ChessState>();
-  // const [highlightedMoves, setHighlitedMoves] = useState<Array<Move>>([]);
   const [selected, setSelected] = useState<undefined | Coordinates>();
   const [promotionPieces, setPromotionPieces] = useState<
     undefined | Array<Move>
@@ -63,25 +62,6 @@ export const useGame = (
         return;
       }
       setSelected(pos);
-      // if (selected && move.flags.capture) {
-      //   if (move) {
-      //     setGame(move(move.san[0], game));
-      //   }
-      //   setSelected(undefined);
-      //   return;
-      // }
-      // if (!move) {
-      //   setGame(clearBoard(game));
-      //   setSelected(undefined);
-      //   setHighlitedMoves([]);
-      //   return;
-      // }
-      // if (move) {
-      //   // setGame(highlightMoves(game.positions[pos.y][pos.x], clearBoard(game)));
-      //   setSelected(pos);
-      //   setHighlitedMoves(moves(pos, game));
-      //   return;
-      // }
     },
   };
 };

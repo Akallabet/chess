@@ -2,8 +2,8 @@ import t from 'tap';
 import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
-t.only('Move', t => {
-  t.plan(6);
+t.test('Move', t => {
+  t.plan(7);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
@@ -68,7 +68,7 @@ t.only('Move', t => {
     t.end();
   });
 
-  t.only('Draw by 50 moves rule', t => {
+  t.test('Draw by 50 moves rule', t => {
     const FEN =
       'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
     const state = start({ FEN, mode: 'standard' });
@@ -82,4 +82,16 @@ t.only('Move', t => {
 
     t.end();
   });
+
+  t.test('Pawn promotion', t => {
+    const FEN = '8/P7/7k/8/8/8/8/4K3 w - - 0 1';
+    const initial = start({ FEN, mode: 'standard' });
+    const state = move('a8Q', initial);
+    t.same(state.FEN, 'Q7/8/7k/8/8/8/8/4K3 b - - 0 1');
+    t.end();
+  });
+  // Move can be check even if it does not directly attack the king
+  // e.g. moving a piece that is pinned
+  // r2qkbnr/pp2pppp/2Pp4/1B2N3/4P1b1/8/PPP2PPP/RNB1K2R w - - 0 1
+  // 1. cxb7+
 });

@@ -1,5 +1,5 @@
-import { flags } from '../constants.js';
-import { Coordinates, InternalState } from '../types.js';
+import { blackPieces, flags, whitePieces } from '../constants.js';
+import { Coordinates, Flags, InternalState } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
 import { getCastlingRights } from '../fen.js';
@@ -69,7 +69,7 @@ const stopIfNotOpponent = ({
 export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
   shallStop: (args: PatternState) => boolean;
-  flag?: string;
+  addFlags?: (args: PatternState) => Flags;
   recursive?: boolean;
 }
 
@@ -82,16 +82,32 @@ const basePatterns: Record<string, Array<Pattern>> = {
         if (origin.y === 1 && step >= 2) return true;
         return stopIfOpponent({ step, origin, target, state });
       },
+      addFlags: ({ target }) => ({
+        [flags.move]: true,
+        ...(target.y === 7
+          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          : {}),
+      }),
     },
     {
       advance: bottomRight,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 7
+          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
+          : {}),
+      }),
     },
     {
       advance: bottomLeft,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 7
+          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
+          : {}),
+      }),
     },
   ],
   P: [
@@ -102,16 +118,32 @@ const basePatterns: Record<string, Array<Pattern>> = {
         if (origin.y === 6 && step >= 2) return true;
         return stopIfOpponent({ step, origin, target, state });
       },
+      addFlags: ({ target }) => ({
+        [flags.move]: true,
+        ...(target.y === 0
+          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          : {}),
+      }),
     },
     {
       advance: topRight,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 0
+          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          : {}),
+      }),
     },
     {
       advance: topLeft,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 0
+          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          : {}),
+      }),
     },
   ],
   n: [

@@ -1,9 +1,6 @@
-// import { fromSAN } from '../san'
-//import { defaultFiles as files, defaultRanks as ranks, defaultNames as pieces } from '../constants'
-
 import t from 'tap';
 import { start } from '../../src/index.js';
-import { translateSANToCoordinates } from '../../src/moves/translate-san-to-coordinates.js';
+import { translateSANToMove } from '../../src/moves/translate-san-to-coordinates.js';
 
 // [
 //   '0-0',
@@ -35,7 +32,7 @@ t.test('SAN - Wrong format', t => {
   const FEN = '3k4/8/8/8/8/8/8/3KQ3 w KQkq - 0 1';
   const san = 'Qp1e8';
   const game = start({ FEN, mode: 'standard' });
-  t.throws(() => translateSANToCoordinates(san, game));
+  t.throws(() => translateSANToMove(san, game));
   t.end();
 });
 
@@ -46,12 +43,12 @@ t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
     piece: 'Q',
     origin: { x: 4, y: 7 },
     target: { x: 4, y: 1 },
-    san: 'Qe7',
+    san: ['Qe7'],
     flags: { move: true },
   };
 
   const game = start({ FEN, mode: 'standard' });
-  const result = translateSANToCoordinates(san, game);
+  const result = translateSANToMove(san, game);
   t.same(result, expected);
   t.end();
 });
@@ -63,12 +60,12 @@ t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
     piece: 'Q',
     origin: { x: 4, y: 7 },
     target: { x: 4, y: 1 },
-    san,
+    san: [san],
     flags: { move: true },
   };
 
   const game = start({ FEN, mode: 'standard' });
-  t.same(translateSANToCoordinates(san, game), expected);
+  t.same(translateSANToMove(san, game), expected);
   t.end();
 });
 
@@ -79,22 +76,17 @@ t.test('Pawn i.e. "c3"', t => {
     piece: 'P',
     origin: { x: 2, y: 6 },
     target: { x: 2, y: 5 },
-    san,
+    san: [san],
     flags: { move: true },
   };
-  t.same(
-    translateSANToCoordinates(san, start({ FEN, mode: 'standard' })),
-    expected
-  );
+  t.same(translateSANToMove(san, start({ FEN, mode: 'standard' })), expected);
   t.end();
 });
 
 t.test('SAN - Pawn wrong format i.e. "c3"', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
   const san = 'h5';
-  t.throws(() =>
-    translateSANToCoordinates(san, start({ FEN, mode: 'standard' }))
-  );
+  t.throws(() => translateSANToMove(san, start({ FEN, mode: 'standard' })));
   t.end();
 });
 
@@ -105,12 +97,9 @@ t.test('SAN - Bishop unique move', t => {
     piece: 'B',
     origin: { x: 5, y: 7 },
     target: { x: 3, y: 5 },
-    san,
+    san: [san],
     flags: { move: true },
   };
-  t.same(
-    translateSANToCoordinates(san, start({ FEN, mode: 'standard' })),
-    expected
-  );
+  t.same(translateSANToMove(san, start({ FEN, mode: 'standard' })), expected);
   t.end();
 });

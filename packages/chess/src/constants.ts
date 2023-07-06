@@ -25,6 +25,7 @@ export const flags = {
   move: 'move',
   selected: 'selected',
   check: 'check',
+  promotion: 'promotion',
 };
 export const modes = {
   standard: 'standard',

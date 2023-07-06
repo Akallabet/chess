@@ -7,45 +7,95 @@ import { Move } from '../types.js';
 // rank of departure if the files are the same but the ranks differ
 // the complete origin square coordinate otherwise
 
+function buildSanString({
+  ambiguousIndexes,
+  origin,
+  destination,
+  promotion,
+  move,
+  moveSquare,
+}: {
+  ambiguousIndexes: Array<number>;
+  origin: Array<string>;
+  destination: Array<string>;
+  promotion?: string;
+  move: Move;
+  moveSquare: Array<Move>;
+}): string {
+  if (ambiguousIndexes.length === 0)
+    return [...origin, ...destination, promotion].join('');
+
+  if (ambiguousIndexes.every(i => move.origin.x !== moveSquare[i].origin.x)) {
+    return [...origin, files[move.origin.x], ...destination, promotion].join(
+      ''
+    );
+  }
+  if (ambiguousIndexes.every(i => move.origin.y !== moveSquare[i].origin.y)) {
+    return [
+      ...origin,
+      String(ranks[move.origin.y]),
+      ...destination,
+      promotion,
+    ].join('');
+  }
+
+  return [
+    ...origin,
+    files[move.origin.x],
+    String(ranks[move.origin.y]),
+    ...destination,
+    promotion,
+  ].join('');
+}
+
 export function translateMoveToSAN(
   moveSquare: Array<Move>,
   moveIndex: number
-): string {
+): Array<string> {
   const move = moveSquare[moveIndex];
-  const { flags, target, piece } = move;
 
-  const file = files[target.x];
-  const rank = ranks[target.y];
-  const capture = flags.capture ? 'x' : '';
-  const check = flags.check ? '+' : '';
-  const checkmate = flags.checkmate ? '#' : '';
-  const sanOrigin = [
-    piece !== piecesMap.p && piece !== piecesMap.P ? piece : '',
+  const file = files[move.target.x];
+  const rank = ranks[move.target.y];
+  const capture = move.flags.capture ? 'x' : '';
+  const check = move.flags.check ? '+' : '';
+  const checkmate = move.flags.checkmate ? '#' : '';
+  const origin = [
+    move.piece !== piecesMap.p && move.piece !== piecesMap.P ? move.piece : '',
   ];
-  const sanDestination = [capture, file, String(rank), check, checkmate];
+  const destination = [capture, file, String(rank), check, checkmate];
 
-  const ambiguousIndexes = [];
+  const ambiguousIndexes: Array<number> = [];
   for (let i = 0; i < moveSquare.length; i++) {
-    if (i !== moveIndex && moveSquare[i].piece === move.piece) {
+    if (
+      i !== moveIndex &&
+      moveSquare[i].piece === move.piece &&
+      !moveSquare[i].flags.promotion &&
+      (moveSquare[i].origin.x === move.origin.x ||
+        moveSquare[i].origin.y === move.origin.y)
+    ) {
       ambiguousIndexes.push(i);
     }
   }
-  if (ambiguousIndexes.length === 0)
-    return [...sanOrigin, ...sanDestination].join('');
-
-  if (ambiguousIndexes.every(i => move.origin.x !== moveSquare[i].origin.x)) {
-    return [...sanOrigin, files[move.origin.x], ...sanDestination].join('');
-  }
-  if (ambiguousIndexes.every(i => move.origin.y !== moveSquare[i].origin.y)) {
-    return [...sanOrigin, String(ranks[move.origin.y]), ...sanDestination].join(
-      ''
+  if (move.flags.promotion) {
+    return move.flags.promotion.split('').map(piece =>
+      buildSanString({
+        ambiguousIndexes,
+        origin,
+        destination,
+        promotion: piece,
+        move,
+        moveSquare,
+      })
     );
   }
 
   return [
-    ...sanOrigin,
-    files[move.origin.x],
-    String(ranks[move.origin.y]),
-    ...sanDestination,
-  ].join('');
+    buildSanString({
+      ambiguousIndexes,
+      origin,
+      destination,
+      move,
+      moveSquare,
+    }),
+  ];
 }

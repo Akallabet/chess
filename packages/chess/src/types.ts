@@ -15,11 +15,15 @@ export type Piece = (typeof piecesList)[number];
 export type Address = string;
 export type Position = Coordinates | Address;
 
-export interface EmptySquare {
+export interface Flags {
   capture?: boolean;
   move?: boolean;
   check?: boolean;
+  checkmate?: boolean;
+  promotion?: string;
 }
+
+export type EmptySquare = Flags;
 
 export interface Square extends EmptySquare {
   piece?: Piece;
@@ -30,17 +34,11 @@ export interface MoveBase {
   piece: Piece;
   origin: Coordinates;
   target: Coordinates;
-  flags: {
-    capture?: boolean;
-    move?: boolean;
-    check?: boolean;
-    checkmate?: boolean;
-    promotion?: boolean;
-  };
+  flags: Flags;
 }
 
 export interface Move extends MoveBase {
-  san: string;
+  san: Array<string>;
 }
 
 export type ChessBoardType = Array<Array<Square>>;

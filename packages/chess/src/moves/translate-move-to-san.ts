@@ -18,7 +18,7 @@ function buildSanString({
   ambiguousIndexes: Array<number>;
   origin: Array<string>;
   destination: Array<string>;
-  promotion: string;
+  promotion?: string;
   move: Move;
   moveSquare: Array<Move>;
 }): string {
@@ -64,11 +64,29 @@ export function translateMoveToSAN(
   ];
   const destination = [capture, file, String(rank), check, checkmate];
 
-  const ambiguousIndexes = [];
+  const ambiguousIndexes: Array<number> = [];
   for (let i = 0; i < moveSquare.length; i++) {
-    if (i !== moveIndex && moveSquare[i].piece === move.piece) {
+    if (
+      i !== moveIndex &&
+      moveSquare[i].piece === move.piece &&
+      !moveSquare[i].flags.promotion &&
+      (moveSquare[i].origin.x === move.origin.x ||
+        moveSquare[i].origin.y === move.origin.y)
+    ) {
       ambiguousIndexes.push(i);
     }
+  }
+  if (move.flags.promotion) {
+    return move.flags.promotion.split('').map(piece =>
+      buildSanString({
+        ambiguousIndexes,
+        origin,
+        destination,
+        promotion: piece,
+        move,
+        moveSquare,
+      })
+    );
   }
 
   return [
@@ -76,7 +94,6 @@ export function translateMoveToSAN(
       ambiguousIndexes,
       origin,
       destination,
-      promotion: move.flags.promotion ? 'Q' : '',
       move,
       moveSquare,
     }),

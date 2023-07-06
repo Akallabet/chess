@@ -2,7 +2,7 @@ import t from 'tap';
 import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
-t.only('Move', t => {
+t.test('Move', t => {
   t.plan(7);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
@@ -85,7 +85,8 @@ t.only('Move', t => {
 
   t.test('Pawn promotion', t => {
     const FEN = '8/P7/7k/8/8/8/8/4K3 w - - 0 1';
-    const state = move('a8Q', start({ FEN, mode: 'standard' }));
+    const initial = start({ FEN, mode: 'standard' });
+    const state = move('a8Q', initial);
     t.same(state.FEN, 'Q7/8/7k/8/8/8/8/4K3 b - - 0 1');
     t.end();
   });

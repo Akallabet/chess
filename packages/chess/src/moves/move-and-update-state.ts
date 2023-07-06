@@ -7,18 +7,17 @@ const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
 
 export function boardWithMove(move: MoveBase, board: ChessBoardType) {
-  const { origin, target, flags } = move;
   return board.map((row, y) =>
     row.map(
       (cell, x) => {
-        if (y === origin.y && x === origin.x) return {};
-        if (y === target.y && x === target.x) {
-          if (flags.promotion) {
+        if (y === move.origin.y && x === move.origin.x) return {};
+        if (y === move.target.y && x === move.target.x) {
+          if (move.flags.promotion) {
             return {
-              piece: 'Q',
+              piece: move.flags.promotion,
             };
           }
-          return board[origin.y][origin.x];
+          return board[move.origin.y][move.origin.x];
         }
         return cell;
       },

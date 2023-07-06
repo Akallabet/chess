@@ -26,17 +26,19 @@ export interface Square extends EmptySquare {
   selected?: boolean;
 }
 
+export interface Flags {
+  capture?: boolean;
+  move?: boolean;
+  check?: boolean;
+  checkmate?: boolean;
+  promotion?: string;
+}
+
 export interface MoveBase {
   piece: Piece;
   origin: Coordinates;
   target: Coordinates;
-  flags: {
-    capture?: boolean;
-    move?: boolean;
-    check?: boolean;
-    checkmate?: boolean;
-    promotion?: boolean;
-  };
+  flags: Flags;
 }
 
 export interface Move extends MoveBase {

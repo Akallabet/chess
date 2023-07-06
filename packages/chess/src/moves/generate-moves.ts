@@ -172,7 +172,17 @@ export function generateMovesForAllPieces(
           { y, x },
           state,
           patterns[square.piece as string]
-        );
+        )
+          .map(move => {
+            if (move.flags.promotion) {
+              return move.flags.promotion.split('').map(promotion => ({
+                ...move,
+                flags: { ...move.flags, promotion },
+              }));
+            }
+            return move;
+          })
+          .flat();
         if (state.mode === modes.standard) {
           for (const move of pieceMoves) {
             if (isMoveValid(move, state)) {

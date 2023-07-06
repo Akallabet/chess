@@ -11,7 +11,7 @@ export function createMovesBoard(
 
   for (let i = 0; i < moves.length; i++) {
     const { x, y } = moves[i].target;
-    movesBoard[y][x].push({ ...moves[i], san: '' });
+    movesBoard[y][x].push({ ...moves[i], san: [''] });
   }
 
   for (let i = 0; i < movesBoard.length; i++) {

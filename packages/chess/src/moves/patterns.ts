@@ -1,5 +1,5 @@
-import { flags } from '../constants.js';
-import { Coordinates, InternalState } from '../types.js';
+import { blackPieces, flags, whitePieces } from '../constants.js';
+import { Coordinates, Flags, InternalState } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
 import { getCastlingRights } from '../fen.js';
@@ -69,7 +69,7 @@ const stopIfNotOpponent = ({
 export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
   shallStop: (args: PatternState) => boolean;
-  addFlags?: (args: PatternState) => Record<string, boolean>;
+  addFlags?: (args: PatternState) => Flags;
   recursive?: boolean;
 }
 
@@ -84,7 +84,9 @@ const basePatterns: Record<string, Array<Pattern>> = {
       },
       addFlags: ({ target }) => ({
         [flags.move]: true,
-        ...(target.y === 7 ? { [flags.promotion]: true } : {}),
+        ...(target.y === 7
+          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          : {}),
       }),
     },
     {
@@ -92,7 +94,9 @@ const basePatterns: Record<string, Array<Pattern>> = {
       shallStop: stopIfNotOpponent,
       addFlags: ({ target }) => ({
         [flags.capture]: true,
-        ...(target.y === 7 ? { [flags.promotion]: true } : {}),
+        ...(target.y === 7
+          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          : {}),
       }),
     },
     {
@@ -100,7 +104,9 @@ const basePatterns: Record<string, Array<Pattern>> = {
       shallStop: stopIfNotOpponent,
       addFlags: ({ target }) => ({
         [flags.capture]: true,
-        ...(target.y === 7 ? { [flags.promotion]: true } : {}),
+        ...(target.y === 7
+          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          : {}),
       }),
     },
   ],
@@ -114,7 +120,9 @@ const basePatterns: Record<string, Array<Pattern>> = {
       },
       addFlags: ({ target }) => ({
         [flags.move]: true,
-        ...(target.y === 0 ? { [flags.promotion]: true } : {}),
+        ...(target.y === 0
+          ? { [flags.promotion]: whitePieces.replace('K', '') }
+          : {}),
       }),
     },
     {
@@ -122,7 +130,9 @@ const basePatterns: Record<string, Array<Pattern>> = {
       shallStop: stopIfNotOpponent,
       addFlags: ({ target }) => ({
         [flags.capture]: true,
-        ...(target.y === 0 ? { [flags.promotion]: true } : {}),
+        ...(target.y === 0
+          ? { [flags.promotion]: whitePieces.replace('K', '') }
+          : {}),
       }),
     },
     {
@@ -130,7 +140,9 @@ const basePatterns: Record<string, Array<Pattern>> = {
       shallStop: stopIfNotOpponent,
       addFlags: ({ target }) => ({
         [flags.capture]: true,
-        ...(target.y === 0 ? { [flags.promotion]: true } : {}),
+        ...(target.y === 0
+          ? { [flags.promotion]: whitePieces.replace('K', '') }
+          : {}),
       }),
     },
   ],

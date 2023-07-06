@@ -3,7 +3,7 @@ import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.only('Move', t => {
-  t.plan(6);
+  t.plan(7);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
@@ -68,7 +68,7 @@ t.only('Move', t => {
     t.end();
   });
 
-  t.only('Draw by 50 moves rule', t => {
+  t.test('Draw by 50 moves rule', t => {
     const FEN =
       'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
     const state = start({ FEN, mode: 'standard' });
@@ -80,6 +80,13 @@ t.only('Move', t => {
     t.same(firstMove.isGameOver, true);
     t.same(firstMove.isDraw, true);
 
+    t.end();
+  });
+
+  t.test('Pawn promotion', t => {
+    const FEN = '8/P7/7k/8/8/8/8/4K3 w - - 0 1';
+    const state = move('a8Q', start({ FEN, mode: 'standard' }));
+    t.same(state.FEN, 'Q7/8/7k/8/8/8/8/4K3 b - - 0 1');
     t.end();
   });
 });

@@ -69,7 +69,7 @@ const stopIfNotOpponent = ({
 export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
   shallStop: (args: PatternState) => boolean;
-  flag?: string;
+  addFlags?: (args: PatternState) => Record<string, boolean>;
   recursive?: boolean;
 }
 
@@ -82,16 +82,26 @@ const basePatterns: Record<string, Array<Pattern>> = {
         if (origin.y === 1 && step >= 2) return true;
         return stopIfOpponent({ step, origin, target, state });
       },
+      addFlags: ({ target }) => ({
+        [flags.move]: true,
+        ...(target.y === 7 ? { [flags.promotion]: true } : {}),
+      }),
     },
     {
       advance: bottomRight,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 7 ? { [flags.promotion]: true } : {}),
+      }),
     },
     {
       advance: bottomLeft,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 7 ? { [flags.promotion]: true } : {}),
+      }),
     },
   ],
   P: [
@@ -102,16 +112,26 @@ const basePatterns: Record<string, Array<Pattern>> = {
         if (origin.y === 6 && step >= 2) return true;
         return stopIfOpponent({ step, origin, target, state });
       },
+      addFlags: ({ target }) => ({
+        [flags.move]: true,
+        ...(target.y === 0 ? { [flags.promotion]: true } : {}),
+      }),
     },
     {
       advance: topRight,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 0 ? { [flags.promotion]: true } : {}),
+      }),
     },
     {
       advance: topLeft,
       shallStop: stopIfNotOpponent,
-      flag: flags.capture,
+      addFlags: ({ target }) => ({
+        [flags.capture]: true,
+        ...(target.y === 0 ? { [flags.promotion]: true } : {}),
+      }),
     },
   ],
   n: [

@@ -12,8 +12,8 @@ import { fromPositionToCoordinates } from './utils.js';
 import {
   generateMovesForAllPieces,
   isKingUnderCheck,
-  translateSANToCoordinates,
   moveAndUpdateState,
+  translateSANToMove,
 } from './moves/index.js';
 import { errorCodes } from './error-codes.js';
 
@@ -46,7 +46,7 @@ export function start(
 
 export function move(san: string, initialState: ChessState): ChessState {
   try {
-    const move = translateSANToCoordinates(san, initialState);
+    const move = translateSANToMove(san, initialState);
     const state = moveAndUpdateState(move, initialState);
     const moves = generateMovesForAllPieces(state);
     const movesBoard = createMovesBoard(state, moves);

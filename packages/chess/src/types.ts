@@ -40,7 +40,7 @@ export interface MoveBase {
 }
 
 export interface Move extends MoveBase {
-  san: string;
+  san: Array<string>;
 }
 
 export type ChessBoardType = Array<Array<Square>>;

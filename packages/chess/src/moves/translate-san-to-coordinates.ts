@@ -152,14 +152,14 @@ import { ChessState, Move } from '../types.js';
 // ],
 // ];
 
-export function translateSANToCoordinates(
+export function translateSANToMove(
   san: string,
   state: ChessState
 ): Move | never {
   const moves = state.movesBoard.flat().flat();
-  const move = moves.find(move => move.san === san);
+  const move = moves.find(move =>
+    move.san.find(sanString => sanString === san)
+  );
   if (!move) throw new Error(errorCodes.wrongFormat); // if (!option) return { error: errorCodes.wrongFormat };
-  // const { parse } = option;
-  // return parse(SAN, state);
   return move;
 }

@@ -8,11 +8,11 @@ t.test('Generate SAN - only one pawn', t => {
     origin: { x: 2, y: 6 },
     target: { x: 2, y: 4 },
     flags: {},
-    san: '',
+    san: [''],
   };
   const moveSquare = [move];
   const input = translateMoveToSAN(moveSquare, 0);
-  t.same(input, 'c4');
+  t.same(input, ['c4']);
   t.end();
 });
 
@@ -23,18 +23,18 @@ t.test('Generate SAN - two knights with different files', t => {
       origin: { x: 2, y: 5 },
       target: { x: 4, y: 4 },
       flags: {},
-      san: '',
+      san: [''],
     },
     {
       piece: 'K',
       origin: { x: 3, y: 6 },
       target: { x: 2, y: 5 },
       flags: {},
-      san: '',
+      san: [''],
     },
   ];
   const input = translateMoveToSAN(moveSquare, 0);
-  t.same(input, 'Kce4');
+  t.same(input, ['Kce4']);
   t.end();
 });
 
@@ -45,18 +45,18 @@ t.test('Generate SAN - two rooks with same file and different ranks', t => {
       origin: { x: 3, y: 3 },
       target: { x: 3, y: 4 },
       flags: {},
-      san: '',
+      san: [''],
     },
     {
       piece: 'R',
       origin: { x: 3, y: 2 },
       target: { x: 3, y: 4 },
       flags: {},
-      san: '',
+      san: [''],
     },
   ];
   const input = translateMoveToSAN(moveSquare, 0);
-  t.same(input, 'R5d4');
+  t.same(input, ['R5d4']);
   t.end();
 });
 
@@ -75,7 +75,7 @@ t.test('Generate SAN - two rooks with same rank and different files', t => {
       flags: {
         move: true,
       },
-      san: '',
+      san: [''],
     },
     {
       piece: 'R',
@@ -90,11 +90,11 @@ t.test('Generate SAN - two rooks with same rank and different files', t => {
       flags: {
         move: true,
       },
-      san: '',
+      san: [''],
     },
   ];
   const input = translateMoveToSAN(moveSquare, 0);
-  t.same(input, 'Rab2');
+  t.same(input, ['Rab2']);
   t.end();
 });
 

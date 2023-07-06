@@ -65,7 +65,11 @@ const generateMovesFromPatterns = ({
             piece,
             origin,
             target: target,
-            flags: { [pattern.flag || flags.capture]: true },
+            flags: {
+              ...(pattern.addFlags
+                ? pattern.addFlags({ step, target, origin, state })
+                : { [flags.capture]: true }),
+            },
           });
         }
         break;
@@ -75,7 +79,9 @@ const generateMovesFromPatterns = ({
         origin,
         target: target,
         flags: {
-          [pattern.flag || flags.move]: true,
+          ...(pattern.addFlags
+            ? pattern.addFlags({ step, target, origin, state })
+            : { [flags.move]: true }),
         },
       });
       step++;

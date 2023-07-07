@@ -16,7 +16,7 @@ t.test('Generate SAN - only one pawn', t => {
   t.end();
 });
 
-t.only('Generate SAN - two knights with different files and ranks', t => {
+t.test('Generate SAN - two knights with different files and ranks', t => {
   const moveSquare = [
     {
       piece: 'N',

@@ -9,6 +9,7 @@ import {
 import {
   areOpponents,
   getKingPiece,
+  getOpponentColor,
   getPieceCoord,
   isActiveColorPiece,
 } from '../utils.js';
@@ -107,15 +108,27 @@ export function generateMoves(
   });
 }
 
-function isMoveValid(move: MoveBase, state: InternalState): boolean {
-  const moveState = moveAndUpdateState(move, state);
+export function isKingUnderCheck(state: InternalState): boolean {
+  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
+  if (!kingCoord) return false;
+  return isCellUnderCheck(
+    state,
+    kingCoord,
+    getOpponentColor(state.activeColor)
+  );
+}
+
+export function isOpponentKingUnderCheck(state: InternalState): boolean {
   const kingCoord = getPieceCoord(
-    getKingPiece(state.activeColor),
-    moveState.board
+    getKingPiece(getOpponentColor(state.activeColor)),
+    state.board
   );
   if (!kingCoord) return false;
+  return isCellUnderCheck(state, kingCoord);
+}
 
-  return !isCellUnderCheck(moveState, kingCoord);
+function isMoveValid(move: MoveBase, state: InternalState): boolean {
+  return !isOpponentKingUnderCheck(moveAndUpdateState(move, state));
 }
 
 function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
@@ -123,24 +136,11 @@ function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
   state: InternalState;
 } {
   const moveState = moveAndUpdateState(move, state);
-  const kingCoord = getPieceCoord(
-    getKingPiece(moveState.activeColor),
-    moveState.board
-  );
 
   return {
-    check: kingCoord
-      ? canPieceMoveToTarget(move.target, kingCoord, moveState)
-      : false,
+    check: isKingUnderCheck(moveState),
     state: moveState,
   };
-}
-
-//detect if king is under check
-export function isKingUnderCheck(state: InternalState): boolean {
-  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
-  if (!kingCoord) throw new Error(errorCodes.king_not_found);
-  return isCellUnderCheck(state, kingCoord);
 }
 
 function isCheckMateMove(state: InternalState): boolean {

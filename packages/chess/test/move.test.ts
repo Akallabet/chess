@@ -21,7 +21,9 @@ t.test('Move', t => {
 
   t.test('Check mate', t => {
     const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
-    const state = move('Qe8#', start({ FEN, mode: 'standard' }));
+    const init = start({ FEN, mode: 'standard' });
+    const state = move('Qe8#', init);
+    console.log(state.FEN);
     t.same(state.isGameOver, true);
     t.end();
   });

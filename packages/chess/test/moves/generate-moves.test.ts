@@ -3,6 +3,8 @@ import { fromFEN } from '../../src/fen.js';
 import {
   generateMoves,
   generateMovesForAllPieces,
+  isKingUnderCheck,
+  isOpponentKingUnderCheck,
 } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/index.js';
 import { fromPositionToCoordinates } from '../../src/utils.js';
@@ -585,4 +587,18 @@ t.test('Highlight checkmate', t => {
   const checkMateMoves = moves.filter(({ flags }) => flags.checkmate);
   t.same(checkMateMoves.length, 4);
   t.end();
+});
+
+t.test('Check detection', t => {
+  t.plan(2);
+  t.test('Own king is in check', t => {
+    const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 b - - 0 1');
+    t.same(isKingUnderCheck({ ...state, mode: 'standard' }), true);
+    t.end();
+  });
+  t.test('Opponent king is in check', t => {
+    const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 w - - 0 1');
+    t.same(isOpponentKingUnderCheck({ ...state, mode: 'standard' }), true);
+    t.end();
+  });
 });

@@ -3,7 +3,7 @@ import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.test('Move', t => {
-  t.plan(7);
+  t.plan(8);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
@@ -23,7 +23,6 @@ t.test('Move', t => {
     const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
     const init = start({ FEN, mode: 'standard' });
     const state = move('Qe8#', init);
-    console.log(state.FEN);
     t.same(state.isGameOver, true);
     t.end();
   });
@@ -92,8 +91,15 @@ t.test('Move', t => {
     t.same(state.FEN, 'Q7/8/7k/8/8/8/8/4K3 b - - 0 1');
     t.end();
   });
-  // Move can be check even if it does not directly attack the king
-  // e.g. moving a piece that is pinned
-  // r2qkbnr/pp2pppp/2Pp4/1B2N3/4P1b1/8/PPP2PPP/RNB1K2R w - - 0 1
-  // 1. cxb7+
+
+  t.test('Check by pinning piece', t => {
+    const FEN = 'r2qkbnr/pp2pppp/2Pp4/1B2N3/4P1b1/8/PPP2PPP/RNB1K2R w - - 0 1';
+    const initial = start({ FEN, mode: 'standard' });
+    const state = move('cxb7+', initial);
+    t.same(
+      state.FEN,
+      'r2qkbnr/pP2pppp/3p4/1B2N3/4P1b1/8/PPP2PPP/RNB1K2R b - - 0 1'
+    );
+    t.end();
+  });
 });

@@ -1,5 +1,6 @@
 import { files, piecesMap, ranks } from '../constants.js';
 import { Move } from '../types.js';
+import { isPawn } from '../utils.js';
 
 // If the piece is sufficient to unambiguously determine the origin square, the whole from square is omitted. Otherwise, if two (or more) pieces of the same kind can move to the same square, the piece's initial is followed by (in descending order of preference)
 //
@@ -60,7 +61,9 @@ export function translateMoveToSAN(
   const check = move.flags.check ? '+' : '';
   const checkmate = move.flags.checkmate ? '#' : '';
   const origin = [
-    move.piece !== piecesMap.p && move.piece !== piecesMap.P ? move.piece : '',
+    (!isPawn(move.piece) && move.piece) ||
+      (move.flags.capture && files[move.origin.x]) ||
+      '',
   ];
   const destination = [capture, file, String(rank), check, checkmate];
 

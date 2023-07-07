@@ -131,29 +131,55 @@ function isMoveValid(move: MoveBase, state: InternalState): boolean {
   return !isOpponentKingUnderCheck(moveAndUpdateState(move, state));
 }
 
-function calcCheck({ move, state }: { move: MoveBase; state: InternalState }): {
-  check: boolean;
-  state: InternalState;
-} {
-  const moveState = moveAndUpdateState(move, state);
-
-  return {
-    check: isKingUnderCheck(moveState),
-    state: moveState,
-  };
+function generateLegalMoves(state: InternalState): Array<MoveBase> {
+  const moves: Array<MoveBase> = [];
+  for (let y = 0; y < state.board.length; y++) {
+    const row = state.board[y];
+    for (let x = 0; x < row.length; x++) {
+      const square = row[x];
+      if (
+        square.piece &&
+        isActiveColorPiece(state.activeColor, square.piece as string) // bad bad bad, please remove coercion :(
+      ) {
+        const pieceMoves = generateMoves(
+          { y, x },
+          state,
+          patterns[square.piece as string]
+        )
+          .map(move => {
+            if (move.flags.promotion) {
+              return move.flags.promotion.split('').map(promotion => ({
+                ...move,
+                flags: { ...move.flags, promotion },
+              }));
+            }
+            return move;
+          })
+          .flat();
+        moves.push(...pieceMoves.filter(move => isMoveValid(move, state)));
+      }
+    }
+  }
+  return moves;
 }
 
-function isCheckMateMove(state: InternalState): boolean {
-  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
-  if (!kingCoord) return false;
+function calcCheckFlags(
+  move: MoveBase,
+  state: InternalState
+): { check?: boolean; checkmate?: boolean } {
+  const moveState = moveAndUpdateState(move, state);
+  const check = isKingUnderCheck(moveState);
+  if (!check) return {};
 
-  return (
-    generateMoves(
-      kingCoord,
-      state,
-      patterns[state.board[kingCoord.y][kingCoord.x].piece as string]
-    ).filter(move => isMoveValid(move, state)).length === 0
+  const kingCoord = getPieceCoord(
+    getKingPiece(moveState.activeColor),
+    moveState.board
   );
+  if (!kingCoord) return {};
+
+  const checkmate = generateLegalMoves(moveState).length === 0;
+  if (checkmate) return { checkmate };
+  return { check: true };
 }
 
 export function generateMovesForAllPieces(
@@ -186,17 +212,10 @@ export function generateMovesForAllPieces(
         if (state.mode === modes.standard) {
           for (const move of pieceMoves) {
             if (isMoveValid(move, state)) {
-              const checkMove = calcCheck({
-                state,
-                move,
-              });
-              if (checkMove.check) {
-                if (isCheckMateMove(checkMove.state)) {
-                  move.flags.checkmate = true;
-                } else {
-                  move.flags.check = true;
-                }
-              }
+              move.flags = {
+                ...move.flags,
+                ...calcCheckFlags(move, state),
+              };
               moves.push(move);
             }
           }

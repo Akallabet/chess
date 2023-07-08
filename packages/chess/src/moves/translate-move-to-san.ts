@@ -60,6 +60,7 @@ export function translateMoveToSAN(
   const capture = move.flags.capture ? 'x' : '';
   const check = move.flags.check ? '+' : '';
   const checkmate = move.flags.checkmate ? '#' : '';
+  const promotion = '=';
   const origin = [
     (!isPawn(move.piece) && move.piece) ||
       (move.flags.capture && files[move.origin.x]) ||
@@ -85,7 +86,7 @@ export function translateMoveToSAN(
         ambiguousIndexes,
         origin,
         destination,
-        promotion: piece,
+        promotion: `${promotion}${piece}`,
         move,
         moveSquare,
       })

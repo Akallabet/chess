@@ -87,7 +87,7 @@ t.test('Move', t => {
   t.test('Pawn promotion', t => {
     const FEN = '8/P7/7k/8/8/8/8/4K3 w - - 0 1';
     const initial = start({ FEN, mode: 'standard' });
-    const state = move('a8Q', initial);
+    const state = move('a8=Q', initial);
     t.same(state.FEN, 'Q7/8/7k/8/8/8/8/4K3 b - - 0 1');
     t.end();
   });

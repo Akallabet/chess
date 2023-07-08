@@ -2,7 +2,7 @@ import t from 'tap';
 import { fromFEN } from '../../src/fen.js';
 import {
   generateMoves,
-  generateMovesForAllPieces,
+  generateLegalMovesForActiveSide,
   isKingUnderCheck,
   isOpponentKingUnderCheck,
 } from '../../src/moves/generate-moves.js';
@@ -319,7 +319,9 @@ t.test('Highligh moves with king under check', t => {
     },
   ];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
-  const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
+  const actual = generateLegalMovesForActiveSide(
+    start({ FEN, mode: 'standard' })
+  );
   t.same(actual, expected);
   t.end();
 });
@@ -413,7 +415,9 @@ t.test('Highlight moves of king under check', t => {
       },
     },
   ];
-  const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
+  const actual = generateLegalMovesForActiveSide(
+    start({ FEN, mode: 'standard' })
+  );
   t.same(actual, expected);
   t.end();
 });
@@ -428,7 +432,7 @@ t.test(
       { piece: 'k', origin, target: { x: 5, y: 0 }, flags: { move: true } },
       { piece: 'k', origin, target: { x: 4, y: 1 }, flags: { move: true } },
     ];
-    const actual = generateMovesForAllPieces({
+    const actual = generateLegalMovesForActiveSide({
       ...fromFEN(FEN),
       mode: 'standard',
     }).filter(({ piece }) => piece === 'k');
@@ -469,7 +473,7 @@ t.test('Highlight kingside and queenside castling for white', t => {
     { piece: 'K', origin, target: { y: 7, x: 5 }, flags: { move: true } },
     { piece: 'K', origin, target: { y: 7, x: 6 }, flags: { move: true } },
   ];
-  const actual = generateMovesForAllPieces({
+  const actual = generateLegalMovesForActiveSide({
     ...fromFEN(FEN),
     mode: 'standard',
   }).filter(({ piece }) => piece === 'K');
@@ -481,7 +485,7 @@ t.test('No castling moves if one of the castling cells is under check', t => {
   const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const origin = { x: 4, y: 0 };
   const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
-  const actual = generateMovesForAllPieces(
+  const actual = generateLegalMovesForActiveSide(
     start({ FEN, mode: 'standard' })
   ).filter(({ piece }) => piece === 'k');
   t.same(
@@ -495,7 +499,7 @@ t.test('No castling moves if one of the castling cells is occupied', t => {
   const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateMovesForAllPieces(
+  const actual = generateLegalMovesForActiveSide(
     start({ FEN, mode: 'standard' })
   ).filter(({ piece }) => piece === 'k');
   t.same(
@@ -575,7 +579,9 @@ t.test('Highlight check', t => {
       flags: { move: true },
     },
   ];
-  const actual = generateMovesForAllPieces(start({ FEN, mode: 'standard' }));
+  const actual = generateLegalMovesForActiveSide(
+    start({ FEN, mode: 'standard' })
+  );
   t.same(actual, expected);
   t.end();
 });
@@ -583,7 +589,10 @@ t.test('Highlight check', t => {
 t.test('Highlight checkmate', t => {
   const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
   const FENState = fromFEN(FEN);
-  const moves = generateMovesForAllPieces({ ...FENState, mode: 'standard' });
+  const moves = generateLegalMovesForActiveSide({
+    ...FENState,
+    mode: 'standard',
+  });
   const checkMateMoves = moves.filter(({ flags }) => flags.checkmate);
   t.same(checkMateMoves.length, 4);
   t.end();

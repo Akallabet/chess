@@ -1,6 +1,6 @@
 export {
   generateMoves,
-  generateMovesForAllPieces,
+  generateLegalMovesForActiveSide,
   isKingUnderCheck as isKingUnderCheck,
 } from './generate-moves.js';
 export { createMovesBoard } from './create-moves-board.js';

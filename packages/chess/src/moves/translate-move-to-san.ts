@@ -1,4 +1,4 @@
-import { files, piecesMap, ranks } from '../constants.js';
+import { files, ranks } from '../constants.js';
 import { Move } from '../types.js';
 import { isPawn } from '../utils.js';
 

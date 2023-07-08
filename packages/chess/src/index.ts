@@ -11,7 +11,7 @@ import {
 } from './types.js';
 
 import {
-  generateMovesForAllPieces,
+  generateLegalMovesForActiveSide,
   isKingUnderCheck,
   moveAndUpdateState,
   translateSANToMove,
@@ -26,7 +26,7 @@ export function start(
     mode: initialState.mode || modes.standard,
   };
 
-  const moves = generateMovesForAllPieces(state);
+  const moves = generateLegalMovesForActiveSide(state);
   const movesBoard = createMovesBoard(state, moves);
   const isDraw =
     state.mode === 'standard' &&
@@ -48,7 +48,7 @@ export function move(san: string, initialState: ChessState): ChessState {
   try {
     const move = translateSANToMove(san, initialState);
     const state = moveAndUpdateState(move, initialState);
-    const moves = generateMovesForAllPieces(state);
+    const moves = generateLegalMovesForActiveSide(state);
     const movesBoard = createMovesBoard(state, moves);
     const isDraw =
       state.mode === 'standard' &&

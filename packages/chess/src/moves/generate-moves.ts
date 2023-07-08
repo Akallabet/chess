@@ -1,5 +1,4 @@
 import { flags, modes } from '../constants.js';
-import { errorCodes } from '../error-codes.js';
 import {
   ChessBoardType,
   Coordinates,
@@ -13,10 +12,7 @@ import {
   getPieceCoord,
   isActiveColorPiece,
 } from '../utils.js';
-import {
-  canPieceMoveToTarget,
-  isCellUnderCheck,
-} from './is-cell-under-check.js';
+import { isCellUnderCheck } from './is-cell-under-check.js';
 import { moveAndUpdateState } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
@@ -182,46 +178,14 @@ function calcCheckFlags(
   return { check: true };
 }
 
-export function generateMovesForAllPieces(
+export function generateLegalMovesForActiveSide(
   state: InternalState
 ): Array<MoveBase> {
-  const moves: Array<MoveBase> = [];
-  for (let y = 0; y < state.board.length; y++) {
-    const row = state.board[y];
-    for (let x = 0; x < row.length; x++) {
-      const square = row[x];
-      if (
-        square.piece &&
-        isActiveColorPiece(state.activeColor, square.piece as string) // bad bad bad, please remove coercion :(
-      ) {
-        const pieceMoves = generateMoves(
-          { y, x },
-          state,
-          patterns[square.piece as string]
-        )
-          .map(move => {
-            if (move.flags.promotion) {
-              return move.flags.promotion.split('').map(promotion => ({
-                ...move,
-                flags: { ...move.flags, promotion },
-              }));
-            }
-            return move;
-          })
-          .flat();
-        if (state.mode === modes.standard) {
-          for (const move of pieceMoves) {
-            if (isMoveValid(move, state)) {
-              move.flags = {
-                ...move.flags,
-                ...calcCheckFlags(move, state),
-              };
-              moves.push(move);
-            }
-          }
-        }
-      }
-    }
-  }
-  return moves;
+  return generateLegalMoves(state).map(move => ({
+    ...move,
+    flags: {
+      ...move.flags,
+      ...calcCheckFlags(move, state),
+    },
+  }));
 }

@@ -3,7 +3,12 @@ import { Coordinates, Flags, InternalState } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
 import { getCastlingRights } from '../fen.js';
-import { areOpponents, getOpponentColor } from '../utils.js';
+import {
+  areOpponents,
+  getOpponentColor,
+  isActiveColorWhite,
+  isWhitePiece,
+} from '../utils.js';
 
 interface PatternState {
   step: number;
@@ -42,29 +47,40 @@ const bottom = ({ y, x }: Coordinates): Coordinates => ({ y: y + 1, x });
 const right = ({ y, x }: Coordinates): Coordinates => ({ y, x: x + 1 });
 const left = ({ y, x }: Coordinates): Coordinates => ({ y, x: x - 1 });
 
-const stopIfOpponent = ({
+function stopIfOpponent({
   target: { x, y },
   origin,
   state,
-}: PatternState): boolean => {
+}: PatternState): boolean {
   if (!state.board[y][x].piece) return false;
   return areOpponents(
     state.board[y][x].piece as string,
     state.board[origin.y][origin.x].piece as string
   );
-};
+}
 
-const stopIfNotOpponent = ({
-  target: { x, y },
-  origin,
-  state,
-}: PatternState): boolean => {
-  if (!state.board[y][x].piece) return true;
+function calcPawnRankFromEnPassant(color: string, enPassant: Coordinates) {
+  return isActiveColorWhite(color) ? enPassant.y - 1 : enPassant.y + 1;
+}
+
+function stopIfNotOpponent({ target, origin, state }: PatternState): boolean {
+  if (!state.board[target.y][target.x].piece) return true;
   return !areOpponents(
-    state.board[y][x].piece as string,
+    state.board[
+      state.enPassant &&
+      state.enPassant.x === target.x &&
+      state.enPassant.y === target.y
+        ? calcPawnRankFromEnPassant(state.activeColor, state.enPassant)
+        : target.y
+    ][target.x] as string,
     state.board[origin.y][origin.x].piece as string
   );
-};
+}
+
+// function pawnCaptureStop (patternState: PatternState) {
+//   const {state:{enPassant}} = patternState;
+//   if
+// }
 
 export interface Pattern {
   advance: (args: Coordinates) => Coordinates;

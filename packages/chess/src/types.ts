@@ -18,7 +18,6 @@ export type Position = Coordinates | Address;
 export interface Flags {
   capture?: boolean;
   move?: boolean;
-  enPassant?: Coordinates;
   check?: boolean;
   checkmate?: boolean;
   promotion?: string;
@@ -62,7 +61,7 @@ export interface FENState {
   // activeColor: 'w' | 'b';
   activeColor: string;
   castlingRights: '-' | string[];
-  enPassant: Coordinates | false;
+  enPassant: string | false;
   halfMoves: number;
   fullMoves: number;
 }

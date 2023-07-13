@@ -1,5 +1,4 @@
 import * as R from 'ramda';
-import { files, ranks } from './constants.js';
 import { ChessBoardType, EmptySquare, FENState, Square } from './types.js';
 import { isBlackPiece, isWhitePiece } from './utils.js';
 
@@ -47,13 +46,7 @@ export function fromFEN(FEN: string): FENState {
     board: boardFromFEN(piecePlacement),
     activeColor,
     castlingRights: castlingRights === '-' ? [] : R.split('', castlingRights),
-    enPassant:
-      enPassant === '-'
-        ? false
-        : {
-            y: ranks.indexOf(Number(enPassant[1])),
-            x: files.indexOf(enPassant[0]),
-          },
+    enPassant: enPassant === '-' ? false : enPassant,
     halfMoves: Number(halfMoves),
     fullMoves: Number(fullMoves),
   };
@@ -85,9 +78,7 @@ export const toFEN = ({
     Array.isArray(castlingRights) && castlingRights.length > 0
       ? castlingRights.join('')
       : '-'
-  } ${
-    enPassant ? `${files[enPassant.x]}${ranks[enPassant.y]}` : '-'
-  } ${halfMoves} ${fullMoves}`;
+  } ${enPassant || '-'} ${halfMoves} ${fullMoves}`;
 };
 
 const FENRegExp = new RegExp(

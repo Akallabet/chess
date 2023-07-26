@@ -48,6 +48,7 @@ export function move(san: string, initialState: ChessState): ChessState {
   try {
     const move = translateSANToMove(san, initialState);
     const state = moveAndUpdateState(move, initialState);
+    // console.log(state.enPassant);
     const moves = generateLegalMovesForActiveSide(state);
     const movesBoard = createMovesBoard(state, moves);
     const isDraw =

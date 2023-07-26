@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "test": "tap --rcfile=test/config/tap.yml",
+    "test:watch": "tap --watch --rcfile=test/config/tap.yml",
     "test:only": "tap --only --rcfile=test/config/tap.yml",
     "emit:types": "tsc -p . --emitDeclarationOnly",
     "bundle": "swc src -d dist -q",

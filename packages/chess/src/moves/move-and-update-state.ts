@@ -1,7 +1,7 @@
 import { fromFEN, toFEN } from '../fen.js';
 import { colours } from '../constants.js';
 import { ChessBoardType, FENState, InternalState, MoveBase } from '../types.js';
-import { isActiveColorBlack, isPawn } from '../utils.js';
+import { isActiveColorBlack, isPawn, isWhitePiece } from '../utils.js';
 
 const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
@@ -26,6 +26,10 @@ export function boardWithMove(move: MoveBase, board: ChessBoardType) {
   );
 }
 
+function calcEnPassantRank(move: MoveBase) {
+  return isWhitePiece(move.piece) ? move.target.y + 1 : move.target.y - 1;
+}
+
 export function moveAndUpdateState(
   move: MoveBase,
   state: InternalState
@@ -42,6 +46,11 @@ export function moveAndUpdateState(
         fullMoves: isActiveColorBlack(state.activeColor)
           ? state.fullMoves + 1
           : state.fullMoves,
+        enPassant: isPawn(move.piece) &&
+          Math.abs(move.target.y - move.origin.y) === 2 && {
+            y: calcEnPassantRank(move),
+            x: move.target.x,
+          },
       })
     ),
   };

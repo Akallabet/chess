@@ -61,7 +61,7 @@ export interface FENState {
   // activeColor: 'w' | 'b';
   activeColor: string;
   castlingRights: '-' | string[];
-  enPassant: string | false;
+  enPassant: Coordinates | false;
   halfMoves: number;
   fullMoves: number;
 }

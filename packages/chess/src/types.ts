@@ -21,6 +21,7 @@ export interface Flags {
   check?: boolean;
   checkmate?: boolean;
   promotion?: string;
+  enPassant?: Coordinates;
 }
 
 export type EmptySquare = Record<string, never>;
@@ -61,7 +62,7 @@ export interface FENState {
   // activeColor: 'w' | 'b';
   activeColor: string;
   castlingRights: '-' | string[];
-  enPassant: string | false;
+  enPassant: Coordinates | false;
   halfMoves: number;
   fullMoves: number;
 }

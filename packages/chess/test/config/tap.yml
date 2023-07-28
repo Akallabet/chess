@@ -1,5 +1,5 @@
 ---
-coverage: false
+coverage: true
 jobs: 5
 node-arg:
   - --loader=tsx

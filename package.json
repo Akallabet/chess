@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "test": "npm test --workspace=@chess/chess",
+    "test:watch": "npm run test:watch --workspace=@chess/chess",
     "test:only": "npm run test:only --workspace=@chess/chess",
     "tap": "tap",
     "build:chess": "npm run build --workspace=@chess/chess",

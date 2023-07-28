@@ -42,29 +42,24 @@ const bottom = ({ y, x }: Coordinates): Coordinates => ({ y: y + 1, x });
 const right = ({ y, x }: Coordinates): Coordinates => ({ y, x: x + 1 });
 const left = ({ y, x }: Coordinates): Coordinates => ({ y, x: x - 1 });
 
-const stopIfOpponent = ({
-  target: { x, y },
-  origin,
-  state,
-}: PatternState): boolean => {
-  if (!state.board[y][x].piece) return false;
-  return areOpponents(
-    state.board[y][x].piece as string,
-    state.board[origin.y][origin.x].piece as string
+function stopIfOpponent({ target, origin, state }: PatternState): boolean {
+  return (
+    !!state.board[target.y][target.x].piece &&
+    areOpponents(
+      state.board[target.y][target.x].piece as string,
+      state.board[origin.y][origin.x].piece as string
+    )
   );
-};
+}
 
-const stopIfNotOpponent = ({
-  target: { x, y },
-  origin,
-  state,
-}: PatternState): boolean => {
-  if (!state.board[y][x].piece) return true;
-  return !areOpponents(
-    state.board[y][x].piece as string,
-    state.board[origin.y][origin.x].piece as string
+function stopIfEmpty({ target, state }: PatternState): boolean {
+  return (
+    (!state.enPassant && !state.board[target.y][target.x].piece) ||
+    (state.enPassant &&
+      !state.board[target.y][target.x].piece &&
+      (target.x !== state.enPassant.x || target.y !== state.enPassant.y))
   );
-};
+}
 
 export interface Pattern {
   advance: (args: Coordinates) => Coordinates;
@@ -91,9 +86,19 @@ const basePatterns: Record<string, Array<Pattern>> = {
     },
     {
       advance: bottomRight,
-      shallStop: stopIfNotOpponent,
-      addFlags: ({ target }) => ({
+      shallStop: stopIfEmpty,
+      addFlags: ({ target, state }) => ({
         [flags.capture]: true,
+        ...(state.enPassant &&
+        target.x === state.enPassant.x &&
+        target.y === state.enPassant.y
+          ? {
+              [flags.enPassant]: {
+                y: state.enPassant.y - 1,
+                x: state.enPassant.x,
+              },
+            }
+          : {}),
         ...(target.y === 7
           ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
           : {}),
@@ -101,9 +106,19 @@ const basePatterns: Record<string, Array<Pattern>> = {
     },
     {
       advance: bottomLeft,
-      shallStop: stopIfNotOpponent,
-      addFlags: ({ target }) => ({
+      shallStop: stopIfEmpty,
+      addFlags: ({ target, state }) => ({
         [flags.capture]: true,
+        ...(state.enPassant &&
+        target.x === state.enPassant.x &&
+        target.y === state.enPassant.y
+          ? {
+              [flags.enPassant]: {
+                y: state.enPassant.y - 1,
+                x: state.enPassant.x,
+              },
+            }
+          : {}),
         ...(target.y === 7
           ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
           : {}),
@@ -127,9 +142,19 @@ const basePatterns: Record<string, Array<Pattern>> = {
     },
     {
       advance: topRight,
-      shallStop: stopIfNotOpponent,
-      addFlags: ({ target }) => ({
+      shallStop: stopIfEmpty,
+      addFlags: ({ target, state }) => ({
         [flags.capture]: true,
+        ...(state.enPassant &&
+        target.x === state.enPassant.x &&
+        target.y === state.enPassant.y
+          ? {
+              [flags.enPassant]: {
+                y: state.enPassant.y + 1,
+                x: state.enPassant.x,
+              },
+            }
+          : {}),
         ...(target.y === 0
           ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
           : {}),
@@ -137,9 +162,19 @@ const basePatterns: Record<string, Array<Pattern>> = {
     },
     {
       advance: topLeft,
-      shallStop: stopIfNotOpponent,
-      addFlags: ({ target }) => ({
+      shallStop: stopIfEmpty,
+      addFlags: ({ target, state }) => ({
         [flags.capture]: true,
+        ...(state.enPassant &&
+        target.x === state.enPassant.x &&
+        target.y === state.enPassant.y
+          ? {
+              [flags.enPassant]: {
+                y: state.enPassant.y + 1,
+                x: state.enPassant.x,
+              },
+            }
+          : {}),
         ...(target.y === 0
           ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
           : {}),

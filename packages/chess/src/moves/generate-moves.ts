@@ -1,4 +1,4 @@
-import { flags, modes } from '../constants.js';
+import { flags } from '../constants.js';
 import {
   ChessBoardType,
   Coordinates,

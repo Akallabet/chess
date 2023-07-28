@@ -1,7 +1,13 @@
 import { fromFEN, toFEN } from '../fen.js';
 import { colours } from '../constants.js';
 import { ChessBoardType, FENState, InternalState, MoveBase } from '../types.js';
-import { isActiveColorBlack, isPawn, isWhitePiece } from '../utils.js';
+import {
+  isActiveColorBlack,
+  isKing,
+  isPawn,
+  isRook,
+  isWhitePiece,
+} from '../utils.js';
 
 const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
@@ -48,39 +54,57 @@ function calcEnPassantRank(move: MoveBase) {
   return isWhitePiece(move.piece) ? move.target.y + 1 : move.target.y - 1;
 }
 
+function calcCastlingRights(move: MoveBase, state: InternalState) {
+  const isCastlingMove =
+    move.flags.kingSideCastling || move.flags.queenSideCastling;
+  return {
+    w: {
+      kingSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) &&
+            move.origin.x === state.board[0].length - 1)) &&
+        state.activeColor === 'w'
+          ? false
+          : state.castlingRights.w.kingSide,
+      queenSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) && move.origin.x === 0)) &&
+        state.activeColor === 'w'
+          ? false
+          : state.castlingRights.w.queenSide,
+    },
+    b: {
+      kingSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) &&
+            move.origin.x === state.board[0].length - 1)) &&
+        state.activeColor === 'b'
+          ? false
+          : state.castlingRights.b.kingSide,
+      queenSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) && move.origin.x === 0)) &&
+        state.activeColor === 'b'
+          ? false
+          : state.castlingRights.b.queenSide,
+    },
+  };
+}
+
 export function moveAndUpdateState(
   move: MoveBase,
   state: InternalState
 ): InternalState {
-  const isCastlingMove =
-    move.flags.kingSideCastling || move.flags.queenSideCastling;
   return {
     ...state,
     ...fromFEN(
       toFEN({
         ...state,
-        castlingRights: {
-          w: {
-            kingSide:
-              isCastlingMove && state.activeColor === 'w'
-                ? false
-                : state.castlingRights.w.kingSide,
-            queenSide:
-              isCastlingMove && state.activeColor === 'w'
-                ? false
-                : state.castlingRights.w.queenSide,
-          },
-          b: {
-            kingSide:
-              isCastlingMove && state.activeColor === 'b'
-                ? false
-                : state.castlingRights.b.kingSide,
-            queenSide:
-              isCastlingMove && state.activeColor === 'b'
-                ? false
-                : state.castlingRights.b.queenSide,
-          },
-        },
+        castlingRights: calcCastlingRights(move, state),
         board: createBoardWithMove(move, state.board),
         activeColor: changeActiveColor(state),
         halfMoves:

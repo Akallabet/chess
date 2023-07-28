@@ -428,7 +428,12 @@ t.test(
     const FEN = 'rnbqk2r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
     const origin = { x: 4, y: 0 };
     const expected = [
-      { piece: 'k', origin, target: { x: 6, y: 0 }, flags: { move: true } },
+      {
+        piece: 'k',
+        origin,
+        target: { x: 6, y: 0 },
+        flags: { move: true, kingSideCastling: true },
+      },
       { piece: 'k', origin, target: { x: 5, y: 0 }, flags: { move: true } },
       { piece: 'k', origin, target: { x: 4, y: 1 }, flags: { move: true } },
     ];

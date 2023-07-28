@@ -3,7 +3,7 @@ import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.test('Move', t => {
-  t.plan(9);
+  t.plan(10);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
@@ -123,19 +123,19 @@ t.test('Move', t => {
     t.end();
   });
 
-  // t.test('En passant capture', t => {
-  //   const FEN = 'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
-  //   const initial = start({ FEN, mode: 'standard' });
-  //   const firstMove = move('d5', initial);
-  //   t.same(
-  //     firstMove.FEN,
-  //     'rnbqkbnr/ppp1pppp/8/2Pp4/8/8/PPPPPPPP/RNBQKBNR w KQkq d6 0 2'
-  //   );
-  //   const secondMove = move('d6', initial);
-  //   t.same(
-  //     secondMove.FEN,
-  //     'rnbqkbnr/ppp1pppp/3P4/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 2'
-  //   );
-  //   t.end();
-  // });
+  t.test('En passant capture', t => {
+    const FEN = 'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
+    const initial = start({ FEN, mode: 'standard' });
+    const firstMove = move('d5', initial);
+    t.same(
+      'rnbqkbnr/ppp1pppp/8/2Pp4/8/8/PPPPPPPP/RNBQKBNR w KQkq d6 0 2',
+      firstMove.FEN
+    );
+    const secondMove = move('cxd6', firstMove);
+    t.same(
+      'rnbqkbnr/ppp1pppp/3P4/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 2',
+      secondMove.FEN
+    );
+    t.end();
+  });
 });

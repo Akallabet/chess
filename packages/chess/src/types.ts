@@ -21,6 +21,7 @@ export interface Flags {
   check?: boolean;
   checkmate?: boolean;
   promotion?: string;
+  enPassant?: Coordinates;
 }
 
 export type EmptySquare = Record<string, never>;

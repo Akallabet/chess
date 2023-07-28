@@ -6,8 +6,9 @@ import { isActiveColorBlack, isPawn, isWhitePiece } from '../utils.js';
 const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
 
-export function boardWithMove(move: MoveBase, board: ChessBoardType) {
-  return board.map((row, y) =>
+export function createBoardWithMove(move: MoveBase, board: ChessBoardType) {
+  const boardWithMove = board.map(row => row.map(cell => ({ ...cell })));
+  return boardWithMove.map((row, y) =>
     row.map(
       (cell, x) => {
         if (y === move.origin.y && x === move.origin.x) return {};
@@ -17,7 +18,10 @@ export function boardWithMove(move: MoveBase, board: ChessBoardType) {
               piece: move.flags.promotion,
             };
           }
-          return board[move.origin.y][move.origin.x];
+          if (move.flags.enPassant) {
+            boardWithMove[move.flags.enPassant.y][move.flags.enPassant.x] = {};
+          }
+          return boardWithMove[move.origin.y][move.origin.x];
         }
         return cell;
       },
@@ -39,7 +43,7 @@ export function moveAndUpdateState(
     ...fromFEN(
       toFEN({
         ...state,
-        board: boardWithMove(move, state.board),
+        board: createBoardWithMove(move, state.board),
         activeColor: changeActiveColor(state),
         halfMoves:
           isPawn(move.piece) || move.flags.capture ? 0 : state.halfMoves + 1,

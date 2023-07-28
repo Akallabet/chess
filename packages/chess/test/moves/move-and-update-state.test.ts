@@ -1,12 +1,12 @@
 import t from 'tap';
 import { fromFEN } from '../../src/fen.js';
-import { boardWithMove } from '../../src/moves/move-and-update-state.js';
+import { createBoardWithMove } from '../../src/moves/move-and-update-state.js';
 
 t.test('Board with moves', t => {
   const { board } = fromFEN(
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1'
   );
-  const boardMove = boardWithMove(
+  const boardMove = createBoardWithMove(
     {
       origin: { y: 6, x: 1 },
       target: { y: 4, x: 1 },

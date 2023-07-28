@@ -26,6 +26,7 @@ export const flags = {
   selected: 'selected',
   check: 'check',
   promotion: 'promotion',
+  enPassant: 'enPassant',
 };
 export const modes = {
   standard: 'standard',

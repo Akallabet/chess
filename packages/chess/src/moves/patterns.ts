@@ -56,6 +56,7 @@ function stopIfEmpty({ target, state }: PatternState): boolean {
   return (
     (!state.enPassant && !state.board[target.y][target.x].piece) ||
     (state.enPassant &&
+      !state.board[target.y][target.x].piece &&
       (target.x !== state.enPassant.x || target.y !== state.enPassant.y))
   );
 }

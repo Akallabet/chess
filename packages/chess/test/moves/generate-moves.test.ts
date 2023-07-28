@@ -469,7 +469,6 @@ t.test(
       },
       patterns.k
     ).filter(({ piece }) => piece === 'k');
-    console.log(actual);
     t.same(actual.sort(compareByMove), expected.sort(compareByMove));
     t.end();
   }

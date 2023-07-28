@@ -46,7 +46,22 @@ export function fromFEN(FEN: string): FENState {
     FEN,
     board: boardFromFEN(piecePlacement),
     activeColor,
-    castlingRights: castlingRights === '-' ? [] : R.split('', castlingRights),
+    castlingRights:
+      castlingRights === '-'
+        ? {
+            w: { kingSide: false, queenSide: false },
+            b: { kingSide: false, queenSide: false },
+          }
+        : {
+            w: {
+              kingSide: castlingRights.includes('K'),
+              queenSide: castlingRights.includes('Q'),
+            },
+            b: {
+              kingSide: castlingRights.includes('k'),
+              queenSide: castlingRights.includes('q'),
+            },
+          },
     enPassant:
       enPassant === '-'
         ? false
@@ -82,9 +97,10 @@ export const toFEN = ({
     .join('/');
 
   return `${piecePlacement} ${activeColor} ${
-    Array.isArray(castlingRights) && castlingRights.length > 0
-      ? castlingRights.join('')
-      : '-'
+    (castlingRights.w.kingSide ? 'K' : '') +
+      (castlingRights.w.queenSide ? 'Q' : '') +
+      (castlingRights.b.kingSide ? 'k' : '') +
+      (castlingRights.b.queenSide ? 'q' : '') || '-'
   } ${
     enPassant ? `${files[enPassant.x]}${ranks[enPassant.y]}` : '-'
   } ${halfMoves} ${fullMoves}`;
@@ -102,23 +118,3 @@ export function isFEN(FEN: string) {
       .every(row => rowFromFEN(row).length === 8)
   );
 }
-
-export const getCastlingRights = (
-  king: string,
-  state: { castlingRights: '-' | string[] }
-) => {
-  const { castlingRights } = state;
-  if (!castlingRights.length) return { kingSide: false, queenSide: false };
-  if (isWhitePiece(king))
-    return {
-      kingSide: R.includes('K', castlingRights),
-      queenSide: R.includes('Q', castlingRights),
-    };
-  if (isBlackPiece(king)) {
-    return {
-      kingSide: R.includes('k', castlingRights),
-      queenSide: R.includes('q', castlingRights),
-    };
-  }
-  return { kingSide: false, queenSide: false };
-};

@@ -34,6 +34,9 @@ export const getKingPiece = (color: string) => (color === 'w' ? 'K' : 'k');
 export const isKing = (piece: string) =>
   piece === piecesMap.k || piece === piecesMap.K;
 
+export const isRook = (piece: string) =>
+  piece === piecesMap.r || piece === piecesMap.R;
+
 export const isPawn = (piece: string): boolean => {
   return piece === piecesMap.p || piece === piecesMap.P;
 };

@@ -92,6 +92,12 @@ export function translateMoveToSAN(
       })
     );
   }
+  if (move.flags.kingSideCastling) {
+    return ['O-O'];
+  }
+  if (move.flags.queenSideCastling) {
+    return ['O-O-O'];
+  }
 
   return [
     buildSanString({

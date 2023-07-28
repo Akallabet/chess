@@ -1,11 +1,5 @@
 import t from 'tap';
-import {
-  fromFEN,
-  getCastlingRights,
-  isFEN,
-  rowFromFEN,
-  toFEN,
-} from '../src/fen.js';
+import { fromFEN, isFEN, rowFromFEN, toFEN } from '../src/fen.js';
 import { FENState } from '../src/types.js';
 
 t.test('Check FEN format', t => {
@@ -26,36 +20,65 @@ t.test('Check FEN format', t => {
 });
 
 t.test('No castling rights', t => {
-  t.same(getCastlingRights('k', { castlingRights: [] }).kingSide, false);
-  t.same(getCastlingRights('k', { castlingRights: [] }).queenSide, false);
+  const FEN = '8/8/8/8/8/8/8/8 b - - 0 1';
+  t.same(
+    {
+      b: { kingSide: false, queenSide: false },
+      w: { kingSide: false, queenSide: false },
+    },
+    fromFEN(FEN).castlingRights
+  );
+
   t.end();
 });
 
 t.test('No castling rights for black king', t => {
-  const castlingRights = ['K', 'Q'];
-  t.same(getCastlingRights('k', { castlingRights }).kingSide, false);
-  t.same(getCastlingRights('k', { castlingRights }).queenSide, false);
+  const FEN = '8/8/8/8/8/8/8/8 b KQ - 0 1';
+  t.same(
+    {
+      b: { kingSide: false, queenSide: false },
+      w: { kingSide: true, queenSide: true },
+    },
+    fromFEN(FEN).castlingRights
+  );
   t.end();
 });
 
 t.test('No kingside castling rights for black king', t => {
-  const castlingRights = ['q', 'K', 'Q'];
-  t.same(getCastlingRights('k', { castlingRights }).kingSide, false);
-  t.same(getCastlingRights('k', { castlingRights }).queenSide, true);
+  const FEN = '8/8/8/8/8/8/8/8 b KQq - 0 1';
+  t.same(
+    {
+      b: { kingSide: false, queenSide: true },
+      w: { kingSide: true, queenSide: true },
+    },
+    fromFEN(FEN).castlingRights
+  );
   t.end();
 });
 
 t.test('No queenside castling rights for black king', t => {
-  const castlingRights = ['k', 'K', 'Q'];
-  t.same(getCastlingRights('k', { castlingRights }).kingSide, true);
-  t.same(getCastlingRights('k', { castlingRights }).queenSide, false);
+  const FEN = '8/8/8/8/8/8/8/8 b KQk - 0 1';
+  t.same(
+    {
+      b: { kingSide: true, queenSide: false },
+      w: { kingSide: true, queenSide: true },
+    },
+    fromFEN(FEN).castlingRights
+  );
+
   t.end();
 });
 
 t.test('No kingside castling rights for white king', t => {
-  const castlingRights = ['k', 'Q'];
-  t.same(getCastlingRights('K', { castlingRights }).kingSide, false);
-  t.same(getCastlingRights('K', { castlingRights }).queenSide, true);
+  const FEN = '8/8/8/8/8/8/8/8 b Qk - 0 1';
+  t.same(
+    {
+      b: { kingSide: true, queenSide: false },
+      w: { kingSide: false, queenSide: true },
+    },
+    fromFEN(FEN).castlingRights
+  );
+
   t.end();
 });
 
@@ -78,7 +101,10 @@ t.test('Return object from FEN string', t => {
     FEN,
     board: emptyBoard,
     activeColor: 'w',
-    castlingRights: ['K', 'Q', 'k', 'q'],
+    castlingRights: {
+      b: { kingSide: true, queenSide: true },
+      w: { kingSide: true, queenSide: true },
+    },
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
@@ -114,7 +140,10 @@ t.test('FEN string from object with empty board', t => {
     FEN,
     board: emptyBoard,
     activeColor: 'w',
-    castlingRights: ['K', 'Q', 'k', 'q'],
+    castlingRights: {
+      b: { kingSide: true, queenSide: true },
+      w: { kingSide: true, queenSide: true },
+    },
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
@@ -139,7 +168,10 @@ t.test('FEN string from object with board', t => {
     FEN,
     board,
     activeColor: 'w',
-    castlingRights: ['K', 'Q', 'k', 'q'],
+    castlingRights: {
+      b: { kingSide: true, queenSide: true },
+      w: { kingSide: true, queenSide: true },
+    },
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,

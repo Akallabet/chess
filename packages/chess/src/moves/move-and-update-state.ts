@@ -1,37 +1,98 @@
 import { fromFEN, toFEN } from '../fen.js';
 import { colours } from '../constants.js';
 import { ChessBoardType, FENState, InternalState, MoveBase } from '../types.js';
-import { isActiveColorBlack, isPawn, isWhitePiece } from '../utils.js';
+import {
+  isActiveColorBlack,
+  isKing,
+  isPawn,
+  isRook,
+  isWhitePiece,
+} from '../utils.js';
 
 const changeActiveColor = (state: FENState) =>
   state.activeColor === colours.w ? colours.b : colours.w;
 
 export function createBoardWithMove(move: MoveBase, board: ChessBoardType) {
   const boardWithMove = board.map(row => row.map(cell => ({ ...cell })));
-  return boardWithMove.map((row, y) =>
-    row.map(
-      (cell, x) => {
-        if (y === move.origin.y && x === move.origin.x) return {};
-        if (y === move.target.y && x === move.target.x) {
-          if (move.flags.promotion) {
-            return {
-              piece: move.flags.promotion,
-            };
-          }
-          if (move.flags.enPassant) {
-            boardWithMove[move.flags.enPassant.y][move.flags.enPassant.x] = {};
-          }
-          return boardWithMove[move.origin.y][move.origin.x];
-        }
-        return cell;
-      },
-      [...row]
-    )
-  );
+
+  if (move.flags.enPassant) {
+    boardWithMove[move.flags.enPassant.y][move.flags.enPassant.x] = {};
+    boardWithMove[move.target.y][move.target.x] = {
+      ...boardWithMove[move.origin.y][move.origin.x],
+    };
+  } else if (move.flags.promotion) {
+    boardWithMove[move.target.y][move.target.x] = {
+      piece: move.flags.promotion,
+    };
+  } else if (move.flags.kingSideCastling) {
+    boardWithMove[move.target.y][move.target.x] = {
+      ...boardWithMove[move.origin.y][move.origin.x],
+    };
+    boardWithMove[move.target.y][5] = {
+      ...boardWithMove[move.target.y][7],
+    };
+    boardWithMove[move.target.y][7] = {};
+  } else if (move.flags.queenSideCastling) {
+    boardWithMove[move.target.y][move.target.x] = {
+      ...boardWithMove[move.origin.y][move.origin.x],
+    };
+    boardWithMove[move.target.y][3] = {
+      ...boardWithMove[move.target.y][0],
+    };
+    boardWithMove[move.target.y][0] = {};
+  } else if (move.flags.capture || move.flags.move) {
+    boardWithMove[move.target.y][move.target.x] = {
+      ...boardWithMove[move.origin.y][move.origin.x],
+    };
+  }
+
+  boardWithMove[move.origin.y][move.origin.x] = {};
+  return boardWithMove;
 }
 
 function calcEnPassantRank(move: MoveBase) {
   return isWhitePiece(move.piece) ? move.target.y + 1 : move.target.y - 1;
+}
+
+function calcCastlingRights(move: MoveBase, state: InternalState) {
+  const isCastlingMove =
+    move.flags.kingSideCastling || move.flags.queenSideCastling;
+  return {
+    w: {
+      kingSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) &&
+            move.origin.x === state.board[0].length - 1)) &&
+        state.activeColor === 'w'
+          ? false
+          : state.castlingRights.w.kingSide,
+      queenSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) && move.origin.x === 0)) &&
+        state.activeColor === 'w'
+          ? false
+          : state.castlingRights.w.queenSide,
+    },
+    b: {
+      kingSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) &&
+            move.origin.x === state.board[0].length - 1)) &&
+        state.activeColor === 'b'
+          ? false
+          : state.castlingRights.b.kingSide,
+      queenSide:
+        (isCastlingMove ||
+          isKing(move.piece) ||
+          (isRook(move.piece) && move.origin.x === 0)) &&
+        state.activeColor === 'b'
+          ? false
+          : state.castlingRights.b.queenSide,
+    },
+  };
 }
 
 export function moveAndUpdateState(
@@ -43,6 +104,7 @@ export function moveAndUpdateState(
     ...fromFEN(
       toFEN({
         ...state,
+        castlingRights: calcCastlingRights(move, state),
         board: createBoardWithMove(move, state.board),
         activeColor: changeActiveColor(state),
         halfMoves:

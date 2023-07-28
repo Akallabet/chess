@@ -22,6 +22,8 @@ export interface Flags {
   checkmate?: boolean;
   promotion?: string;
   enPassant?: Coordinates;
+  kingSideCastling?: boolean;
+  queenSideCastling?: boolean;
 }
 
 export type EmptySquare = Record<string, never>;
@@ -59,9 +61,17 @@ export interface ChessInitialState {
 export interface FENState {
   board: ChessBoardType;
   FEN: string;
-  // activeColor: 'w' | 'b';
   activeColor: string;
-  castlingRights: '-' | string[];
+  castlingRights: {
+    w: {
+      kingSide: boolean;
+      queenSide: boolean;
+    };
+    b: {
+      kingSide: boolean;
+      queenSide: boolean;
+    };
+  };
   enPassant: Coordinates | false;
   halfMoves: number;
   fullMoves: number;

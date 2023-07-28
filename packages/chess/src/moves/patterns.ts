@@ -2,7 +2,6 @@ import { blackPieces, flags, whitePieces } from '../constants.js';
 import { Coordinates, Flags, InternalState } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
-import { getCastlingRights } from '../fen.js';
 import { areOpponents, getOpponentColor } from '../utils.js';
 
 interface PatternState {
@@ -267,7 +266,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return { x: x + 2, y };
       },
       shallStop: ({ step, state, origin, target }) => {
-        if (!getCastlingRights('k', state).kingSide) return true;
+        if (!state.castlingRights.b.kingSide) return true;
         if (origin.y !== 0 && origin.x !== 3) return true;
         if (lte(1)({ step })) return true;
         const castlingEmptyCells = [
@@ -282,6 +281,10 @@ const basePatterns: Record<string, Array<Pattern>> = {
           castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
         );
       },
+      addFlags: () => ({
+        [flags.move]: true,
+        [flags.kingSideCastling]: true,
+      }),
       recursive: true,
     },
     {
@@ -289,7 +292,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return { x: x - 2, y };
       },
       shallStop: ({ step, state, origin, target }) => {
-        if (!getCastlingRights('k', state).queenSide) return true;
+        if (!state.castlingRights.b.queenSide) return true;
         if (origin.y !== 0 && origin.x !== 3) return true;
         if (lte(1)({ step })) return true;
         const castlingEmptyCells = [
@@ -305,6 +308,10 @@ const basePatterns: Record<string, Array<Pattern>> = {
           castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
         );
       },
+      addFlags: () => ({
+        [flags.move]: true,
+        [flags.queenSideCastling]: true,
+      }),
       recursive: true,
     },
     { advance: right, shallStop: lte(1) },
@@ -322,7 +329,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return { x: x + 2, y };
       },
       shallStop: ({ step, state, origin, target }) => {
-        if (!getCastlingRights('K', state).kingSide) return true;
+        if (!state.castlingRights.w.kingSide) return true;
         if (origin.y !== state.board.length - 1 && origin.x !== 3) return true;
         if (lte(1)({ step })) return true;
         const castlingEmptyCells = [
@@ -337,6 +344,10 @@ const basePatterns: Record<string, Array<Pattern>> = {
           castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
         );
       },
+      addFlags: () => ({
+        [flags.move]: true,
+        [flags.kingSideCastling]: true,
+      }),
       recursive: true,
     },
     {
@@ -344,7 +355,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return { x: x - 2, y };
       },
       shallStop: ({ step, state, origin, target }) => {
-        if (!getCastlingRights('K', state).queenSide) return true;
+        if (!state.castlingRights.w.queenSide) return true;
         if (origin.y !== state.board.length - 1 && origin.x !== 3) return true;
         if (lte(1)({ step })) return true;
         const castlingEmptyCells = [
@@ -360,6 +371,11 @@ const basePatterns: Record<string, Array<Pattern>> = {
           castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
         );
       },
+      addFlags: () => ({
+        [flags.move]: true,
+        [flags.queenSideCastling]: true,
+      }),
+
       recursive: true,
     },
     { advance: right, shallStop: lte(1) },

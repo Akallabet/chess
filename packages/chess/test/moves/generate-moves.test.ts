@@ -448,7 +448,12 @@ t.test(
     const origin = { x: 4, y: 0 };
     const expected = [
       { piece: 'k', origin, target: { y: 0, x: 3 }, flags: { move: true } },
-      { piece: 'k', origin, target: { y: 0, x: 2 }, flags: { move: true } },
+      {
+        piece: 'k',
+        origin,
+        target: { y: 0, x: 2 },
+        flags: { move: true, queenSideCastling: true },
+      },
       { piece: 'k', origin, target: { y: 1, x: 4 }, flags: { move: true } },
     ];
     const actual = generateMoves(
@@ -459,6 +464,7 @@ t.test(
       },
       patterns.k
     ).filter(({ piece }) => piece === 'k');
+    console.log(actual);
     t.same(actual.sort(compareByMove), expected.sort(compareByMove));
     t.end();
   }
@@ -469,9 +475,19 @@ t.test('Highlight kingside and queenside castling for white', t => {
   const origin = { x: 4, y: 7 };
   const expected = [
     { piece: 'K', origin, target: { y: 7, x: 3 }, flags: { move: true } },
-    { piece: 'K', origin, target: { y: 7, x: 2 }, flags: { move: true } },
+    {
+      piece: 'K',
+      origin,
+      target: { y: 7, x: 2 },
+      flags: { move: true, queenSideCastling: true },
+    },
     { piece: 'K', origin, target: { y: 7, x: 5 }, flags: { move: true } },
-    { piece: 'K', origin, target: { y: 7, x: 6 }, flags: { move: true } },
+    {
+      piece: 'K',
+      origin,
+      target: { y: 7, x: 6 },
+      flags: { move: true, kingSideCastling: true },
+    },
   ];
   const actual = generateLegalMovesForActiveSide({
     ...fromFEN(FEN),

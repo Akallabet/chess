@@ -27,6 +27,8 @@ export const flags = {
   check: 'check',
   promotion: 'promotion',
   enPassant: 'enPassant',
+  kingSideCastling: 'kingSideCastling',
+  queenSideCastling: 'queenSideCastling',
 };
 export const modes = {
   standard: 'standard',

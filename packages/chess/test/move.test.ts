@@ -3,7 +3,7 @@ import { move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.test('Move', t => {
-  t.plan(10);
+  t.plan(12);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
@@ -135,6 +135,27 @@ t.test('Move', t => {
     t.same(
       'rnbqkbnr/ppp1pppp/3P4/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 2',
       secondMove.FEN
+    );
+    t.end();
+  });
+
+  t.test('Kingside Castling - white', t => {
+    const FEN = 'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1';
+    const initial = start({ FEN, mode: 'standard' });
+    const kingsideCastlingMove = move('O-O', initial);
+    t.same(
+      'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/RNBQ1RK1 b kq - 1 1',
+      kingsideCastlingMove.FEN
+    );
+    t.end();
+  });
+  t.test('Queenside Castling - white', t => {
+    const FEN = 'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1';
+    const initial = start({ FEN, mode: 'standard' });
+    const kingsideCastlingMove = move('O-O-O', initial);
+    t.same(
+      'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/2KR1BNR b kq - 1 1',
+      kingsideCastlingMove.FEN
     );
     t.end();
   });

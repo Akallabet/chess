@@ -1,7 +1,6 @@
 import * as R from 'ramda';
 import { files, ranks } from './constants.js';
 import { ChessBoardType, EmptySquare, FENState, Square } from './types.js';
-import { isBlackPiece, isWhitePiece } from './utils.js';
 
 const addEmptyCells = (n: number): Array<EmptySquare> => {
   const cells = [];
@@ -43,7 +42,6 @@ export function fromFEN(FEN: string): FENState {
     fullMoves,
   ] = FEN.split(' ');
   return {
-    FEN,
     board: boardFromFEN(piecePlacement),
     activeColor,
     castlingRights:

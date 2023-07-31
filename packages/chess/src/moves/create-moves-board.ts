@@ -1,8 +1,8 @@
-import { InternalState, Move, MoveBase } from '../types.js';
+import { FENState, Move, MoveBase } from '../types.js';
 import { translateMoveToSAN } from './translate-move-to-san.js';
 
 export function createMovesBoard(
-  state: InternalState,
+  state: FENState,
   moves: Array<MoveBase>
 ): Array<Array<Array<Move>>> {
   const movesBoard: Array<Array<Array<Move>>> = state.board.map(row => {

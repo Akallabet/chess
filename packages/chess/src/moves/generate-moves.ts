@@ -1,10 +1,5 @@
 import { flags } from '../constants.js';
-import {
-  ChessBoardType,
-  Coordinates,
-  InternalState,
-  MoveBase,
-} from '../types.js';
+import { ChessBoardType, Coordinates, FENState, MoveBase } from '../types.js';
 import {
   areOpponents,
   getKingPiece,
@@ -13,7 +8,7 @@ import {
   isActiveColorPiece,
 } from '../utils.js';
 import { isCellUnderCheck } from './is-cell-under-check.js';
-import { moveAndUpdateState } from './move-and-update-state.js';
+import { updateFENStateWithMove } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
 const isOutOfBound = (coord: Coordinates, board: ChessBoardType): boolean =>
@@ -30,7 +25,7 @@ const generateMovesFromPatterns = ({
 }: {
   patterns: Array<Pattern>;
   origin: Coordinates;
-  state: InternalState;
+  state: FENState;
   piece: string;
 }): Array<MoveBase> => {
   const moves: Array<MoveBase> = [];
@@ -90,7 +85,7 @@ const generateMovesFromPatterns = ({
 
 export function generateMoves(
   coord: Coordinates,
-  state: InternalState,
+  state: FENState,
   piecePatterns: Array<Pattern>
 ): Array<MoveBase> {
   const { piece } = state.board[coord.y][coord.x];
@@ -104,7 +99,7 @@ export function generateMoves(
   });
 }
 
-export function isKingUnderCheck(state: InternalState): boolean {
+export function isKingUnderCheck(state: FENState): boolean {
   const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
   if (!kingCoord) return false;
   return isCellUnderCheck(
@@ -114,7 +109,7 @@ export function isKingUnderCheck(state: InternalState): boolean {
   );
 }
 
-export function isOpponentKingUnderCheck(state: InternalState): boolean {
+export function isOpponentKingUnderCheck(state: FENState): boolean {
   const kingCoord = getPieceCoord(
     getKingPiece(getOpponentColor(state.activeColor)),
     state.board
@@ -123,11 +118,20 @@ export function isOpponentKingUnderCheck(state: InternalState): boolean {
   return isCellUnderCheck(state, kingCoord);
 }
 
-function isMoveValid(move: MoveBase, state: InternalState): boolean {
-  return !isOpponentKingUnderCheck(moveAndUpdateState(move, state));
+function isMoveValid(move: MoveBase, state: FENState): boolean {
+  return !isOpponentKingUnderCheck(
+    updateFENStateWithMove(
+      move,
+      state.board,
+      state.activeColor,
+      state.castlingRights,
+      state.halfMoves,
+      state.fullMoves
+    )
+  );
 }
 
-function generateLegalMoves(state: InternalState): Array<MoveBase> {
+function generateLegalMoves(state: FENState): Array<MoveBase> {
   const moves: Array<MoveBase> = [];
   for (let y = 0; y < state.board.length; y++) {
     const row = state.board[y];
@@ -161,9 +165,16 @@ function generateLegalMoves(state: InternalState): Array<MoveBase> {
 
 function calcCheckFlags(
   move: MoveBase,
-  state: InternalState
+  state: FENState
 ): { check?: boolean; checkmate?: boolean } {
-  const moveState = moveAndUpdateState(move, state);
+  const moveState = updateFENStateWithMove(
+    move,
+    state.board,
+    state.activeColor,
+    state.castlingRights,
+    state.halfMoves,
+    state.fullMoves
+  );
   const check = isKingUnderCheck(moveState);
   if (!check) return {};
 
@@ -179,7 +190,7 @@ function calcCheckFlags(
 }
 
 export function generateLegalMovesForActiveSide(
-  state: InternalState
+  state: FENState
 ): Array<MoveBase> {
   return generateLegalMoves(state).map(move => ({
     ...move,

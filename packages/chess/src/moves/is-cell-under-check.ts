@@ -1,4 +1,4 @@
-import { Coordinates, InternalState } from '../types.js';
+import { Coordinates, FENState } from '../types.js';
 import { isActiveColorPiece } from '../utils.js';
 import { generateMoves } from './generate-moves.js';
 import { patterns } from './patterns.js';
@@ -6,7 +6,7 @@ import { patterns } from './patterns.js';
 export const canPieceMoveToTarget = (
   origin: Coordinates,
   target: Coordinates,
-  state: InternalState
+  state: FENState
 ): boolean => {
   const moves = generateMoves(
     origin,
@@ -22,7 +22,7 @@ export const canPieceMoveToTarget = (
 };
 
 export const isCellUnderCheck = (
-  state: InternalState,
+  state: FENState,
   target: Coordinates,
   colorOverride?: string
 ) => {
@@ -47,6 +47,6 @@ export const isCellUnderCheck = (
 };
 
 export const anyCellUnderCheck = (
-  state: InternalState,
+  state: FENState,
   coords: Array<Coordinates>
 ) => coords.some(coord => isCellUnderCheck(state, coord));

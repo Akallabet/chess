@@ -98,7 +98,6 @@ t.test('Return object from FEN string', t => {
   const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
   const FENObj = fromFEN(FEN);
   t.same(FENObj, {
-    FEN,
     board: emptyBoard,
     activeColor: 'w',
     castlingRights: {

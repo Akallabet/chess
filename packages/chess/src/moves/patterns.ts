@@ -1,5 +1,5 @@
 import { blackPieces, flags, whitePieces } from '../constants.js';
-import { Coordinates, Flags, InternalState } from '../types.js';
+import { Coordinates, FENState, Flags } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
 import { areOpponents, getOpponentColor } from '../utils.js';
@@ -8,7 +8,7 @@ interface PatternState {
   step: number;
   target: Coordinates;
   origin: Coordinates;
-  state: InternalState;
+  state: FENState;
 }
 
 const F = () => false;

@@ -58,30 +58,38 @@ export interface ChessInitialState {
   FEN: string;
 }
 
+export type FENString = string;
+
+export interface CastlingRights {
+  w: {
+    kingSide: boolean;
+    queenSide: boolean;
+  };
+  b: {
+    kingSide: boolean;
+    queenSide: boolean;
+  };
+}
+
 export interface FENState {
   board: ChessBoardType;
-  FEN: string;
   activeColor: string;
-  castlingRights: {
-    w: {
-      kingSide: boolean;
-      queenSide: boolean;
-    };
-    b: {
-      kingSide: boolean;
-      queenSide: boolean;
-    };
-  };
+  castlingRights: CastlingRights;
   enPassant: Coordinates | false;
   halfMoves: number;
   fullMoves: number;
 }
 
-export interface InternalState extends ChessInitialState, FENState {
+export interface InternalState extends FENState {
+  mode: GameMode;
+  FEN: FENString;
   error?: string;
 }
 
-export interface ChessState extends InternalState, MetaData {
+export interface ChessState extends FENState, MetaData {
+  mode: GameMode;
+  FEN: FENString;
+  error?: string;
   movesBoard: Array<Array<Array<Move>>>;
   isGameOver: boolean;
   isDraw: boolean;

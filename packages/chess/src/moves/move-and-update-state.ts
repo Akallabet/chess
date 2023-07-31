@@ -1,6 +1,10 @@
-import { fromFEN, toFEN } from '../fen.js';
 import { colours } from '../constants.js';
-import { ChessBoardType, FENState, InternalState, MoveBase } from '../types.js';
+import {
+  CastlingRights,
+  ChessBoardType,
+  FENState,
+  MoveBase,
+} from '../types.js';
 import {
   isActiveColorBlack,
   isKing,
@@ -9,8 +13,8 @@ import {
   isWhitePiece,
 } from '../utils.js';
 
-const changeActiveColor = (state: FENState) =>
-  state.activeColor === colours.w ? colours.b : colours.w;
+const changeActiveColor = (activeColor: string) =>
+  activeColor === colours.w ? colours.b : colours.w;
 
 export function createBoardWithMove(move: MoveBase, board: ChessBoardType) {
   const boardWithMove = board.map(row => row.map(cell => ({ ...cell })));
@@ -50,11 +54,25 @@ export function createBoardWithMove(move: MoveBase, board: ChessBoardType) {
   return boardWithMove;
 }
 
-function calcEnPassantRank(move: MoveBase) {
-  return isWhitePiece(move.piece) ? move.target.y + 1 : move.target.y - 1;
+function calcEnPassant(move: MoveBase) {
+  const enPassantRank = isWhitePiece(move.piece)
+    ? move.target.y + 1
+    : move.target.y - 1;
+  return (
+    isPawn(move.piece) &&
+    Math.abs(move.target.y - move.origin.y) === 2 && {
+      y: enPassantRank,
+      x: move.target.x,
+    }
+  );
 }
 
-function calcCastlingRights(move: MoveBase, state: InternalState) {
+function calcCastlingRights(
+  move: MoveBase,
+  board: ChessBoardType,
+  activeColor: string,
+  castlingRights: CastlingRights
+) {
   const isCastlingMove =
     move.flags.kingSideCastling || move.flags.queenSideCastling;
   return {
@@ -62,62 +80,56 @@ function calcCastlingRights(move: MoveBase, state: InternalState) {
       kingSide:
         (isCastlingMove ||
           isKing(move.piece) ||
-          (isRook(move.piece) &&
-            move.origin.x === state.board[0].length - 1)) &&
-        state.activeColor === 'w'
+          (isRook(move.piece) && move.origin.x === board[0].length - 1)) &&
+        activeColor === 'w'
           ? false
-          : state.castlingRights.w.kingSide,
+          : castlingRights.w.kingSide,
       queenSide:
         (isCastlingMove ||
           isKing(move.piece) ||
           (isRook(move.piece) && move.origin.x === 0)) &&
-        state.activeColor === 'w'
+        activeColor === 'w'
           ? false
-          : state.castlingRights.w.queenSide,
+          : castlingRights.w.queenSide,
     },
     b: {
       kingSide:
         (isCastlingMove ||
           isKing(move.piece) ||
-          (isRook(move.piece) &&
-            move.origin.x === state.board[0].length - 1)) &&
-        state.activeColor === 'b'
+          (isRook(move.piece) && move.origin.x === board[0].length - 1)) &&
+        activeColor === 'b'
           ? false
-          : state.castlingRights.b.kingSide,
+          : castlingRights.b.kingSide,
       queenSide:
         (isCastlingMove ||
           isKing(move.piece) ||
           (isRook(move.piece) && move.origin.x === 0)) &&
-        state.activeColor === 'b'
+        activeColor === 'b'
           ? false
-          : state.castlingRights.b.queenSide,
+          : castlingRights.b.queenSide,
     },
   };
 }
 
-export function moveAndUpdateState(
+export function updateFENStateWithMove(
   move: MoveBase,
-  state: InternalState
-): InternalState {
+  board: ChessBoardType,
+  activeColor: string,
+  castlingRights: CastlingRights,
+  halfMoves: number,
+  fullMoves: number
+): FENState {
   return {
-    ...state,
-    ...fromFEN(
-      toFEN({
-        ...state,
-        castlingRights: calcCastlingRights(move, state),
-        board: createBoardWithMove(move, state.board),
-        activeColor: changeActiveColor(state),
-        halfMoves:
-          isPawn(move.piece) || move.flags.capture ? 0 : state.halfMoves + 1,
-        fullMoves: isActiveColorBlack(state.activeColor)
-          ? state.fullMoves + 1
-          : state.fullMoves,
-        enPassant: isPawn(move.piece) &&
-          Math.abs(move.target.y - move.origin.y) === 2 && {
-            y: calcEnPassantRank(move),
-            x: move.target.x,
-          },
-      })
+    castlingRights: calcCastlingRights(
+      move,
+      board,
+      activeColor,
+      castlingRights
     ),
+    board: createBoardWithMove(move, board),
+    activeColor: changeActiveColor(activeColor),
+    halfMoves: isPawn(move.piece) || move.flags.capture ? 0 : halfMoves + 1,
+    fullMoves: isActiveColorBlack(activeColor) ? fullMoves + 1 : fullMoves,
+    enPassant: calcEnPassant(move),
   };
 }

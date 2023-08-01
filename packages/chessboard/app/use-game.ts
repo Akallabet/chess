@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ChessState, Coordinates, GameMode, Move } from '@chess/chess';
 import * as chess from '@chess/chess';
 
@@ -16,26 +16,14 @@ export const useGame = (
   FEN: string,
   mode: GameMode
 ): GameOutput | undefined => {
-  const [game, setGame] = useState<undefined | ChessState>();
+  const initialGame = useMemo(() => {
+    return chess.start({ mode, FEN });
+  }, [FEN, mode]);
+  const [game, setGame] = useState<ChessState>(initialGame);
   const [selected, setSelected] = useState<undefined | Coordinates>();
   const [promotionPieces, setPromotionPieces] = useState<
     undefined | Array<Move>
   >();
-
-  // useEffect(() => {
-  //   if (!game) {
-  //     setGame(start({ mode, FEN }));
-  //   }
-  // }, [FEN, mode, game]);
-
-  useEffect(() => {
-    setGame(chess.start({ mode, FEN }));
-  }, []);
-  // useEffect(() => {
-  //   setGame(start({ mode, FEN }));
-  // }, [FEN, mode]);
-
-  if (!game) return undefined;
 
   const highlightedMoves = selected ? chess.moves(selected, game) : [];
 

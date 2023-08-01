@@ -10,6 +10,9 @@ module.exports = {
       : './server.js',
   ignoredRouteFiles: ['**/.*'],
   serverDependenciesToBundle: ['@chess/chess'],
+  future: {
+    v2_routeConvention: true,
+  },
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "api/index.js",

@@ -47,6 +47,8 @@ export type ChessBoardType = Array<Array<Square>>;
 
 export type GameMode = keyof typeof modes;
 
+export type Variant = 'standard' | 'chess960';
+
 export interface MetaData {
   positions: Address[][];
   ranks: Ranks;

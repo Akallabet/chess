@@ -9,7 +9,10 @@ module.exports = {
       ? undefined
       : './server.js',
   ignoredRouteFiles: ['**/.*'],
-  serverDependenciesToBundle: ['@chess/chess'],
+  serverDependenciesToBundle: ['@chess/chess', 'nanoid'],
+  future: {
+    v2_routeConvention: true,
+  },
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "api/index.js",

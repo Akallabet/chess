@@ -90,6 +90,6 @@ export function moves(coord: Coordinates, state: ChessState): Array<Move> {
   return moves;
 }
 
-export { files, ranks } from './constants.js';
+export { files, ranks, modes } from './constants.js';
 
 export * from './types.js';

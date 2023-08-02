@@ -1,7 +1,7 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { ChessBoard } from '../components/chessboard';
 import { useLoaderData } from '@remix-run/react';
-import { useGame } from '../use-game';
+import { useGame } from '~/shared/hooks/use-game';
 
 export const loader = ({ request }: LoaderArgs) => {
   const url = new URL(request.url);

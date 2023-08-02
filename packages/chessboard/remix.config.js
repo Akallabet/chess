@@ -9,7 +9,7 @@ module.exports = {
       ? undefined
       : './server.js',
   ignoredRouteFiles: ['**/.*'],
-  serverDependenciesToBundle: ['@chess/chess'],
+  serverDependenciesToBundle: ['@chess/chess', 'nanoid'],
   future: {
     v2_routeConvention: true,
   },

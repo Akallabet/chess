@@ -13,43 +13,6 @@ interface GameOutput extends ChessState {
   action: GameAction;
 }
 
-// export const useGame = (initialGame: ChessState): GameOutput => {
-//   console.log('use game', initialGame);
-//   const [game, setGame] = useState<ChessState>(initialGame);
-//   const [selected, setSelected] = useState<undefined | Coordinates>();
-//   const [promotionPieces, setPromotionPieces] = useState<
-//     undefined | Array<Move>
-//   >();
-//
-//   const highlightedMoves = selected ? chess.moves(selected, game) : [];
-//
-//   return {
-//     ...game,
-//     selected,
-//     highlightedMoves,
-//     promotionMoves: promotionPieces,
-//     promote: move => {
-//       setGame(chess.move(move.san[0], game));
-//       setSelected(undefined);
-//       setPromotionPieces(undefined);
-//     },
-//     action: (pos, move) => {
-//       if (move && selected) {
-//         if (move.flags.promotion) {
-//           setPromotionPieces(
-//             game.movesBoard[pos.y][pos.x].filter(m => m.flags.promotion)
-//           );
-//           return;
-//         }
-//         setGame(chess.move(move.san[0], game));
-//         setSelected(undefined);
-//         return;
-//       }
-//       setSelected(pos);
-//     },
-//   };
-// };
-
 export const useGame = (gameId: string): GameOutput | undefined => {
   const { getItem } = useLocalStorage();
   const [game, setGame] = useState<ChessState | undefined>();

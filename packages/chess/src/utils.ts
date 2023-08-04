@@ -1,7 +1,6 @@
 import * as R from 'ramda';
-import { errorCodes } from './error-codes.js';
-import { files, piecesMap, ranks } from './constants.js';
-import { Address, ChessBoardType, Coordinates } from './types.js';
+import { piecesMap } from './constants.js';
+import { ChessBoardType } from './types.js';
 
 export const isWhitePiece = (piece: string): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);
@@ -47,21 +46,6 @@ export const getPieceCoord = (piece: string, board: ChessBoardType) => {
       if (R.pathEq([y, x, 'piece'], piece, board)) return { y, x };
     }
   }
-};
-export const isAddress = (addr: Address) =>
-  new RegExp(/([a-h]+[1-9]+)/).test(addr);
-
-export const fromPositionToCoordinates = (pos: Address | Coordinates) => {
-  if (typeof pos === 'string' && isAddress(pos)) {
-    const [file, rank] = pos.split('');
-    return {
-      x: files.indexOf(file),
-      y: ranks.indexOf(Number(rank)),
-    };
-  }
-  const isCoord = R.has('x', pos) && R.has('y', pos);
-  if (!isCoord) throw new Error(errorCodes.wrongFormat);
-  return pos;
 };
 
 export const isCellEmpty = R.curry((state, { y, x }) =>

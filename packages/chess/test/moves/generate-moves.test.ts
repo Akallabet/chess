@@ -7,7 +7,6 @@ import {
   isOpponentKingUnderCheck,
 } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/index.js';
-import { fromPositionToCoordinates } from '../../src/utils.js';
 import { patterns } from '../../src/moves/patterns.js';
 
 const compareByMove = (a, b) => {
@@ -23,11 +22,6 @@ const compareByMove = (a, b) => {
   if (!a.flags.capture && b.flags.capture) return -1;
   return 0;
 };
-
-t.test('Convert ches piece targetinates to x/y coordinates', t => {
-  t.same(fromPositionToCoordinates('e3'), { x: 4, y: 5 });
-  t.end();
-});
 
 const addOrigin = origin => move => {
   move.origin = origin;

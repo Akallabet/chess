@@ -1,7 +1,16 @@
 import * as R from 'ramda';
-import { files, ranks } from './constants.js';
-import { ChessBoardType, EmptySquare, FENState, Square } from './types.js';
+import { files, pieces, piecesMap, positions, ranks } from './constants.js';
+import { errorCodes } from './error-codes.js';
+import {
+  ChessBoardAddress,
+  EmptySquare,
+  FENState,
+  Rank,
+  File,
+  Square,
+} from './types.js';
 
+const emptySquare = '' as Square;
 const addEmptyCells = (n: number): Array<EmptySquare> => {
   const cells = [];
   for (let i = 0; i < n; i++) {
@@ -10,21 +19,21 @@ const addEmptyCells = (n: number): Array<EmptySquare> => {
   return cells;
 };
 
-export function rowFromFEN(FENRow: string): Array<Square> {
+export function rowFromFEN(FENRow: string): Square[] {
   const elements = FENRow.split('');
   const row = [];
-  for (let i = 0; i < elements.length; i++) {
-    if (isNaN(Number(elements[i]))) {
-      row.push({ piece: elements[i] });
+  for (const element of elements) {
+    if (pieces.includes(element)) {
+      row.push(element);
     } else {
-      row.push(...addEmptyCells(Number(elements[i])));
+      row.push(...addEmptyCells(Number(element)));
     }
   }
   return row;
 }
 
-function boardFromFEN(FEN: string): ChessBoardType {
-  const FENRows = R.split('/', FEN);
+function boardFromFEN(piacePlacement: string): Square[][] {
+  const FENRows = R.split('/', piacePlacement);
   const board = [];
   for (let i = 0; i < FENRows.length; i++) {
     board.push(rowFromFEN(FENRows[i]));
@@ -41,35 +50,45 @@ export function fromFEN(FEN: string): FENState {
     halfMoves,
     fullMoves,
   ] = FEN.split(' ');
-  return {
-    board: boardFromFEN(piecePlacement),
-    activeColor,
-    castlingRights:
-      castlingRights === '-'
-        ? {
-            w: { kingSide: false, queenSide: false },
-            b: { kingSide: false, queenSide: false },
-          }
-        : {
-            w: {
-              kingSide: castlingRights.includes('K'),
-              queenSide: castlingRights.includes('Q'),
+
+  const isValidFEN =
+    (activeColor === 'w' || activeColor === 'b') &&
+    (enPassant === '-' || positions.includes(enPassant as ChessBoardAddress)) &&
+    Number(halfMoves) >= 0 &&
+    Number(fullMoves) >= 0;
+
+  if (isValidFEN) {
+    return {
+      board: boardFromFEN(piecePlacement),
+      activeColor,
+      castlingRights:
+        castlingRights === '-'
+          ? {
+              w: { kingSide: false, queenSide: false },
+              b: { kingSide: false, queenSide: false },
+            }
+          : {
+              w: {
+                kingSide: castlingRights.includes('K'),
+                queenSide: castlingRights.includes('Q'),
+              },
+              b: {
+                kingSide: castlingRights.includes('k'),
+                queenSide: castlingRights.includes('q'),
+              },
             },
-            b: {
-              kingSide: castlingRights.includes('k'),
-              queenSide: castlingRights.includes('q'),
-            },
-          },
-    enPassant:
-      enPassant === '-'
-        ? false
-        : {
-            y: ranks.indexOf(Number(enPassant[1])),
-            x: files.indexOf(enPassant[0]),
-          },
-    halfMoves: Number(halfMoves),
-    fullMoves: Number(fullMoves),
-  };
+      enPassant:
+        (enPassant === '-' && false) ||
+        (enPassant.length === 2 &&
+          positions.includes(enPassant as ChessBoardAddress) && {
+            x: files.indexOf(enPassant[0] as File),
+            y: ranks.indexOf(enPassant[1] as Rank),
+          }),
+      halfMoves: Number(halfMoves),
+      fullMoves: Number(fullMoves),
+    };
+  }
+  throw new Error(errorCodes.invalid_fen);
 }
 
 export const toFEN = ({

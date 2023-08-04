@@ -3,4 +3,5 @@ export const errorCodes = {
   wrongMove: 'WRONG_MOVE',
   no_piece_selected: 'NO_PIECE_SELECTED',
   king_not_found: 'KING_NOT_FOUND',
+  invalid_fen: 'INVALID_FEN',
 };

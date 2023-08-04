@@ -1,19 +1,31 @@
-import { modes, piecesMap } from './constants.js';
+import { modes } from './constants.js';
 
-const piecesList = Object.keys(piecesMap);
 export interface Coordinates {
   x: number;
   y: number;
 }
 
-type Rank = number; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-type File = string; // 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+export type Rank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
+export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+
 export type Files = File[];
 export type Ranks = Rank[];
 
-export type Piece = (typeof piecesList)[number];
-export type Address = string;
-export type Position = Coordinates | Address;
+export type Piece =
+  | 'p'
+  | 'n'
+  | 'b'
+  | 'r'
+  | 'q'
+  | 'k'
+  | 'P'
+  | 'N'
+  | 'B'
+  | 'R'
+  | 'Q'
+  | 'K';
+
+export type ChessBoardAddress = `${File}${Rank}`;
 
 export interface Flags {
   capture?: boolean;
@@ -28,9 +40,7 @@ export interface Flags {
 
 export type EmptySquare = Record<string, never>;
 
-export interface Square {
-  piece?: Piece;
-}
+export type Square = Piece | '';
 
 export interface MoveBase {
   piece: Piece;
@@ -43,14 +53,12 @@ export interface Move extends MoveBase {
   san: Array<string>;
 }
 
-export type ChessBoardType = Array<Array<Square>>;
-
 export type GameMode = keyof typeof modes;
 
 export type Variant = 'standard' | 'chess960';
 
 export interface MetaData {
-  positions: Address[][];
+  positions: ChessBoardAddress[][];
   ranks: Ranks;
   files: Files;
 }
@@ -61,6 +69,8 @@ export interface ChessInitialState {
 }
 
 export type FENString = string;
+
+export type ChessColor = 'w' | 'b';
 
 export interface CastlingRights {
   w: {
@@ -74,8 +84,8 @@ export interface CastlingRights {
 }
 
 export interface FENState {
-  board: ChessBoardType;
-  activeColor: string;
+  board: Square[][];
+  activeColor: ChessColor;
   castlingRights: CastlingRights;
   enPassant: Coordinates | false;
   halfMoves: number;

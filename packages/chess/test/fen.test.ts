@@ -1,6 +1,6 @@
 import t from 'tap';
 import { fromFEN, isFEN, rowFromFEN, toFEN } from '../src/fen.js';
-import { FENState } from '../src/types.js';
+import { FENState, Square } from '../src/types.js';
 
 t.test('Check FEN format', t => {
   t.plan(3);
@@ -82,7 +82,17 @@ t.test('No kingside castling rights for white king', t => {
   t.end();
 });
 
-const emptyRow = [{}, {}, {}, {}, {}, {}, {}, {}];
+const emptySquare: Square = '' as Square;
+const emptyRow = [
+  emptySquare,
+  emptySquare,
+  emptySquare,
+  emptySquare,
+  emptySquare,
+  emptySquare,
+  emptySquare,
+  emptySquare,
+];
 const emptyBoard = [
   emptyRow,
   emptyRow,
@@ -118,16 +128,7 @@ t.test('Create board rows from piece placement', t => {
     t.end();
   });
   t.test('Row with two pawns', t => {
-    t.same(rowFromFEN('2pp4'), [
-      {},
-      {},
-      { piece: 'p' },
-      { piece: 'p' },
-      {},
-      {},
-      {},
-      {},
-    ]);
+    t.same(rowFromFEN('2pp4'), ['', '', 'p', 'p', '', '', '', '']);
     t.end();
   });
   t.end();
@@ -136,7 +137,6 @@ t.test('Create board rows from piece placement', t => {
 t.test('FEN string from object with empty board', t => {
   const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
   const FENObj: FENState = {
-    FEN,
     board: emptyBoard,
     activeColor: 'w',
     castlingRights: {
@@ -153,18 +153,26 @@ t.test('FEN string from object with empty board', t => {
 
 t.test('FEN string from object with board', t => {
   const FEN = '3k2r/8/8/7P/8/8/8/8 w KQkq - 0 1';
-  const board = [
-    [{}, {}, {}, { piece: 'k' }, {}, {}, { piece: 'r' }],
+  const board: Square[][] = [
+    [emptySquare, emptySquare, emptySquare, 'k', emptySquare, emptySquare, 'r'],
     emptyRow,
     emptyRow,
-    [{}, {}, {}, {}, {}, {}, {}, { piece: 'P' }],
+    [
+      emptySquare,
+      emptySquare,
+      emptySquare,
+      emptySquare,
+      emptySquare,
+      emptySquare,
+      emptySquare,
+      'P',
+    ],
     emptyRow,
     emptyRow,
     emptyRow,
     emptyRow,
   ];
   const FENObj: FENState = {
-    FEN,
     board,
     activeColor: 'w',
     castlingRights: {

@@ -1,4 +1,10 @@
-import type { ChessBoardAddress, Files, Piece, Ranks } from './types.js';
+import type {
+  ChessBoardAddress,
+  EmptySquare,
+  Files,
+  Piece,
+  Ranks,
+} from './types.js';
 
 function getPositions(files: Files, ranks: Ranks): ChessBoardAddress[][] {
   const positions = [];
@@ -12,6 +18,7 @@ function getPositions(files: Files, ranks: Ranks): ChessBoardAddress[][] {
   return positions;
 }
 
+export const emptySquare: EmptySquare = '' as EmptySquare;
 export const files: Files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 export const ranks: Ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
 export const positions: ChessBoardAddress[] = getPositions(files, ranks).flat();

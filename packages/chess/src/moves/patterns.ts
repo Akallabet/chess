@@ -43,19 +43,19 @@ const left = ({ y, x }: Coordinates): Coordinates => ({ y, x: x - 1 });
 
 function stopIfOpponent({ target, origin, state }: PatternState): boolean {
   return (
-    !!state.board[target.y][target.x].piece &&
+    !!state.board[target.y][target.x] &&
     areOpponents(
-      state.board[target.y][target.x].piece as string,
-      state.board[origin.y][origin.x].piece as string
+      state.board[target.y][target.x] as string,
+      state.board[origin.y][origin.x] as string
     )
   );
 }
 
 function stopIfEmpty({ target, state }: PatternState): boolean {
   return (
-    (!state.enPassant && !state.board[target.y][target.x].piece) ||
+    (!state.enPassant && !state.board[target.y][target.x]) ||
     (state.enPassant &&
-      !state.board[target.y][target.x].piece &&
+      !state.board[target.y][target.x] &&
       (target.x !== state.enPassant.x || target.y !== state.enPassant.y))
   );
 }
@@ -277,8 +277,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({
@@ -304,8 +303,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({
@@ -340,8 +338,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({
@@ -367,8 +364,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({

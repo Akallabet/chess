@@ -32,15 +32,14 @@ export interface Flags {
   move?: boolean;
   check?: boolean;
   checkmate?: boolean;
-  promotion?: string;
+  promotion?: Piece;
   enPassant?: Coordinates;
   kingSideCastling?: boolean;
   queenSideCastling?: boolean;
 }
 
-export type EmptySquare = Record<string, never>;
-
-export type Square = Piece | '';
+export type EmptySquare = '';
+export type Square = Piece | EmptySquare;
 
 export interface MoveBase {
   piece: Piece;

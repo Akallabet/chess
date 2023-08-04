@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { piecesMap } from './constants.js';
-import { ChessBoardType } from './types.js';
+import { ChessColor, Piece, Square } from './types.js';
 
 export const isWhitePiece = (piece: string): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);
@@ -28,9 +28,9 @@ export const areOpponents = (pa: string, pb: string) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));
 
-export const getKingPiece = (color: string) => (color === 'w' ? 'K' : 'k');
+export const getKingPiece = (color: ChessColor) => (color === 'w' ? 'K' : 'k');
 
-export const isKing = (piece: string) =>
+export const isKing = (piece: Piece) =>
   piece === piecesMap.k || piece === piecesMap.K;
 
 export const isRook = (piece: string) =>
@@ -40,7 +40,7 @@ export const isPawn = (piece: string): boolean => {
   return piece === piecesMap.p || piece === piecesMap.P;
 };
 
-export const getPieceCoord = (piece: string, board: ChessBoardType) => {
+export const getPieceCoord = (piece: Piece, board: Square[][]) => {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (R.pathEq([y, x, 'piece'], piece, board)) return { y, x };

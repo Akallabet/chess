@@ -1,32 +1,25 @@
 import * as R from 'ramda';
-import { files, pieces, piecesMap, positions, ranks } from './constants.js';
+import { emptySquare, files, pieces, positions, ranks } from './constants.js';
 import { errorCodes } from './error-codes.js';
 import {
   ChessBoardAddress,
-  EmptySquare,
   FENState,
   Rank,
   File,
   Square,
+  Piece,
 } from './types.js';
-
-const emptySquare = '' as Square;
-const addEmptyCells = (n: number): Array<EmptySquare> => {
-  const cells = [];
-  for (let i = 0; i < n; i++) {
-    cells.push({});
-  }
-  return cells;
-};
 
 export function rowFromFEN(FENRow: string): Square[] {
   const elements = FENRow.split('');
-  const row = [];
+  const row: Square[] = [];
   for (const element of elements) {
     if (pieces.includes(element)) {
-      row.push(element);
+      row.push(element as Piece);
     } else {
-      row.push(...addEmptyCells(Number(element)));
+      for (let i = 0; i < Number(element); i++) {
+        row.push(emptySquare);
+      }
     }
   }
   return row;
@@ -104,7 +97,7 @@ export const toFEN = ({
       boardRow
         .reduce((row: Array<string | number>, cell) => {
           const last = row[row.length - 1];
-          if (cell.piece) row.push(cell.piece);
+          if (cell) row.push(cell);
           else if (typeof last === 'number') row[row.length - 1] = last + 1;
           else row.push(1);
           return row;

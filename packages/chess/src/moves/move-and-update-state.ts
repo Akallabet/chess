@@ -1,9 +1,10 @@
-import { colours } from '../constants.js';
+import { emptySquare } from '../constants.js';
 import {
   CastlingRights,
-  ChessBoardType,
+  ChessColor,
   FENState,
   MoveBase,
+  Square,
 } from '../types.js';
 import {
   isActiveColorBlack,
@@ -13,44 +14,34 @@ import {
   isWhitePiece,
 } from '../utils.js';
 
-const changeActiveColor = (activeColor: string) =>
-  activeColor === colours.w ? colours.b : colours.w;
+const changeActiveColor = (activeColor: ChessColor): ChessColor =>
+  activeColor === 'w' ? 'b' : 'w';
 
-export function createBoardWithMove(move: MoveBase, board: ChessBoardType) {
-  const boardWithMove = board.map(row => row.map(cell => ({ ...cell })));
+export function createBoardWithMove(move: MoveBase, board: Square[][]) {
+  const boardWithMove = board.map(row => row.map(cell => cell));
 
   if (move.flags.enPassant) {
-    boardWithMove[move.flags.enPassant.y][move.flags.enPassant.x] = {};
-    boardWithMove[move.target.y][move.target.x] = {
-      ...boardWithMove[move.origin.y][move.origin.x],
-    };
+    boardWithMove[move.flags.enPassant.y][move.flags.enPassant.x] = emptySquare;
+    boardWithMove[move.target.y][move.target.x] =
+      boardWithMove[move.origin.y][move.origin.x];
   } else if (move.flags.promotion) {
-    boardWithMove[move.target.y][move.target.x] = {
-      piece: move.flags.promotion,
-    };
+    boardWithMove[move.target.y][move.target.x] = move.flags.promotion;
   } else if (move.flags.kingSideCastling) {
-    boardWithMove[move.target.y][move.target.x] = {
-      ...boardWithMove[move.origin.y][move.origin.x],
-    };
-    boardWithMove[move.target.y][5] = {
-      ...boardWithMove[move.target.y][7],
-    };
-    boardWithMove[move.target.y][7] = {};
+    boardWithMove[move.target.y][move.target.x] =
+      boardWithMove[move.origin.y][move.origin.x];
+    boardWithMove[move.target.y][5] = boardWithMove[move.target.y][7];
+    boardWithMove[move.target.y][7] = emptySquare;
   } else if (move.flags.queenSideCastling) {
-    boardWithMove[move.target.y][move.target.x] = {
-      ...boardWithMove[move.origin.y][move.origin.x],
-    };
-    boardWithMove[move.target.y][3] = {
-      ...boardWithMove[move.target.y][0],
-    };
-    boardWithMove[move.target.y][0] = {};
+    boardWithMove[move.target.y][move.target.x] =
+      boardWithMove[move.origin.y][move.origin.x];
+    boardWithMove[move.target.y][3] = boardWithMove[move.target.y][0];
+    boardWithMove[move.target.y][0] = emptySquare;
   } else if (move.flags.capture || move.flags.move) {
-    boardWithMove[move.target.y][move.target.x] = {
-      ...boardWithMove[move.origin.y][move.origin.x],
-    };
+    boardWithMove[move.target.y][move.target.x] =
+      boardWithMove[move.origin.y][move.origin.x];
   }
 
-  boardWithMove[move.origin.y][move.origin.x] = {};
+  boardWithMove[move.origin.y][move.origin.x] = emptySquare;
   return boardWithMove;
 }
 
@@ -69,7 +60,7 @@ function calcEnPassant(move: MoveBase) {
 
 function calcCastlingRights(
   move: MoveBase,
-  board: ChessBoardType,
+  board: Square[][],
   activeColor: string,
   castlingRights: CastlingRights
 ) {
@@ -113,8 +104,8 @@ function calcCastlingRights(
 
 export function updateFENStateWithMove(
   move: MoveBase,
-  board: ChessBoardType,
-  activeColor: string,
+  board: Square[][],
+  activeColor: ChessColor,
   castlingRights: CastlingRights,
   halfMoves: number,
   fullMoves: number

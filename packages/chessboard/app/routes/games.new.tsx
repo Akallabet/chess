@@ -20,13 +20,13 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function NewGame() {
   const { setItem } = useLocalStorage();
-  const { FEN, id } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const game = chess.start({ FEN, mode: 'standard' });
-    setItem(`chess-game-${id}`, game);
-    navigate(`/games/${id}`);
+    const { FEN, mode } = chess.start({ FEN: data.FEN, mode: 'standard' });
+    setItem(`chess-game-${data.id}`, { FEN, mode });
+    navigate(`/games/${data.id}`);
   }, []);
 
   return 'Loading';

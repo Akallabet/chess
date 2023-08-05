@@ -24,7 +24,7 @@ export const useGame = (gameId: string): GameOutput | undefined => {
 
   useEffect(() => {
     const item = getItem(`chess-game-${gameId}`);
-    if (item) setGame(item);
+    if (item) setGame(chess.start(item));
   }, []);
 
   return game

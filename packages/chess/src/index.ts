@@ -6,9 +6,8 @@ import {
   ChessState,
   Coordinates,
   FENState,
-  InternalState,
   Move,
-  MoveBase,
+  GameMode,
 } from './types.js';
 
 import {
@@ -18,22 +17,23 @@ import {
   calcIfKingUnderCheck,
 } from './moves/index.js';
 
-function calcMetaData(
-  state: InternalState,
-  moves: MoveBase[]
-): {
-  isGameOver: boolean;
-  isCheckmate: boolean;
-  isDraw: boolean;
-} {
-  const isKingUnderCheck = calcIfKingUnderCheck(state);
+function deriveState(FENState: FENState, mode: GameMode): ChessState {
+  const moves = generateLegalMovesForActiveSide(FENState);
+
+  const isKingUnderCheck = calcIfKingUnderCheck(FENState);
   const isDraw =
-    state.mode === 'standard' &&
-    (state.halfMoves === 50 || (moves.length === 0 && !isKingUnderCheck));
+    mode === 'standard' &&
+    (FENState.halfMoves === 50 || (moves.length === 0 && !isKingUnderCheck));
   const isGameOver = moves.length === 0 || isDraw;
   const isCheckmate = isKingUnderCheck && isGameOver;
 
   return {
+    ...FENState,
+    FEN: toFEN(FENState),
+    mode: mode || modes.standard,
+    files,
+    ranks,
+    movesBoard: createMovesBoard(FENState.board, moves),
     isGameOver,
     isCheckmate,
     isDraw,
@@ -43,50 +43,31 @@ function calcMetaData(
 export function start(
   initialState: ChessInitialState | ChessState
 ): ChessState {
-  const state = {
-    ...initialState,
-    ...fromFEN(initialState.FEN),
-    mode: initialState.mode || modes.standard,
-  };
-
-  const moves = generateLegalMovesForActiveSide(state);
-
-  return {
-    ...state,
-    files,
-    ranks,
-    movesBoard: createMovesBoard(state, moves),
-    ...calcMetaData(state, moves),
-  };
+  return deriveState(
+    fromFEN(initialState.FEN),
+    initialState.mode || modes.standard
+  );
 }
 
-export function move(san: string, prevState: ChessState): ChessState {
+export function move(
+  san: string,
+  inputState: ChessInitialState | ChessState
+): ChessState {
+  const state = deriveState(fromFEN(inputState.FEN), inputState.mode);
   try {
-    const move = translateSANToMove(san, prevState);
-    const FENState: FENState = updateFENStateWithMove(
-      move,
-      prevState.board,
-      prevState.activeColor,
-      prevState.castlingRights,
-      prevState.halfMoves,
-      prevState.fullMoves
+    return deriveState(
+      updateFENStateWithMove(
+        translateSANToMove(san, state.movesBoard),
+        state.board,
+        state.activeColor,
+        state.castlingRights,
+        state.halfMoves,
+        state.fullMoves
+      ),
+      inputState.mode
     );
-    const state = {
-      mode: prevState.mode,
-      ...FENState,
-      FEN: toFEN(FENState),
-    };
-    const moves = generateLegalMovesForActiveSide(state);
-
-    return {
-      ...state,
-      files,
-      ranks,
-      movesBoard: createMovesBoard(state, moves),
-      ...calcMetaData(state, moves),
-    };
   } catch (e) {
-    return prevState;
+    return state;
   }
 }
 

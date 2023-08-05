@@ -32,7 +32,7 @@ t.test('SAN - Wrong format', t => {
   const FEN = '3k4/8/8/8/8/8/8/3KQ3 w KQkq - 0 1';
   const san = 'Qp1e8';
   const game = start({ FEN, mode: 'standard' });
-  t.throws(() => translateSANToMove(san, game));
+  t.throws(() => translateSANToMove(san, game.movesBoard));
   t.end();
 });
 
@@ -48,7 +48,7 @@ t.test('SAN - piece - from (file+rank) - to (file+rank)', t => {
   };
 
   const game = start({ FEN, mode: 'standard' });
-  const result = translateSANToMove(san, game);
+  const result = translateSANToMove(san, game.movesBoard);
   t.same(result, expected);
   t.end();
 });
@@ -65,7 +65,7 @@ t.test('SAN - piece with destination file and rank i.e. "Qe8"', t => {
   };
 
   const game = start({ FEN, mode: 'standard' });
-  t.same(translateSANToMove(san, game), expected);
+  t.same(translateSANToMove(san, game.movesBoard), expected);
   t.end();
 });
 
@@ -79,14 +79,19 @@ t.test('Pawn i.e. "c3"', t => {
     san: [san],
     flags: { move: true },
   };
-  t.same(translateSANToMove(san, start({ FEN, mode: 'standard' })), expected);
+  t.same(
+    translateSANToMove(san, start({ FEN, mode: 'standard' }).movesBoard),
+    expected
+  );
   t.end();
 });
 
 t.test('SAN - Pawn wrong format i.e. "c3"', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1';
   const san = 'h5';
-  t.throws(() => translateSANToMove(san, start({ FEN, mode: 'standard' })));
+  t.throws(() =>
+    translateSANToMove(san, start({ FEN, mode: 'standard' }).movesBoard)
+  );
   t.end();
 });
 
@@ -100,6 +105,9 @@ t.test('SAN - Bishop unique move', t => {
     san: [san],
     flags: { move: true },
   };
-  t.same(translateSANToMove(san, start({ FEN, mode: 'standard' })), expected);
+  t.same(
+    translateSANToMove(san, start({ FEN, mode: 'standard' }).movesBoard),
+    expected
+  );
   t.end();
 });

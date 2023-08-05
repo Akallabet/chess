@@ -56,12 +56,12 @@ export type GameMode = keyof typeof modes;
 
 export type Variant = 'standard' | 'chess960';
 
+export type FENString = string;
+
 export interface ChessInitialState {
   mode: GameMode;
-  FEN: string;
+  FEN: FENString;
 }
-
-export type FENString = string;
 
 export type ChessColor = 'w' | 'b';
 

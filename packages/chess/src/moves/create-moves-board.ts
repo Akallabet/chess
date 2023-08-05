@@ -1,11 +1,11 @@
-import { FENState, Move, MoveBase } from '../types.js';
+import { Move, MoveBase, Square } from '../types.js';
 import { translateMoveToSAN } from './translate-move-to-san.js';
 
 export function createMovesBoard(
-  state: FENState,
+  board: Square[][],
   moves: Array<MoveBase>
 ): Array<Array<Array<Move>>> {
-  const movesBoard: Array<Array<Array<Move>>> = state.board.map(row => {
+  const movesBoard: Array<Array<Array<Move>>> = board.map(row => {
     return row.map(() => []);
   });
 

@@ -1,5 +1,5 @@
 import { blackPieces, flags, whitePieces } from '../constants.js';
-import { Coordinates, FENState, Flags } from '../types.js';
+import { Coordinates, FENState, Flags, Piece } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
 import { areOpponents, getOpponentColor } from '../utils.js';
@@ -45,8 +45,8 @@ function stopIfOpponent({ target, origin, state }: PatternState): boolean {
   return (
     !!state.board[target.y][target.x] &&
     areOpponents(
-      state.board[target.y][target.x] as string,
-      state.board[origin.y][origin.x] as string
+      state.board[target.y][target.x] as Piece,
+      state.board[origin.y][origin.x] as Piece
     )
   );
 }
@@ -79,7 +79,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.move]: true,
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          ? {
+              [flags.promotion]: blackPieces
+                .replace('k', '')
+                .replace('p', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -99,7 +104,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
+          ? {
+              [flags.promotion]: blackPieces
+                .replace('k', '')
+                .replace('p', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -119,7 +129,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
+          ? {
+              [flags.promotion]: blackPieces
+                .replace('k', '')
+                .replace('p', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -135,7 +150,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.move]: true,
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          ? {
+              [flags.promotion]: whitePieces
+                .replace('K', '')
+                .replace('P', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -155,7 +175,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          ? {
+              [flags.promotion]: whitePieces
+                .replace('K', '')
+                .replace('P', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -175,7 +200,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          ? {
+              [flags.promotion]: whitePieces
+                .replace('K', '')
+                .replace('P', '')
+                .split(''),
+            }
           : {}),
       }),
     },

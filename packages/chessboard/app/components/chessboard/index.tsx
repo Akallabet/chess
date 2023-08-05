@@ -1,8 +1,8 @@
 import { FENForm } from '../fen';
-import type { GameAction } from '~/use-game';
-import type { ChessBoardType, Files, Ranks, Move } from '@chess/chess';
+import type { Files, Ranks, Move, Square } from '@chess/chess';
 import { Promotion } from './promotion';
 import { Piece } from './piece';
+import type { GameAction } from '~/shared/hooks/use-game';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
@@ -10,7 +10,7 @@ const isOdd = (n: number) => !isEven(n);
 const isWhitePiece = (piece: string): boolean => /[PRBNQK]/.test(piece);
 
 interface ChessBoardProps {
-  board: ChessBoardType;
+  board: Square[][];
   highlightedMoves: Array<Move>;
   promotionMoves: Array<Move>;
   files: Files;
@@ -37,7 +37,7 @@ export const ChessBoard = ({
     <div className="border-1 border-black relative mx-auto flex h-full-w w-full flex-col sm:h-452 sm:w-452">
       {board.map((row, y) => (
         <div key={y} className="flex h-1/8 w-full flex-row">
-          {row.map(({ piece }, x) => {
+          {row.map((piece, x) => {
             const move = highlightedMoves.find(
               move => move.target.x === x && move.target.y === y
             );

@@ -32,7 +32,7 @@ export interface Flags {
   move?: boolean;
   check?: boolean;
   checkmate?: boolean;
-  promotion?: Piece;
+  promotion?: Piece[];
   enPassant?: Coordinates;
   kingSideCastling?: boolean;
   queenSideCastling?: boolean;

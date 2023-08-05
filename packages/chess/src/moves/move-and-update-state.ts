@@ -25,7 +25,7 @@ export function createBoardWithMove(move: MoveBase, board: Square[][]) {
     boardWithMove[move.target.y][move.target.x] =
       boardWithMove[move.origin.y][move.origin.x];
   } else if (move.flags.promotion) {
-    boardWithMove[move.target.y][move.target.x] = move.flags.promotion;
+    boardWithMove[move.target.y][move.target.x] = move.flags.promotion[0];
   } else if (move.flags.kingSideCastling) {
     boardWithMove[move.target.y][move.target.x] =
       boardWithMove[move.origin.y][move.origin.x];

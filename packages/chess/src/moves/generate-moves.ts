@@ -47,7 +47,9 @@ const generateMovesFromPatterns = ({
 
       const targetCell = state.board[target.y][target.x];
       if (targetCell) {
-        if (areOpponents(targetCell, state.board[origin.y][origin.x])) {
+        if (
+          areOpponents(targetCell, state.board[origin.y][origin.x] as Piece)
+        ) {
           moves.push({
             piece,
             origin,
@@ -139,9 +141,9 @@ function generateLegalMoves(state: FENState): Array<MoveBase> {
         const pieceMoves = generateMoves({ y, x }, state, patterns[square])
           .map(move => {
             if (move.flags.promotion) {
-              return move.flags.promotion.split('').map(promotion => ({
+              return move.flags.promotion.map(promotion => ({
                 ...move,
-                flags: { ...move.flags, promotion },
+                flags: { ...move.flags, promotion: [promotion] },
               }));
             }
             return move;

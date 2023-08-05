@@ -1,29 +1,29 @@
 import { piecesMap } from './constants.js';
 import { ChessColor, Coordinates, Piece, Square } from './types.js';
 
-export const isWhitePiece = (piece: string): boolean =>
+export const isWhitePiece = (piece: Piece): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);
-export const isBlackPiece = (piece: string): boolean =>
+export const isBlackPiece = (piece: Piece): boolean =>
   new RegExp(/[pnbrqk]+/).test(piece);
-export const isActiveColorWhite = (color: string): boolean => color === 'w';
-export const isActiveColorBlack = (color: string): boolean => color === 'b';
-export const getOpponentColor = (color: string): string =>
+export const isActiveColorWhite = (color: ChessColor): boolean => color === 'w';
+export const isActiveColorBlack = (color: ChessColor): boolean => color === 'b';
+export const getOpponentColor = (color: ChessColor): ChessColor =>
   isActiveColorWhite(color) ? 'b' : 'w';
-export const getPieceColor = (piece: string) =>
+export const getPieceColor = (piece: Piece) =>
   isWhitePiece(piece) ? 'w' : 'b';
-export const isOpponentPiece = (color: string, piece: string): boolean =>
+export const isOpponentPiece = (color: ChessColor, piece: Piece): boolean =>
   (isActiveColorWhite(color) && isBlackPiece(piece)) ||
   (isActiveColorBlack(color) && isWhitePiece(piece));
 export const isActiveColorPiece = (
-  activeColor: string,
-  piece: string
+  activeColor: ChessColor,
+  piece: Piece
 ): boolean => activeColor === getPieceColor(piece);
 export const isOpponentColorPiece = (
-  activeColor: string,
-  piece: string
+  activeColor: ChessColor,
+  piece: Piece
 ): boolean => activeColor !== getPieceColor(piece);
 
-export const areOpponents = (pa: string, pb: string) =>
+export const areOpponents = (pa: Piece, pb: Piece) =>
   (isWhitePiece(pa) && isBlackPiece(pb)) ||
   (isBlackPiece(pa) && isWhitePiece(pb));
 
@@ -32,10 +32,10 @@ export const getKingPiece = (color: ChessColor) => (color === 'w' ? 'K' : 'k');
 export const isKing = (piece: Piece) =>
   piece === piecesMap.k || piece === piecesMap.K;
 
-export const isRook = (piece: string) =>
+export const isRook = (piece: Piece) =>
   piece === piecesMap.r || piece === piecesMap.R;
 
-export const isPawn = (piece: string): boolean => {
+export const isPawn = (piece: Piece): boolean => {
   return piece === piecesMap.p || piece === piecesMap.P;
 };
 

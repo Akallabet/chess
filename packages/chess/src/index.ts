@@ -1,6 +1,5 @@
-import { modes } from './constants.js';
+import { modes, files, ranks } from './constants.js';
 import { fromFEN, toFEN } from './fen.js';
-import { getMetadata } from './metadata.js';
 import { createMovesBoard } from './moves/create-moves-board.js';
 import {
   ChessInitialState,
@@ -33,11 +32,11 @@ export function start(
     (state.halfMoves === 50 ||
       (moves.length === 0 && !isKingUnderCheck(state)));
   const isGameOver = moves.length === 0 || isDraw;
-  const metadata = getMetadata();
 
   return {
     ...state,
-    ...metadata,
+    files,
+    ranks,
     movesBoard,
     isGameOver,
     isDraw,
@@ -68,9 +67,15 @@ export function move(san: string, prevState: ChessState): ChessState {
       (internalState.halfMoves === 50 ||
         (moves.length === 0 && !isKingUnderCheck(internalState)));
     const isGameOver = moves.length === 0 || isDraw;
-    const metadata = getMetadata();
 
-    return { ...internalState, ...metadata, movesBoard, isGameOver, isDraw };
+    return {
+      ...internalState,
+      files,
+      ranks,
+      movesBoard,
+      isGameOver,
+      isDraw,
+    };
   } catch (e) {
     return prevState;
   }

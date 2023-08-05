@@ -56,12 +56,6 @@ export type GameMode = keyof typeof modes;
 
 export type Variant = 'standard' | 'chess960';
 
-export interface MetaData {
-  positions: ChessBoardAddress[][];
-  ranks: Ranks;
-  files: Files;
-}
-
 export interface ChessInitialState {
   mode: GameMode;
   FEN: string;
@@ -97,7 +91,9 @@ export interface InternalState extends FENState {
   error?: string;
 }
 
-export interface ChessState extends FENState, MetaData {
+export interface ChessState extends FENState {
+  ranks: Ranks;
+  files: Files;
   mode: GameMode;
   FEN: FENString;
   error?: string;

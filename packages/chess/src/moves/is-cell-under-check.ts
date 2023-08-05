@@ -1,4 +1,4 @@
-import { Coordinates, FENState } from '../types.js';
+import { ChessColor, Coordinates, FENState } from '../types.js';
 import { isActiveColorPiece } from '../utils.js';
 import { generateMoves } from './generate-moves.js';
 import { patterns } from './patterns.js';
@@ -11,7 +11,7 @@ export const canPieceMoveToTarget = (
   const moves = generateMoves(
     origin,
     state,
-    patterns[state.board[origin.y][origin.x].piece as string].filter(
+    patterns[state.board[origin.y][origin.x]].filter(
       ({ recursive }) => !recursive
     )
   );
@@ -24,7 +24,7 @@ export const canPieceMoveToTarget = (
 export const isCellUnderCheck = (
   state: FENState,
   target: Coordinates,
-  colorOverride?: string
+  colorOverride?: ChessColor
 ) => {
   const { board } = state;
 
@@ -32,11 +32,8 @@ export const isCellUnderCheck = (
     for (let x = 0; x < board[y].length; x++) {
       const square = board[y][x];
       if (
-        square.piece &&
-        isActiveColorPiece(
-          colorOverride || state.activeColor,
-          square.piece as string
-        ) && // bad bad bad, please remove coercion :(
+        square &&
+        isActiveColorPiece(colorOverride || state.activeColor, square) &&
         canPieceMoveToTarget({ x, y }, target, state)
       ) {
         return true;

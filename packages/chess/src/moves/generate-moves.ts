@@ -1,5 +1,5 @@
 import { flags } from '../constants.js';
-import { ChessBoardType, Coordinates, FENState, MoveBase } from '../types.js';
+import { Coordinates, FENState, MoveBase, Piece, Square } from '../types.js';
 import {
   areOpponents,
   getKingPiece,
@@ -11,7 +11,7 @@ import { isCellUnderCheck } from './is-cell-under-check.js';
 import { updateFENStateWithMove } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
-const isOutOfBound = (coord: Coordinates, board: ChessBoardType): boolean =>
+const isOutOfBound = (coord: Coordinates, board: Square[][]): boolean =>
   coord.y >= board.length ||
   coord.x >= board[0].length ||
   coord.y < 0 ||
@@ -26,7 +26,7 @@ const generateMovesFromPatterns = ({
   patterns: Array<Pattern>;
   origin: Coordinates;
   state: FENState;
-  piece: string;
+  piece: Piece;
 }): Array<MoveBase> => {
   const moves: Array<MoveBase> = [];
   for (const pattern of patterns) {
@@ -46,12 +46,9 @@ const generateMovesFromPatterns = ({
       if (willStop) break;
 
       const targetCell = state.board[target.y][target.x];
-      if (targetCell.piece) {
+      if (targetCell) {
         if (
-          areOpponents(
-            targetCell.piece,
-            state.board[origin.y][origin.x].piece as string
-          )
+          areOpponents(targetCell, state.board[origin.y][origin.x] as Piece)
         ) {
           moves.push({
             piece,
@@ -88,7 +85,7 @@ export function generateMoves(
   state: FENState,
   piecePatterns: Array<Pattern>
 ): Array<MoveBase> {
-  const { piece } = state.board[coord.y][coord.x];
+  const piece = state.board[coord.y][coord.x];
   if (!piece) return [];
 
   return generateMovesFromPatterns({
@@ -138,19 +135,15 @@ function generateLegalMoves(state: FENState): Array<MoveBase> {
     for (let x = 0; x < row.length; x++) {
       const square = row[x];
       if (
-        square.piece &&
-        isActiveColorPiece(state.activeColor, square.piece as string) // bad bad bad, please remove coercion :(
+        square &&
+        isActiveColorPiece(state.activeColor, square) // bad bad bad, please remove coercion :(
       ) {
-        const pieceMoves = generateMoves(
-          { y, x },
-          state,
-          patterns[square.piece as string]
-        )
+        const pieceMoves = generateMoves({ y, x }, state, patterns[square])
           .map(move => {
             if (move.flags.promotion) {
-              return move.flags.promotion.split('').map(promotion => ({
+              return move.flags.promotion.map(promotion => ({
                 ...move,
-                flags: { ...move.flags, promotion },
+                flags: { ...move.flags, promotion: [promotion] },
               }));
             }
             return move;

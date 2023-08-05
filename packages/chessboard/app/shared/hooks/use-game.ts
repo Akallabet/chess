@@ -3,7 +3,7 @@ import type { ChessState, Coordinates, Move } from '@chess/chess';
 import * as chess from '@chess/chess';
 import { useLocalStorage } from './use-local-storage';
 
-export type GameAction = (pos: Coordinates, move: Move) => void;
+export type GameAction = (pos: Coordinates, move: Move | undefined) => void;
 
 interface GameOutput extends ChessState {
   selected?: Coordinates;
@@ -41,7 +41,9 @@ export const useGame = (gameId: string): GameOutput | undefined => {
           if (move && selected) {
             if (move.flags.promotion) {
               setPromotionPieces(
-                game.movesBoard[pos.y][pos.x].filter(m => m.flags.promotion)
+                game.movesBoard[pos.y][pos.x].filter(
+                  m => m.flags.promotion && m.flags.promotion[0]
+                )
               );
               return;
             }

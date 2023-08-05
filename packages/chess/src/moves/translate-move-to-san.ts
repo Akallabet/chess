@@ -81,7 +81,7 @@ export function translateMoveToSAN(
     }
   }
   if (move.flags.promotion) {
-    return move.flags.promotion.split('').map(piece =>
+    return move.flags.promotion.map(piece =>
       buildSanString({
         ambiguousIndexes,
         origin,

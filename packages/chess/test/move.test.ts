@@ -6,9 +6,9 @@ t.test('Move', t => {
   t.plan(12);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
-      { coord: { x: 4, y: 5 }, cell: { piece: 'P' } },
-      { coord: { x: 3, y: 0 }, cell: { piece: 'k' } },
-      { coord: { x: 4, y: 7 }, cell: { piece: 'K' } },
+      { coord: { x: 4, y: 5 }, cell: 'P' },
+      { coord: { x: 3, y: 0 }, cell: 'k' },
+      { coord: { x: 4, y: 7 }, cell: 'K' },
     ]);
     const state = move(
       'e3',

@@ -1,5 +1,5 @@
 import { blackPieces, flags, whitePieces } from '../constants.js';
-import { Coordinates, FENState, Flags } from '../types.js';
+import { Coordinates, FENState, Flags, Piece } from '../types.js';
 
 import { isCellUnderCheck } from './is-cell-under-check.js';
 import { areOpponents, getOpponentColor } from '../utils.js';
@@ -43,19 +43,19 @@ const left = ({ y, x }: Coordinates): Coordinates => ({ y, x: x - 1 });
 
 function stopIfOpponent({ target, origin, state }: PatternState): boolean {
   return (
-    !!state.board[target.y][target.x].piece &&
+    !!state.board[target.y][target.x] &&
     areOpponents(
-      state.board[target.y][target.x].piece as string,
-      state.board[origin.y][origin.x].piece as string
+      state.board[target.y][target.x] as Piece,
+      state.board[origin.y][origin.x] as Piece
     )
   );
 }
 
 function stopIfEmpty({ target, state }: PatternState): boolean {
   return (
-    (!state.enPassant && !state.board[target.y][target.x].piece) ||
+    (!state.enPassant && !state.board[target.y][target.x]) ||
     (state.enPassant &&
-      !state.board[target.y][target.x].piece &&
+      !state.board[target.y][target.x] &&
       (target.x !== state.enPassant.x || target.y !== state.enPassant.y))
   );
 }
@@ -79,7 +79,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.move]: true,
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '') }
+          ? {
+              [flags.promotion]: blackPieces
+                .replace('k', '')
+                .replace('p', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -99,7 +104,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
+          ? {
+              [flags.promotion]: blackPieces
+                .replace('k', '')
+                .replace('p', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -119,7 +129,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 7
-          ? { [flags.promotion]: blackPieces.replace('k', '').replace('p', '') }
+          ? {
+              [flags.promotion]: blackPieces
+                .replace('k', '')
+                .replace('p', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -135,7 +150,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
       addFlags: ({ target }) => ({
         [flags.move]: true,
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          ? {
+              [flags.promotion]: whitePieces
+                .replace('K', '')
+                .replace('P', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -155,7 +175,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          ? {
+              [flags.promotion]: whitePieces
+                .replace('K', '')
+                .replace('P', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -175,7 +200,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
             }
           : {}),
         ...(target.y === 0
-          ? { [flags.promotion]: whitePieces.replace('K', '').replace('P', '') }
+          ? {
+              [flags.promotion]: whitePieces
+                .replace('K', '')
+                .replace('P', '')
+                .split(''),
+            }
           : {}),
       }),
     },
@@ -277,8 +307,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({
@@ -304,8 +333,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({
@@ -340,8 +368,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({
@@ -367,8 +394,7 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return (
           castlingCells.some(target =>
             isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
-          ) ||
-          castlingEmptyCells.some(coord => state.board[coord.y][coord.x].piece)
+          ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
       addFlags: () => ({

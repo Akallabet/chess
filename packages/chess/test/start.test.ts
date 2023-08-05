@@ -1,7 +1,7 @@
 import t from 'tap';
-import { start } from '../src/index.js';
+import { EmptySquare, start } from '../src/index.js';
 
-const emptyCell = {};
+const emptyCell = '' as EmptySquare;
 const emptyRow = () => [
   emptyCell,
   emptyCell,

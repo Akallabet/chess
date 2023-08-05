@@ -1,35 +1,31 @@
-import * as R from 'ramda';
-import { files, ranks } from './constants.js';
-import { ChessBoardType, EmptySquare, FENState, Square } from './types.js';
+import { emptySquare, files, pieces, positions, ranks } from './constants.js';
+import { errorCodes } from './error-codes.js';
+import {
+  ChessBoardAddress,
+  FENState,
+  Rank,
+  File,
+  Square,
+  Piece,
+} from './types.js';
 
-const addEmptyCells = (n: number): Array<EmptySquare> => {
-  const cells = [];
-  for (let i = 0; i < n; i++) {
-    cells.push({});
-  }
-  return cells;
-};
-
-export function rowFromFEN(FENRow: string): Array<Square> {
+export function rowFromFEN(FENRow: string): Square[] {
   const elements = FENRow.split('');
-  const row = [];
-  for (let i = 0; i < elements.length; i++) {
-    if (isNaN(Number(elements[i]))) {
-      row.push({ piece: elements[i] });
+  const row: Square[] = [];
+  for (const element of elements) {
+    if (pieces.includes(element)) {
+      row.push(element as Piece);
     } else {
-      row.push(...addEmptyCells(Number(elements[i])));
+      for (let i = 0; i < Number(element); i++) {
+        row.push(emptySquare);
+      }
     }
   }
   return row;
 }
 
-function boardFromFEN(FEN: string): ChessBoardType {
-  const FENRows = R.split('/', FEN);
-  const board = [];
-  for (let i = 0; i < FENRows.length; i++) {
-    board.push(rowFromFEN(FENRows[i]));
-  }
-  return board;
+function boardFromFEN(piacePlacement: string): Square[][] {
+  return piacePlacement.split('/').map(rowFromFEN);
 }
 
 export function fromFEN(FEN: string): FENState {
@@ -41,35 +37,45 @@ export function fromFEN(FEN: string): FENState {
     halfMoves,
     fullMoves,
   ] = FEN.split(' ');
-  return {
-    board: boardFromFEN(piecePlacement),
-    activeColor,
-    castlingRights:
-      castlingRights === '-'
-        ? {
-            w: { kingSide: false, queenSide: false },
-            b: { kingSide: false, queenSide: false },
-          }
-        : {
-            w: {
-              kingSide: castlingRights.includes('K'),
-              queenSide: castlingRights.includes('Q'),
+
+  const isValidFEN =
+    (activeColor === 'w' || activeColor === 'b') &&
+    (enPassant === '-' || positions.includes(enPassant as ChessBoardAddress)) &&
+    Number(halfMoves) >= 0 &&
+    Number(fullMoves) >= 0;
+
+  if (isValidFEN) {
+    return {
+      board: boardFromFEN(piecePlacement),
+      activeColor,
+      castlingRights:
+        castlingRights === '-'
+          ? {
+              w: { kingSide: false, queenSide: false },
+              b: { kingSide: false, queenSide: false },
+            }
+          : {
+              w: {
+                kingSide: castlingRights.includes('K'),
+                queenSide: castlingRights.includes('Q'),
+              },
+              b: {
+                kingSide: castlingRights.includes('k'),
+                queenSide: castlingRights.includes('q'),
+              },
             },
-            b: {
-              kingSide: castlingRights.includes('k'),
-              queenSide: castlingRights.includes('q'),
-            },
-          },
-    enPassant:
-      enPassant === '-'
-        ? false
-        : {
-            y: ranks.indexOf(Number(enPassant[1])),
-            x: files.indexOf(enPassant[0]),
-          },
-    halfMoves: Number(halfMoves),
-    fullMoves: Number(fullMoves),
-  };
+      enPassant:
+        (enPassant === '-' && false) ||
+        (enPassant.length === 2 &&
+          positions.includes(enPassant as ChessBoardAddress) && {
+            x: files.indexOf(enPassant[0] as File),
+            y: ranks.indexOf(enPassant[1] as Rank),
+          }),
+      halfMoves: Number(halfMoves),
+      fullMoves: Number(fullMoves),
+    };
+  }
+  throw new Error(errorCodes.invalid_fen);
 }
 
 export const toFEN = ({
@@ -85,7 +91,7 @@ export const toFEN = ({
       boardRow
         .reduce((row: Array<string | number>, cell) => {
           const last = row[row.length - 1];
-          if (cell.piece) row.push(cell.piece);
+          if (cell) row.push(cell);
           else if (typeof last === 'number') row[row.length - 1] = last + 1;
           else row.push(1);
           return row;

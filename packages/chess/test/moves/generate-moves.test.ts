@@ -7,7 +7,6 @@ import {
   isOpponentKingUnderCheck,
 } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/index.js';
-import { fromPositionToCoordinates } from '../../src/utils.js';
 import { patterns } from '../../src/moves/patterns.js';
 
 const compareByMove = (a, b) => {
@@ -23,11 +22,6 @@ const compareByMove = (a, b) => {
   if (!a.flags.capture && b.flags.capture) return -1;
   return 0;
 };
-
-t.test('Convert ches piece targetinates to x/y coordinates', t => {
-  t.same(fromPositionToCoordinates('e3'), { x: 4, y: 5 });
-  t.end();
-});
 
 const addOrigin = origin => move => {
   move.origin = origin;
@@ -143,10 +137,7 @@ t.test('Select knight', t => {
   const origin = { x: 4, y: 3 };
   const actual = generateMoves(
     origin,
-    {
-      ...fromFEN('8/8/8/4n3/8/8/8/8 b KQkq - 0 1'),
-      mode: 'demo',
-    },
+    fromFEN('8/8/8/4n3/8/8/8/8 b KQkq - 0 1'),
     patterns['n']
   ).sort(compareByMove);
   t.same(
@@ -439,7 +430,6 @@ t.test(
     ];
     const actual = generateLegalMovesForActiveSide({
       ...fromFEN(FEN),
-      mode: 'standard',
     }).filter(({ piece }) => piece === 'k');
     t.same(actual, expected);
     t.end();
@@ -465,7 +455,6 @@ t.test(
       origin,
       {
         ...fromFEN(FEN),
-        mode: 'standard',
       },
       patterns.k
     ).filter(({ piece }) => piece === 'k');
@@ -495,7 +484,6 @@ t.test('Highlight kingside and queenside castling for white', t => {
   ];
   const actual = generateLegalMovesForActiveSide({
     ...fromFEN(FEN),
-    mode: 'standard',
   }).filter(({ piece }) => piece === 'K');
   t.same(actual.sort(compareByMove), expected.sort(compareByMove));
   t.end();
@@ -611,7 +599,6 @@ t.test('Highlight checkmate', t => {
   const FENState = fromFEN(FEN);
   const moves = generateLegalMovesForActiveSide({
     ...FENState,
-    mode: 'standard',
   });
   const checkMateMoves = moves.filter(({ flags }) => flags.checkmate);
   t.same(checkMateMoves.length, 4);
@@ -622,12 +609,12 @@ t.test('Check detection', t => {
   t.plan(2);
   t.test('Own king is in check', t => {
     const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 b - - 0 1');
-    t.same(isKingUnderCheck({ ...state, mode: 'standard' }), true);
+    t.same(isKingUnderCheck(state), true);
     t.end();
   });
   t.test('Opponent king is in check', t => {
     const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 w - - 0 1');
-    t.same(isOpponentKingUnderCheck({ ...state, mode: 'standard' }), true);
+    t.same(isOpponentKingUnderCheck(state), true);
     t.end();
   });
 });

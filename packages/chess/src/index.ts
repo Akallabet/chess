@@ -6,15 +6,39 @@ import {
   ChessState,
   Coordinates,
   FENState,
+  InternalState,
   Move,
+  MoveBase,
 } from './types.js';
 
 import {
   generateLegalMovesForActiveSide,
-  isKingUnderCheck,
   updateFENStateWithMove,
   translateSANToMove,
+  calcIfKingUnderCheck,
 } from './moves/index.js';
+
+function calcMetaData(
+  state: InternalState,
+  moves: MoveBase[]
+): {
+  isGameOver: boolean;
+  isCheckmate: boolean;
+  isDraw: boolean;
+} {
+  const isKingUnderCheck = calcIfKingUnderCheck(state);
+  const isDraw =
+    state.mode === 'standard' &&
+    (state.halfMoves === 50 || (moves.length === 0 && !isKingUnderCheck));
+  const isGameOver = moves.length === 0 || isDraw;
+  const isCheckmate = isKingUnderCheck && isGameOver;
+
+  return {
+    isGameOver,
+    isCheckmate,
+    isDraw,
+  };
+}
 
 export function start(
   initialState: ChessInitialState | ChessState
@@ -26,20 +50,13 @@ export function start(
   };
 
   const moves = generateLegalMovesForActiveSide(state);
-  const movesBoard = createMovesBoard(state, moves);
-  const isDraw =
-    state.mode === 'standard' &&
-    (state.halfMoves === 50 ||
-      (moves.length === 0 && !isKingUnderCheck(state)));
-  const isGameOver = moves.length === 0 || isDraw;
 
   return {
     ...state,
     files,
     ranks,
-    movesBoard,
-    isGameOver,
-    isDraw,
+    movesBoard: createMovesBoard(state, moves),
+    ...calcMetaData(state, moves),
   };
 }
 
@@ -54,27 +71,19 @@ export function move(san: string, prevState: ChessState): ChessState {
       prevState.halfMoves,
       prevState.fullMoves
     );
-    const FEN = toFEN(FENState);
-    const internalState = {
+    const state = {
       mode: prevState.mode,
       ...FENState,
-      FEN,
+      FEN: toFEN(FENState),
     };
-    const moves = generateLegalMovesForActiveSide(internalState);
-    const movesBoard = createMovesBoard(internalState, moves);
-    const isDraw =
-      internalState.mode === 'standard' &&
-      (internalState.halfMoves === 50 ||
-        (moves.length === 0 && !isKingUnderCheck(internalState)));
-    const isGameOver = moves.length === 0 || isDraw;
+    const moves = generateLegalMovesForActiveSide(state);
 
     return {
-      ...internalState,
+      ...state,
       files,
       ranks,
-      movesBoard,
-      isGameOver,
-      isDraw,
+      movesBoard: createMovesBoard(state, moves),
+      ...calcMetaData(state, moves),
     };
   } catch (e) {
     return prevState;

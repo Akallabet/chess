@@ -96,7 +96,7 @@ export function generateMoves(
   });
 }
 
-export function isKingUnderCheck(state: FENState): boolean {
+export function calcIfKingUnderCheck(state: FENState): boolean {
   const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
   if (!kingCoord) return false;
   return isCellUnderCheck(
@@ -168,7 +168,7 @@ function calcCheckFlags(
     state.halfMoves,
     state.fullMoves
   );
-  const check = isKingUnderCheck(moveState);
+  const check = calcIfKingUnderCheck(moveState);
   if (!check) return {};
 
   const kingCoord = getPieceCoord(

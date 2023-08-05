@@ -3,7 +3,7 @@ import { fromFEN } from '../../src/fen.js';
 import {
   generateMoves,
   generateLegalMovesForActiveSide,
-  isKingUnderCheck,
+  calcIfKingUnderCheck,
   isOpponentKingUnderCheck,
 } from '../../src/moves/generate-moves.js';
 import { start } from '../../src/index.js';
@@ -609,7 +609,7 @@ t.test('Check detection', t => {
   t.plan(2);
   t.test('Own king is in check', t => {
     const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 b - - 0 1');
-    t.same(isKingUnderCheck(state), true);
+    t.same(calcIfKingUnderCheck(state), true);
     t.end();
   });
   t.test('Opponent king is in check', t => {

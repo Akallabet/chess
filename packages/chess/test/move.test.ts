@@ -24,6 +24,8 @@ t.test('Move', t => {
     const init = start({ FEN, mode: 'standard' });
     const state = move('Qe8#', init);
     t.same(state.isGameOver, true);
+    t.same(state.isCheckmate, true);
+    t.same(state.isDraw, false);
     t.end();
   });
 
@@ -33,6 +35,7 @@ t.test('Move', t => {
     t.same(state.FEN, 'k7/1R3Q2/8/8/8/8/8/4K3 b - - 1 1');
     t.same(state.isGameOver, true);
     t.same(state.isDraw, true);
+    t.same(state.isCheckmate, false);
     t.end();
   });
 
@@ -80,6 +83,7 @@ t.test('Move', t => {
     );
     t.same(firstMove.isGameOver, true);
     t.same(firstMove.isDraw, true);
+    t.same(state.isCheckmate, false);
 
     t.end();
   });

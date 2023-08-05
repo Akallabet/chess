@@ -99,5 +99,6 @@ export interface ChessState extends FENState {
   error?: string;
   movesBoard: Array<Array<Array<Move>>>;
   isGameOver: boolean;
+  isCheckmate: boolean;
   isDraw: boolean;
 }

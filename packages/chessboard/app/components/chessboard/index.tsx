@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { FENForm } from '../fen';
 import type { GameAction } from '~/use-game';
 import type { ChessBoardType, Files, Ranks, Move } from '@chess/chess';
@@ -8,7 +7,7 @@ import { Piece } from './piece';
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
 
-const isWhitePiece = R.test(/[PRBNQK]/);
+const isWhitePiece = (piece: string): boolean => /[PRBNQK]/.test(piece);
 
 interface ChessBoardProps {
   board: ChessBoardType;

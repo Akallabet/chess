@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { emptySquare, files, pieces, positions, ranks } from './constants.js';
 import { errorCodes } from './error-codes.js';
 import {
@@ -26,12 +25,7 @@ export function rowFromFEN(FENRow: string): Square[] {
 }
 
 function boardFromFEN(piacePlacement: string): Square[][] {
-  const FENRows = R.split('/', piacePlacement);
-  const board = [];
-  for (let i = 0; i < FENRows.length; i++) {
-    board.push(rowFromFEN(FENRows[i]));
-  }
-  return board;
+  return piacePlacement.split('/').map(rowFromFEN);
 }
 
 export function fromFEN(FEN: string): FENState {

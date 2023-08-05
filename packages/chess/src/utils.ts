@@ -1,6 +1,5 @@
-import * as R from 'ramda';
 import { piecesMap } from './constants.js';
-import { ChessColor, Coordinates, FENState, Piece, Square } from './types.js';
+import { ChessColor, Coordinates, Piece, Square } from './types.js';
 
 export const isWhitePiece = (piece: string): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);
@@ -51,22 +50,3 @@ export const getPieceCoord = (
   }
   return null;
 };
-
-export const isCellOccupied = (
-  state: FENState,
-  { y, x }: Coordinates
-): boolean => Boolean(state.board[y][x]);
-
-export function anyCellOccupied(
-  state: FENState,
-  cells: Coordinates[]
-): boolean {
-  return cells.some(cell => isCellOccupied(state, cell));
-}
-
-export const overProp = R.curryN(3, (prop, fn, item) =>
-  R.over(R.lensProp(prop), fn, item)
-);
-export const updateProp = R.curryN(3, (prop, fn, obj) =>
-  R.assoc(prop, fn(obj), obj)
-);

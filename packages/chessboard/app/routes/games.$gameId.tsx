@@ -18,7 +18,9 @@ export default function Game() {
       <div className="my-5" />
       {game && (
         <ChessBoard
-          {...game}
+          game={game.game}
+          highlightedMoves={game.highlightedMoves}
+          promotionMoves={game.promotionMoves}
           onCellClick={game.action}
           onPromotion={game.promote}
         />

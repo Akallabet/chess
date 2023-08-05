@@ -5,10 +5,11 @@ import { useLocalStorage } from './use-local-storage';
 
 export type GameAction = (pos: Coordinates, move: Move | undefined) => void;
 
-interface GameOutput extends ChessState {
+interface GameOutput {
+  game: ChessState;
   selected?: Coordinates;
   highlightedMoves: Array<Move>;
-  promotionMoves?: Array<Move>;
+  promotionMoves?: Move[];
   promote: (move: Move) => void;
   action: GameAction;
 }
@@ -28,7 +29,7 @@ export const useGame = (gameId: string): GameOutput | undefined => {
 
   return game
     ? {
-        ...game,
+        game,
         selected,
         highlightedMoves: selected ? chess.moves(selected, game) : [],
         promotionMoves: promotionPieces,

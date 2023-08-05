@@ -4,7 +4,6 @@ import {
   anyCellOccupied,
   getPieceCoord,
   isActiveColorPiece,
-  isCellEmpty,
   isCellOccupied,
 } from '../src/utils.js';
 import { getBoard } from '../test-utils.js';
@@ -12,7 +11,7 @@ import { getBoard } from '../test-utils.js';
 t.test('Get coordinated for black king in e8', t => {
   const coord = getPieceCoord(
     'k',
-    getBoard([{ coord: { y: 0, x: 4 }, cell: { piece: 'k' } }])
+    getBoard([{ coord: { y: 0, x: 4 }, cell: 'k' }])
   );
   t.same(coord, { y: 0, x: 4 });
   t.end();
@@ -21,7 +20,7 @@ t.test('Get coordinated for black king in e8', t => {
 t.test('Get coordinated for white king in e1', t => {
   const coord = getPieceCoord(
     'K',
-    getBoard([{ coord: { y: 7, x: 4 }, cell: { piece: 'K' } }])
+    getBoard([{ coord: { y: 7, x: 4 }, cell: 'K' }])
   );
   t.same(coord, { y: 7, x: 4 });
   t.end();
@@ -31,19 +30,12 @@ t.test('Get coordinates for first Rook', t => {
   const coord = getPieceCoord(
     'R',
     getBoard([
-      { coord: { y: 0, x: 6 }, cell: { piece: 'R' } },
-      { coord: { y: 7, x: 2 }, cell: { piece: 'R' } },
-      { coord: { y: 0, x: 4 }, cell: { piece: 'k' } },
+      { coord: { y: 0, x: 6 }, cell: 'R' },
+      { coord: { y: 7, x: 2 }, cell: 'R' },
+      { coord: { y: 0, x: 4 }, cell: 'k' },
     ])
   );
   t.same(coord, { y: 0, x: 6 });
-  t.end();
-});
-
-t.test('Cell is empty', t => {
-  const FEN = '8/8/8/8/8/8/8/8 b KQkq - 0 1';
-  const state = fromFEN(FEN);
-  t.same(isCellEmpty(state, { x: 4, y: 6 }), true);
   t.end();
 });
 

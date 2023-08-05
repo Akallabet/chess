@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { piecesMap } from './constants.js';
-import { ChessColor, Piece, Square } from './types.js';
+import { ChessColor, Coordinates, FENState, Piece, Square } from './types.js';
 
 export const isWhitePiece = (piece: string): boolean =>
   new RegExp(/[PNBRQK]+/).test(piece);
@@ -40,25 +40,29 @@ export const isPawn = (piece: string): boolean => {
   return piece === piecesMap.p || piece === piecesMap.P;
 };
 
-export const getPieceCoord = (piece: Piece, board: Square[][]) => {
+export const getPieceCoord = (
+  piece: Piece,
+  board: Square[][]
+): Coordinates | null => {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
-      if (R.pathEq([y, x, 'piece'], piece, board)) return { y, x };
+      if (board[y][x] === piece) return { y, x };
     }
   }
+  return null;
 };
 
-export const isCellEmpty = R.curry((state, { y, x }) =>
-  R.isNil(R.path([y, x, 'piece'], state.board))
-);
+export const isCellOccupied = (
+  state: FENState,
+  { y, x }: Coordinates
+): boolean => Boolean(state.board[y][x]);
 
-export const isCellOccupied = R.curry((state, { y, x }) =>
-  R.hasPath([y, x, 'piece'], state.board)
-);
-
-export const anyCellOccupied = R.curry((state, cells) =>
-  R.any(isCellOccupied(state), cells)
-);
+export function anyCellOccupied(
+  state: FENState,
+  cells: Coordinates[]
+): boolean {
+  return cells.some(cell => isCellOccupied(state, cell));
+}
 
 export const overProp = R.curryN(3, (prop, fn, item) =>
   R.over(R.lensProp(prop), fn, item)

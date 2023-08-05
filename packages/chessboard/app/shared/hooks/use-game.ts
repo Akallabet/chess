@@ -15,7 +15,7 @@ interface GameOutput {
 }
 
 export const useGame = (gameId: string): GameOutput | undefined => {
-  const { getItem } = useLocalStorage();
+  const { getItem, setItem } = useLocalStorage();
   const [game, setGame] = useState<ChessState | undefined>();
   const [selected, setSelected] = useState<undefined | Coordinates>();
   const [promotionPieces, setPromotionPieces] = useState<
@@ -26,6 +26,12 @@ export const useGame = (gameId: string): GameOutput | undefined => {
     const item = getItem(`chess-game-${gameId}`);
     if (item) setGame(chess.start(item));
   }, []);
+
+  useEffect(() => {
+    if (game) {
+      setItem(`chess-game-${gameId}`, game);
+    }
+  }, [game, setItem, gameId]);
 
   return game
     ? {

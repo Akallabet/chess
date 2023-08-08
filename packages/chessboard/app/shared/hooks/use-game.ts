@@ -29,7 +29,8 @@ export const useGame = (gameId: string): GameOutput | undefined => {
 
   useEffect(() => {
     if (game) {
-      setItem(`chess-game-${gameId}`, game);
+      const { FEN, mode } = game;
+      setItem(`chess-game-${gameId}`, { FEN, mode });
     }
   }, [game, setItem, gameId]);
 

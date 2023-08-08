@@ -58,6 +58,11 @@ export type Variant = 'standard' | 'chess960';
 
 export type FENString = string;
 
+export interface ChessBaseState {
+  mode: GameMode;
+  FEN: FENString;
+}
+
 export interface ChessInitialState {
   mode: GameMode;
   FEN: FENString;

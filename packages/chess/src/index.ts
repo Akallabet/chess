@@ -8,6 +8,8 @@ import {
   FENState,
   Move,
   GameMode,
+  FENString,
+  ChessBaseState,
 } from './types.js';
 
 import {
@@ -40,9 +42,10 @@ function deriveState(FENState: FENState, mode: GameMode): ChessState {
   };
 }
 
-export function start(
-  initialState: ChessInitialState | ChessState
-): ChessState {
+export function start(initialState: {
+  FEN: FENString;
+  mode: GameMode;
+}): ChessState {
   return deriveState(
     fromFEN(initialState.FEN),
     initialState.mode || modes.standard
@@ -55,17 +58,15 @@ export function move(
 ): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState.mode);
   try {
-    return deriveState(
-      updateFENStateWithMove(
-        translateSANToMove(san, state.movesBoard),
-        state.board,
-        state.activeColor,
-        state.castlingRights,
-        state.halfMoves,
-        state.fullMoves
-      ),
-      inputState.mode
+    const FENStateWithMove = updateFENStateWithMove(
+      translateSANToMove(san, state.movesBoard),
+      state.board,
+      state.activeColor,
+      state.castlingRights,
+      state.halfMoves,
+      state.fullMoves
     );
+    return deriveState(FENStateWithMove, inputState.mode);
   } catch (e) {
     return state;
   }

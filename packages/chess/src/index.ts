@@ -9,7 +9,6 @@ import {
   Move,
   GameMode,
   FENString,
-  ChessBaseState,
 } from './types.js';
 
 import {

@@ -1,4 +1,4 @@
-import { emptySquare } from '../constants.js';
+import { colours, emptySquare } from '../constants.js';
 import {
   CastlingRights,
   ChessColor,
@@ -6,16 +6,10 @@ import {
   MoveBase,
   Square,
 } from '../types.js';
-import {
-  isActiveColorBlack,
-  isKing,
-  isPawn,
-  isRook,
-  isWhitePiece,
-} from '../utils.js';
+import { isKing, isPawn, isRook, isWhitePiece } from '../utils.js';
 
 const changeActiveColor = (activeColor: ChessColor): ChessColor =>
-  activeColor === 'w' ? 'b' : 'w';
+  activeColor === colours.w ? colours.b : colours.w;
 
 export function createBoardWithMove(move: MoveBase, board: Square[][]) {
   const boardWithMove = board.map(row => row.map(cell => cell));
@@ -72,14 +66,14 @@ function calcCastlingRights(
         (isCastlingMove ||
           isKing(move.piece) ||
           (isRook(move.piece) && move.origin.x === board[0].length - 1)) &&
-        activeColor === 'w'
+        activeColor === colours.w
           ? false
           : castlingRights.w.kingSide,
       queenSide:
         (isCastlingMove ||
           isKing(move.piece) ||
           (isRook(move.piece) && move.origin.x === 0)) &&
-        activeColor === 'w'
+        activeColor === colours.w
           ? false
           : castlingRights.w.queenSide,
     },
@@ -88,14 +82,14 @@ function calcCastlingRights(
         (isCastlingMove ||
           isKing(move.piece) ||
           (isRook(move.piece) && move.origin.x === board[0].length - 1)) &&
-        activeColor === 'b'
+        activeColor === colours.b
           ? false
           : castlingRights.b.kingSide,
       queenSide:
         (isCastlingMove ||
           isKing(move.piece) ||
           (isRook(move.piece) && move.origin.x === 0)) &&
-        activeColor === 'b'
+        activeColor === colours.b
           ? false
           : castlingRights.b.queenSide,
     },
@@ -120,7 +114,7 @@ export function updateFENStateWithMove(
     board: createBoardWithMove(move, board),
     activeColor: changeActiveColor(activeColor),
     halfMoves: isPawn(move.piece) || move.flags.capture ? 0 : halfMoves + 1,
-    fullMoves: isActiveColorBlack(activeColor) ? fullMoves + 1 : fullMoves,
+    fullMoves: activeColor === colours.b ? fullMoves + 1 : fullMoves,
     enPassant: calcEnPassant(move),
   };
 }

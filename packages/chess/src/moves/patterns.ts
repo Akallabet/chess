@@ -80,10 +80,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
         [flags.move]: true,
         ...(target.y === 7
           ? {
-              [flags.promotion]: blackPieces
-                .replace('k', '')
-                .replace('p', '')
-                .split(''),
+              [flags.promotion]: [
+                blackPieces.rook,
+                blackPieces.bishop,
+                blackPieces.knight,
+                blackPieces.queen,
+              ],
             }
           : {}),
       }),
@@ -105,10 +107,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
           : {}),
         ...(target.y === 7
           ? {
-              [flags.promotion]: blackPieces
-                .replace('k', '')
-                .replace('p', '')
-                .split(''),
+              [flags.promotion]: [
+                blackPieces.rook,
+                blackPieces.bishop,
+                blackPieces.knight,
+                blackPieces.queen,
+              ],
             }
           : {}),
       }),
@@ -130,10 +134,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
           : {}),
         ...(target.y === 7
           ? {
-              [flags.promotion]: blackPieces
-                .replace('k', '')
-                .replace('p', '')
-                .split(''),
+              [flags.promotion]: [
+                blackPieces.rook,
+                blackPieces.bishop,
+                blackPieces.knight,
+                blackPieces.queen,
+              ],
             }
           : {}),
       }),
@@ -151,10 +157,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
         [flags.move]: true,
         ...(target.y === 0
           ? {
-              [flags.promotion]: whitePieces
-                .replace('K', '')
-                .replace('P', '')
-                .split(''),
+              [flags.promotion]: [
+                whitePieces.rook,
+                whitePieces.bishop,
+                whitePieces.knight,
+                whitePieces.queen,
+              ],
             }
           : {}),
       }),
@@ -176,10 +184,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
           : {}),
         ...(target.y === 0
           ? {
-              [flags.promotion]: whitePieces
-                .replace('K', '')
-                .replace('P', '')
-                .split(''),
+              [flags.promotion]: [
+                whitePieces.rook,
+                whitePieces.bishop,
+                whitePieces.knight,
+                whitePieces.queen,
+              ],
             }
           : {}),
       }),
@@ -201,10 +211,12 @@ const basePatterns: Record<string, Array<Pattern>> = {
           : {}),
         ...(target.y === 0
           ? {
-              [flags.promotion]: whitePieces
-                .replace('K', '')
-                .replace('P', '')
-                .split(''),
+              [flags.promotion]: [
+                whitePieces.rook,
+                whitePieces.bishop,
+                whitePieces.knight,
+                whitePieces.queen,
+              ],
             }
           : {}),
       }),

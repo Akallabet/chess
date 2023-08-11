@@ -11,20 +11,30 @@ export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 export type Files = File[];
 export type Ranks = Rank[];
 
-export type Piece =
-  | 'p'
-  | 'n'
-  | 'b'
-  | 'r'
-  | 'q'
-  | 'k'
-  | 'P'
-  | 'N'
-  | 'B'
-  | 'R'
-  | 'Q'
-  | 'K';
-
+export enum PieceEnum {
+  p = 'p',
+  n = 'n',
+  b = 'b',
+  r = 'r',
+  q = 'q',
+  k = 'k',
+  P = 'P',
+  N = 'N',
+  B = 'B',
+  R = 'R',
+  Q = 'Q',
+  K = 'K',
+}
+export type BlackPiece = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
+export type WhitePiece = 'P' | 'N' | 'B' | 'R' | 'Q' | 'K';
+export type Piece = BlackPiece | WhitePiece;
+export type PieceType =
+  | 'pawn'
+  | 'knight'
+  | 'bishop'
+  | 'rook'
+  | 'queen'
+  | 'king';
 export type ChessBoardAddress = `${File}${Rank}`;
 
 export interface Flags {

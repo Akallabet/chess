@@ -1,10 +1,8 @@
-import { flags } from '../constants.js';
+import { flags, piecesByColor } from '../constants.js';
 import { Coordinates, FENState, MoveBase, Piece, Square } from '../types.js';
 import {
   areOpponents,
-  getKingPiece,
   getOpponentColor,
-  getPieceCoord,
   isActiveColorPiece,
 } from '../utils.js';
 import { isCellUnderCheck } from './is-cell-under-check.js';
@@ -96,8 +94,33 @@ export function generateMoves(
   });
 }
 
+function getPieceCoord(
+  piece: Piece,
+  board: Square[][]
+): Coordinates | undefined {
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      if (board[y][x] === piece) return { y, x };
+    }
+  }
+  return undefined;
+}
+
+function getOwnKingCoord(state: FENState): Coordinates | undefined {
+  return getPieceCoord(piecesByColor[state.activeColor].king, state.board);
+}
+function getOpponentKingCoord(state: FENState): Coordinates | undefined {
+  return getPieceCoord(
+    piecesByColor[getOpponentColor(state.activeColor)].king,
+    state.board
+  );
+}
+
 export function calcIfKingUnderCheck(state: FENState): boolean {
-  const kingCoord = getPieceCoord(getKingPiece(state.activeColor), state.board);
+  const kingCoord = getPieceCoord(
+    piecesByColor[state.activeColor].king,
+    state.board
+  );
   if (!kingCoord) return false;
   return isCellUnderCheck(
     state,
@@ -107,10 +130,7 @@ export function calcIfKingUnderCheck(state: FENState): boolean {
 }
 
 export function isOpponentKingUnderCheck(state: FENState): boolean {
-  const kingCoord = getPieceCoord(
-    getKingPiece(getOpponentColor(state.activeColor)),
-    state.board
-  );
+  const kingCoord = getOpponentKingCoord(state);
   if (!kingCoord) return false;
   return isCellUnderCheck(state, kingCoord);
 }
@@ -171,11 +191,7 @@ function calcCheckFlags(
   const check = calcIfKingUnderCheck(moveState);
   if (!check) return {};
 
-  const kingCoord = getPieceCoord(
-    getKingPiece(moveState.activeColor),
-    moveState.board
-  );
-  if (!kingCoord) return {};
+  if (!getOwnKingCoord(moveState)) return {};
 
   const checkmate = generateLegalMoves(moveState).length === 0;
   if (checkmate) return { checkmate };

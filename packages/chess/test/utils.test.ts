@@ -1,38 +1,6 @@
 import t from 'tap';
 import { fromFEN } from '../src/fen.js';
-import { getPieceCoord, isActiveColorPiece } from '../src/utils.js';
-import { getBoard } from '../test-utils.js';
-
-t.test('Get coordinated for black king in e8', t => {
-  const coord = getPieceCoord(
-    'k',
-    getBoard([{ coord: { y: 0, x: 4 }, cell: 'k' }])
-  );
-  t.same(coord, { y: 0, x: 4 });
-  t.end();
-});
-
-t.test('Get coordinated for white king in e1', t => {
-  const coord = getPieceCoord(
-    'K',
-    getBoard([{ coord: { y: 7, x: 4 }, cell: 'K' }])
-  );
-  t.same(coord, { y: 7, x: 4 });
-  t.end();
-});
-
-t.test('Get coordinates for first Rook', t => {
-  const coord = getPieceCoord(
-    'R',
-    getBoard([
-      { coord: { y: 0, x: 6 }, cell: 'R' },
-      { coord: { y: 7, x: 2 }, cell: 'R' },
-      { coord: { y: 0, x: 4 }, cell: 'k' },
-    ])
-  );
-  t.same(coord, { y: 0, x: 6 });
-  t.end();
-});
+import { isActiveColorPiece } from '../src/utils.js';
 
 t.test('Is active color piece', t => {
   const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';

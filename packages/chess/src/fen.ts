@@ -1,4 +1,13 @@
-import { emptySquare, files, pieces, positions, ranks } from './constants.js';
+import {
+  blackPieces,
+  colours,
+  emptySquare,
+  files,
+  piecesMap,
+  positions,
+  ranks,
+  whitePieces,
+} from './constants.js';
 import { errorCodes } from './error-codes.js';
 import {
   ChessBoardAddress,
@@ -13,7 +22,7 @@ export function rowFromFEN(FENRow: string): Square[] {
   const elements = FENRow.split('');
   const row: Square[] = [];
   for (const element of elements) {
-    if (pieces.includes(element)) {
+    if (piecesMap[element as Piece]) {
       row.push(element as Piece);
     } else {
       for (let i = 0; i < Number(element); i++) {
@@ -39,7 +48,7 @@ export function fromFEN(FEN: string): FENState {
   ] = FEN.split(' ');
 
   const isValidFEN =
-    (activeColor === 'w' || activeColor === 'b') &&
+    (activeColor === colours.w || activeColor === colours.b) &&
     (enPassant === '-' || positions.includes(enPassant as ChessBoardAddress)) &&
     Number(halfMoves) >= 0 &&
     Number(fullMoves) >= 0;
@@ -56,12 +65,12 @@ export function fromFEN(FEN: string): FENState {
             }
           : {
               w: {
-                kingSide: castlingRights.includes('K'),
-                queenSide: castlingRights.includes('Q'),
+                kingSide: castlingRights.includes(whitePieces.king),
+                queenSide: castlingRights.includes(whitePieces.queen),
               },
               b: {
-                kingSide: castlingRights.includes('k'),
-                queenSide: castlingRights.includes('q'),
+                kingSide: castlingRights.includes(blackPieces.king),
+                queenSide: castlingRights.includes(blackPieces.queen),
               },
             },
       enPassant:
@@ -101,10 +110,10 @@ export const toFEN = ({
     .join('/');
 
   return `${piecePlacement} ${activeColor} ${
-    (castlingRights.w.kingSide ? 'K' : '') +
-      (castlingRights.w.queenSide ? 'Q' : '') +
-      (castlingRights.b.kingSide ? 'k' : '') +
-      (castlingRights.b.queenSide ? 'q' : '') || '-'
+    (castlingRights.w.kingSide ? whitePieces.king : '') +
+      (castlingRights.w.queenSide ? whitePieces.queen : '') +
+      (castlingRights.b.kingSide ? blackPieces.king : '') +
+      (castlingRights.b.queenSide ? blackPieces.queen : '') || '-'
   } ${
     enPassant ? `${files[enPassant.x]}${ranks[enPassant.y]}` : '-'
   } ${halfMoves} ${fullMoves}`;

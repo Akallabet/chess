@@ -1,5 +1,5 @@
 import { modes, files, ranks } from './constants.js';
-import { fromFEN, toFEN } from './fen.js';
+import { fromFEN, toFEN, updateFENStateWithMove } from './fen.js';
 import { createMovesBoard } from './moves/create-moves-board.js';
 import {
   ChessInitialState,
@@ -13,20 +13,19 @@ import {
 
 import {
   generateLegalMovesForActiveSide,
-  updateFENStateWithMove,
-  translateSANToMove,
   calcIfKingUnderCheck,
 } from './moves/index.js';
+import { translateSANToMove } from './san.js';
 
-function deriveState(FENState: FENState, mode: GameMode): ChessState {
+function deriveStateFromFEN(FENState: FENState, mode: GameMode): ChessState {
   const moves = generateLegalMovesForActiveSide(FENState);
 
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
+  const isStalemate = moves.length === 0 && !isKingUnderCheck;
   const isDraw =
-    mode === 'standard' &&
-    (FENState.halfMoves === 50 || (moves.length === 0 && !isKingUnderCheck));
-  const isGameOver = moves.length === 0 || isDraw;
-  const isCheckmate = isKingUnderCheck && isGameOver;
+    mode === 'standard' && (FENState.halfMoves === 50 || isStalemate);
+  const isCheckmate = isKingUnderCheck && moves.length === 0;
+  const isGameOver = isDraw || isCheckmate;
 
   return {
     ...FENState,
@@ -37,7 +36,9 @@ function deriveState(FENState: FENState, mode: GameMode): ChessState {
     movesBoard: createMovesBoard(FENState.board, moves),
     isGameOver,
     isCheckmate,
+    isCheck: isKingUnderCheck && !isCheckmate,
     isDraw,
+    isStalemate,
   };
 }
 
@@ -45,7 +46,7 @@ export function start(initialState: {
   FEN: FENString;
   mode: GameMode;
 }): ChessState {
-  return deriveState(
+  return deriveStateFromFEN(
     fromFEN(initialState.FEN),
     initialState.mode || modes.standard
   );
@@ -55,7 +56,7 @@ export function move(
   san: string,
   inputState: ChessInitialState | ChessState
 ): ChessState {
-  const state = deriveState(fromFEN(inputState.FEN), inputState.mode);
+  const state = deriveStateFromFEN(fromFEN(inputState.FEN), inputState.mode);
   try {
     const FENStateWithMove = updateFENStateWithMove(
       translateSANToMove(san, state.movesBoard),
@@ -65,7 +66,7 @@ export function move(
       state.halfMoves,
       state.fullMoves
     );
-    return deriveState(FENStateWithMove, inputState.mode);
+    return deriveStateFromFEN(FENStateWithMove, inputState.mode);
   } catch (e) {
     return state;
   }

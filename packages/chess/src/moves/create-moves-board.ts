@@ -1,5 +1,5 @@
+import { translateMoveToSAN } from '../san.js';
 import { Move, MoveBase, Square } from '../types.js';
-import { translateMoveToSAN } from './translate-move-to-san.js';
 
 export function createMovesBoard(
   board: Square[][],

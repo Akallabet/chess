@@ -1,12 +1,7 @@
-import { files, ranks } from '../constants.js';
-import { Move } from '../types.js';
-import { isPawn } from '../utils.js';
-
-// If the piece is sufficient to unambiguously determine the origin square, the whole from square is omitted. Otherwise, if two (or more) pieces of the same kind can move to the same square, the piece's initial is followed by (in descending order of preference)
-//
-// file of departure if different
-// rank of departure if the files are the same but the ranks differ
-// the complete origin square coordinate otherwise
+import { files, ranks } from './constants.js';
+import { errorCodes } from './error-codes.js';
+import { Move } from './types.js';
+import { isPawn } from './utils.js';
 
 function buildSanString({
   ambiguousIndexes,
@@ -108,4 +103,16 @@ export function translateMoveToSAN(
       moveSquare,
     }),
   ];
+}
+
+export function translateSANToMove(
+  san: string,
+  movesBoard: Move[][][]
+): Move | never {
+  const moves = movesBoard.flat().flat();
+  const move = moves.find(move =>
+    move.san.find(sanString => sanString === san)
+  );
+  if (!move) throw new Error(errorCodes.wrongFormat);
+  return move;
 }

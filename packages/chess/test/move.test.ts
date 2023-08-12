@@ -26,6 +26,7 @@ t.test('Move', t => {
     t.same(state.isGameOver, true);
     t.same(state.isCheckmate, true);
     t.same(state.isDraw, false);
+    t.same(state.isStalemate, false);
     t.end();
   });
 
@@ -35,6 +36,7 @@ t.test('Move', t => {
     t.same(state.FEN, 'k7/1R3Q2/8/8/8/8/8/4K3 b - - 1 1');
     t.same(state.isGameOver, true);
     t.same(state.isDraw, true);
+    t.same(state.isStalemate, true);
     t.same(state.isCheckmate, false);
     t.end();
   });

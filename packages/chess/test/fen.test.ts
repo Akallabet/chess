@@ -1,5 +1,11 @@
 import t from 'tap';
-import { fromFEN, isFEN, rowFromFEN, toFEN } from '../src/fen.js';
+import {
+  fromFEN,
+  isFEN,
+  rowFromFEN,
+  toFEN,
+  updateBoardWithMove,
+} from '../src/fen.js';
 import { FENState, Square } from '../src/types.js';
 
 t.test('Check FEN format', t => {
@@ -184,5 +190,25 @@ t.test('FEN string from object with board', t => {
     fullMoves: 1,
   };
   t.same(FEN, toFEN(FENObj));
+  t.end();
+});
+
+t.test('Board with moves', t => {
+  const { board } = fromFEN(
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1'
+  );
+  const boardMove = updateBoardWithMove(
+    {
+      origin: { y: 6, x: 1 },
+      target: { y: 4, x: 1 },
+      flags: { move: true },
+      piece: 'P',
+    },
+    board
+  );
+  t.same(
+    boardMove,
+    fromFEN('rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR w - - 0 1').board
+  );
   t.end();
 });

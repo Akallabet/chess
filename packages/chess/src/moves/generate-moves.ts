@@ -1,4 +1,5 @@
 import { flags, piecesByColor } from '../constants.js';
+import { updateFENStateWithMove } from '../fen.js';
 import { Coordinates, FENState, MoveBase, Piece, Square } from '../types.js';
 import {
   areOpponents,
@@ -6,7 +7,6 @@ import {
   isActiveColorPiece,
 } from '../utils.js';
 import { isCellUnderCheck } from './is-cell-under-check.js';
-import { updateFENStateWithMove } from './move-and-update-state.js';
 import { Pattern, patterns } from './patterns.js';
 
 const isOutOfBound = (coord: Coordinates, board: Square[][]): boolean =>
@@ -117,10 +117,7 @@ function getOpponentKingCoord(state: FENState): Coordinates | undefined {
 }
 
 export function calcIfKingUnderCheck(state: FENState): boolean {
-  const kingCoord = getPieceCoord(
-    piecesByColor[state.activeColor].king,
-    state.board
-  );
+  const kingCoord = getOwnKingCoord(state);
   if (!kingCoord) return false;
   return isCellUnderCheck(
     state,

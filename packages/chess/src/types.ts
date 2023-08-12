@@ -115,5 +115,7 @@ export interface ChessState extends FENState {
   movesBoard: Array<Array<Array<Move>>>;
   isGameOver: boolean;
   isCheckmate: boolean;
+  isCheck: boolean;
+  isStalemate: boolean;
   isDraw: boolean;
 }

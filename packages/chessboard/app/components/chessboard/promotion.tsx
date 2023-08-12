@@ -31,23 +31,29 @@ export function Promotion({
                     Choose a piece to promote to
                   </h3>
                   <div className="mt-2">
-                    {moves.map(move => (
-                      <button key={move.piece} onClick={() => onSelect(move)}>
-                        <Piece
-                          piece={move.flags.promotion || ''}
-                          fill={
-                            isWhitePiece(move.flags.promotion || '')
-                              ? '#ffffff'
-                              : '#000000'
-                          }
-                          stroke={
-                            isWhitePiece(move.flags.promotion || '')
-                              ? '#000000'
-                              : '#ffffff'
-                          }
-                        />
-                      </button>
-                    ))}
+                    {moves.map(
+                      move =>
+                        move.flags.promotion && (
+                          <button
+                            key={move.piece}
+                            onClick={() => onSelect(move)}
+                          >
+                            <Piece
+                              piece={move.flags.promotion[0] || ''}
+                              fill={
+                                isWhitePiece(move.flags.promotion[0] || '')
+                                  ? '#ffffff'
+                                  : '#000000'
+                              }
+                              stroke={
+                                isWhitePiece(move.flags.promotion[0] || '')
+                                  ? '#000000'
+                                  : '#ffffff'
+                              }
+                            />
+                          </button>
+                        )
+                    )}
                   </div>
                 </div>
               </div>

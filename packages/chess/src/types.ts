@@ -62,22 +62,6 @@ export interface Move extends MoveBase {
   san: Array<string>;
 }
 
-export type GameMode = keyof typeof modes;
-
-export type Variant = 'standard' | 'chess960';
-
-export type FENString = string;
-
-export interface ChessBaseState {
-  mode: GameMode;
-  FEN: FENString;
-}
-
-export interface ChessInitialState {
-  mode: GameMode;
-  FEN: FENString;
-}
-
 export type ChessColor = 'w' | 'b';
 
 export interface CastlingRights {
@@ -100,19 +84,32 @@ export interface FENState {
   fullMoves: number;
 }
 
-export interface InternalState extends FENState {
-  mode: GameMode;
-  FEN: FENString;
-  error?: string;
+export interface PGNState {
+  event?: string;
+  site?: string;
+  date?: string;
+  round?: string;
+  white?: string;
+  black?: string;
+  result?: '*' | '1-0' | '0-1' | '1/2-1/2';
+  moves?: Move[];
 }
 
-export interface ChessState extends FENState {
+export type GameMode = keyof typeof modes;
+
+export type Variant = 'standard' | 'chess960';
+
+export interface ChessInitialState extends PGNState {
+  mode: GameMode;
+  FEN: string;
+}
+
+export interface ChessState extends ChessInitialState, FENState, PGNState {
   ranks: Ranks;
   files: Files;
-  mode: GameMode;
-  FEN: FENString;
   error?: string;
-  movesBoard: Array<Array<Array<Move>>>;
+  movesBoard: Move[][][];
+  PGN: string;
   isGameOver: boolean;
   isCheckmate: boolean;
   isCheck: boolean;

@@ -1,4 +1,4 @@
-import type { FENString, Variant } from '@chess/chess';
+import type { Variant } from '@chess/chess';
 import type { LoaderArgs } from '@remix-run/node';
 import { redirect, json } from '@remix-run/node';
 import { useLoaderData, useNavigate } from '@remix-run/react';
@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid';
 
 export const loader = ({ request }: LoaderArgs) => {
   const url = new URL(request.url);
-  const FEN: FENString = url.searchParams.get('FEN') as FENString;
+  const FEN = url.searchParams.get('FEN');
   const variant: Variant = url.searchParams.get('variant') as Variant;
   if (!FEN || !variant) {
     return redirect('/play');
@@ -24,8 +24,29 @@ export default function NewGame() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { FEN, mode } = chess.start({ FEN: data.FEN, mode: 'standard' });
-    setItem(`chess-game-${data.id}`, { FEN, mode });
+    const { FEN, mode, PGN, event, site, date, round, white, black, result } =
+      chess.start({
+        FEN: data.FEN,
+        mode: 'standard',
+        event: 'Local game',
+        site: 'localhost',
+        date: new Date().toISOString(),
+        round: '1',
+        white: 'White',
+        black: 'Black',
+      });
+    setItem(`chess-game-${data.id}`, {
+      FEN,
+      PGN,
+      mode,
+      event,
+      site,
+      date,
+      round,
+      white,
+      black,
+      result,
+    });
     navigate(`/games/${data.id}`);
   }, []);
 

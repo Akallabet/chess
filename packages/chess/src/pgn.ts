@@ -3,15 +3,20 @@ import { Move, PGNState } from './types.js';
 // specs https://www.chessclub.com/help/PGN-spec
 
 function buildPGNMoves(moves: Move[]) {
-  const movesString = moves
-    .map((move, i) => {
-      const { san } = move;
+  return moves
+    .reduce((acc, move) => {
+      const lastMove = acc[acc.length - 1];
+      if (Array.isArray(lastMove) && lastMove.length === 1) {
+        acc[acc.length - 1].push(move);
+      } else {
+        acc.push([move]);
+      }
+      return acc;
+    }, [] as Move[][])
+    .map(([white, black], i) => {
       const moveNumber = i + 1;
-      return `${moveNumber}. ${san}`;
-    })
-    .join(' ');
-
-  return `${movesString}`;
+      return `${moveNumber}. ${white.san} ${black?.san}`;
+    });
 }
 
 export function buildPGNString({
@@ -34,5 +39,5 @@ export function buildPGNString({
     `[Result "${result}"]`,
   ];
   const movesString = buildPGNMoves(moves);
-  return headerTags.join('\n') + movesString + '\n\n';
+  return headerTags.concat(movesString).join('\n') + '\n\n';
 }

@@ -57,7 +57,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     (isCheckmate && ((FENState.activeColor === 'w' && '0-1') || '1-0')) ||
     '*';
 
-  return {
+  const newState = {
     ...FENState,
     mode: state.mode || modes.standard,
     files,
@@ -78,6 +78,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     isDraw,
     isStalemate,
   };
+  return newState;
 }
 
 export function start(initialState: ChessInitialState): ChessState {
@@ -96,9 +97,9 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
       state.halfMoves,
       state.fullMoves
     );
-    if (!inputState.moves) inputState.moves = [];
-    inputState.moves.push(move);
-    return deriveState(FENStateWithMove, inputState);
+    if (!state.moves) state.moves = [];
+    state.moves.push(move);
+    return deriveState(FENStateWithMove, state);
   } catch (e) {
     return state;
   }

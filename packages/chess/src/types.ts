@@ -89,7 +89,7 @@ export interface PGNState {
   round?: string;
   white?: string;
   black?: string;
-  result?: '*' | '1-0' | '0-1' | '1/2-1/2';
+  result?: string;
   moves?: Move[];
 }
 

@@ -45,20 +45,20 @@ function buildSanString({
 }
 
 export function translateMoveToSAN(
-  moveSquare: Array<Move>,
+  moveSquare: Move[],
   moveIndex: number
 ): Array<string> {
   const move = moveSquare[moveIndex];
 
   const file = files[move.target.x];
   const rank = ranks[move.target.y];
-  const capture = move.flags.capture ? 'x' : '';
-  const check = move.flags.check ? '+' : '';
-  const checkmate = move.flags.checkmate ? '#' : '';
+  const capture = move.capture ? 'x' : '';
+  const check = move.check ? '+' : '';
+  const checkmate = move.checkmate ? '#' : '';
   const promotion = '=';
   const origin = [
     (!isPawn(move.piece) && move.piece) ||
-      (move.flags.capture && files[move.origin.x]) ||
+      (move.capture && files[move.origin.x]) ||
       '',
   ];
   const destination = [capture, file, String(rank), check, checkmate];
@@ -68,15 +68,15 @@ export function translateMoveToSAN(
     if (
       i !== moveIndex &&
       moveSquare[i].piece === move.piece &&
-      !moveSquare[i].flags.promotion &&
+      !moveSquare[i].promotion &&
       (moveSquare[i].origin.x === move.origin.x ||
         moveSquare[i].origin.y === move.origin.y)
     ) {
       ambiguousIndexes.push(i);
     }
   }
-  if (move.flags.promotion) {
-    return move.flags.promotion.map(piece =>
+  if (move.promotion) {
+    return move.promotion.map(piece =>
       buildSanString({
         ambiguousIndexes,
         origin,
@@ -87,10 +87,10 @@ export function translateMoveToSAN(
       })
     );
   }
-  if (move.flags.kingSideCastling) {
+  if (move.kingSideCastling) {
     return ['O-O'];
   }
-  if (move.flags.queenSideCastling) {
+  if (move.queenSideCastling) {
     return ['O-O-O'];
   }
 

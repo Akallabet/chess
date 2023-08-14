@@ -71,6 +71,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     site: state.site,
     white: state.white,
     black: state.black,
+    moves: state.moves,
     isGameOver,
     isCheckmate,
     isCheck: isKingUnderCheck && !isCheckmate,
@@ -86,8 +87,9 @@ export function start(initialState: ChessInitialState): ChessState {
 export function move(san: string, inputState: ChessInitialState): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
   try {
+    const move = translateSANToMove(san, state.movesBoard);
     const FENStateWithMove = updateFENStateWithMove(
-      translateSANToMove(san, state.movesBoard),
+      move,
       state.board,
       state.activeColor,
       state.castlingRights,

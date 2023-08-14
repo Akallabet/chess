@@ -201,7 +201,6 @@ t.test('Board with moves', t => {
     {
       origin: { y: 6, x: 1 },
       target: { y: 4, x: 1 },
-      flags: { move: true },
       piece: 'P',
     },
     board

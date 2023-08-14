@@ -67,7 +67,6 @@ export const piecesByColor = {
 
 export const flags = {
   capture: 'capture',
-  move: 'move',
   selected: 'selected',
   check: 'check',
   promotion: 'promotion',

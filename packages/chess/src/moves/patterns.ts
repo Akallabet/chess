@@ -77,7 +77,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return stopIfOpponent({ step, origin, target, state });
       },
       addFlags: ({ target }) => ({
-        [flags.move]: true,
         ...(target.y === 7
           ? {
               [flags.promotion]: [
@@ -154,7 +153,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
         return stopIfOpponent({ step, origin, target, state });
       },
       addFlags: ({ target }) => ({
-        [flags.move]: true,
         ...(target.y === 0
           ? {
               [flags.promotion]: [
@@ -323,7 +321,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
         );
       },
       addFlags: () => ({
-        [flags.move]: true,
         [flags.kingSideCastling]: true,
       }),
       recursive: true,
@@ -349,7 +346,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
         );
       },
       addFlags: () => ({
-        [flags.move]: true,
         [flags.queenSideCastling]: true,
       }),
       recursive: true,
@@ -384,7 +380,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
         );
       },
       addFlags: () => ({
-        [flags.move]: true,
         [flags.kingSideCastling]: true,
       }),
       recursive: true,
@@ -410,7 +405,6 @@ const basePatterns: Record<string, Array<Pattern>> = {
         );
       },
       addFlags: () => ({
-        [flags.move]: true,
         [flags.queenSideCastling]: true,
       }),
 

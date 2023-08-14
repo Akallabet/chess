@@ -142,23 +142,26 @@ const changeActiveColor = (activeColor: ChessColor): ChessColor =>
 export function updateBoardWithMove(move: MoveBase, board: Square[][]) {
   const boardWithMove = board.map(row => row.map(cell => cell));
 
-  if (move.flags.enPassant) {
-    boardWithMove[move.flags.enPassant.y][move.flags.enPassant.x] = emptySquare;
+  if (move.enPassant) {
+    boardWithMove[move.enPassant.y][move.enPassant.x] = emptySquare;
     boardWithMove[move.target.y][move.target.x] =
       boardWithMove[move.origin.y][move.origin.x];
-  } else if (move.flags.promotion) {
-    boardWithMove[move.target.y][move.target.x] = move.flags.promotion[0];
-  } else if (move.flags.kingSideCastling) {
+  } else if (move.promotion) {
+    boardWithMove[move.target.y][move.target.x] = move.promotion[0];
+  } else if (move.kingSideCastling) {
     boardWithMove[move.target.y][move.target.x] =
       boardWithMove[move.origin.y][move.origin.x];
     boardWithMove[move.target.y][5] = boardWithMove[move.target.y][7];
     boardWithMove[move.target.y][7] = emptySquare;
-  } else if (move.flags.queenSideCastling) {
+  } else if (move.queenSideCastling) {
     boardWithMove[move.target.y][move.target.x] =
       boardWithMove[move.origin.y][move.origin.x];
     boardWithMove[move.target.y][3] = boardWithMove[move.target.y][0];
     boardWithMove[move.target.y][0] = emptySquare;
-  } else if (move.flags.capture || move.flags.move) {
+  } else if (move.capture) {
+    boardWithMove[move.target.y][move.target.x] =
+      boardWithMove[move.origin.y][move.origin.x];
+  } else {
     boardWithMove[move.target.y][move.target.x] =
       boardWithMove[move.origin.y][move.origin.x];
   }
@@ -186,8 +189,7 @@ function updateCastlingRights(
   activeColor: string,
   castlingRights: CastlingRights
 ) {
-  const isCastlingMove =
-    move.flags.kingSideCastling || move.flags.queenSideCastling;
+  const isCastlingMove = move.kingSideCastling || move.queenSideCastling;
   return {
     w: {
       kingSide:
@@ -241,7 +243,7 @@ export function updateFENStateWithMove(
     ),
     board: updateBoardWithMove(move, board),
     activeColor: changeActiveColor(activeColor),
-    halfMoves: isPawn(move.piece) || move.flags.capture ? 0 : halfMoves + 1,
+    halfMoves: isPawn(move.piece) || move.capture ? 0 : halfMoves + 1,
     fullMoves: activeColor === colours.b ? fullMoves + 1 : fullMoves,
     enPassant: updateEnPassant(move),
   };

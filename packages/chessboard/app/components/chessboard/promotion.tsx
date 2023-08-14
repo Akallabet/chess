@@ -33,20 +33,20 @@ export function Promotion({
                   <div className="mt-2">
                     {moves.map(
                       move =>
-                        move.flags.promotion && (
+                        move.promotion && (
                           <button
                             key={move.piece}
                             onClick={() => onSelect(move)}
                           >
                             <Piece
-                              piece={move.flags.promotion[0] || ''}
+                              piece={move.promotion[0] || ''}
                               fill={
-                                isWhitePiece(move.flags.promotion[0] || '')
+                                isWhitePiece(move.promotion[0] || '')
                                   ? '#ffffff'
                                   : '#000000'
                               }
                               stroke={
-                                isWhitePiece(move.flags.promotion[0] || '')
+                                isWhitePiece(move.promotion[0] || '')
                                   ? '#000000'
                                   : '#ffffff'
                               }

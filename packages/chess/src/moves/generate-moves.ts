@@ -52,11 +52,9 @@ const generateMovesFromPatterns = ({
             piece,
             origin,
             target: target,
-            flags: {
-              ...(pattern.addFlags
-                ? pattern.addFlags({ step, target, origin, state })
-                : { [flags.capture]: true }),
-            },
+            ...(pattern.addFlags
+              ? pattern.addFlags({ step, target, origin, state })
+              : { [flags.capture]: true }),
           });
         }
         break;
@@ -65,11 +63,9 @@ const generateMovesFromPatterns = ({
         piece,
         origin,
         target: target,
-        flags: {
-          ...(pattern.addFlags
-            ? pattern.addFlags({ step, target, origin, state })
-            : { [flags.move]: true }),
-        },
+        ...(pattern.addFlags
+          ? pattern.addFlags({ step, target, origin, state })
+          : {}),
       });
       step++;
       lastMove = moves[moves.length - 1];
@@ -157,10 +153,10 @@ function generateLegalMoves(state: FENState): Array<MoveBase> {
       ) {
         const pieceMoves = generateMoves({ y, x }, state, patterns[square])
           .map(move => {
-            if (move.flags.promotion) {
-              return move.flags.promotion.map(promotion => ({
+            if (move.promotion) {
+              return move.promotion.map(promotion => ({
                 ...move,
-                flags: { ...move.flags, promotion: [promotion] },
+                promotion: [promotion],
               }));
             }
             return move;
@@ -198,11 +194,10 @@ function calcCheckFlags(
 export function generateLegalMovesForActiveSide(
   state: FENState
 ): Array<MoveBase> {
-  return generateLegalMoves(state).map(move => ({
-    ...move,
-    flags: {
-      ...move.flags,
+  return generateLegalMoves(state).map(move => {
+    return {
+      ...move,
       ...calcCheckFlags(move, state),
-    },
-  }));
+    };
+  });
 }

@@ -39,7 +39,6 @@ export type ChessBoardAddress = `${File}${Rank}`;
 
 export interface Flags {
   capture?: boolean;
-  move?: boolean;
   check?: boolean;
   checkmate?: boolean;
   promotion?: Piece[];
@@ -51,15 +50,14 @@ export interface Flags {
 export type EmptySquare = '';
 export type Square = Piece | EmptySquare;
 
-export interface MoveBase {
+export interface MoveBase extends Flags {
   piece: Piece;
   origin: Coordinates;
   target: Coordinates;
-  flags: Flags;
 }
 
 export interface Move extends MoveBase {
-  san: Array<string>;
+  san: string[];
 }
 
 export type ChessColor = 'w' | 'b';

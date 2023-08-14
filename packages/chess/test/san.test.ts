@@ -1,4 +1,5 @@
 import t from 'tap';
+import { piecesMap } from '../src/constants.js';
 import { start } from '../src/index.js';
 import { translateMoveToSAN, translateSANToMove } from '../src/san.js';
 import { Move } from '../src/types.js';
@@ -8,10 +9,9 @@ t.test('translateMoveToSAN', t => {
 
   t.test('only one pawn', t => {
     const move: Move = {
-      piece: 'P',
+      piece: piecesMap.P,
       origin: { x: 2, y: 6 },
       target: { x: 2, y: 4 },
-      flags: {},
       san: [''],
     };
     const moveSquare = [move];
@@ -23,17 +23,15 @@ t.test('translateMoveToSAN', t => {
   t.test(' two knights with different files and ranks', t => {
     const moveSquare = [
       {
-        piece: 'N',
+        piece: piecesMap.N,
         origin: { x: 2, y: 5 },
         target: { x: 4, y: 4 },
-        flags: {},
         san: [''],
       },
       {
-        piece: 'N',
+        piece: piecesMap.N,
         origin: { x: 6, y: 3 },
         target: { x: 4, y: 4 },
-        flags: {},
         san: [''],
       },
     ];
@@ -45,17 +43,15 @@ t.test('translateMoveToSAN', t => {
   t.test(' two rooks with same file and different ranks', t => {
     const moveSquare = [
       {
-        piece: 'R',
+        piece: piecesMap.R,
         origin: { x: 3, y: 3 },
         target: { x: 3, y: 4 },
-        flags: {},
         san: [''],
       },
       {
-        piece: 'R',
+        piece: piecesMap.R,
         origin: { x: 3, y: 7 },
         target: { x: 3, y: 4 },
-        flags: {},
         san: [''],
       },
     ];
@@ -67,7 +63,7 @@ t.test('translateMoveToSAN', t => {
   t.test('two rooks with same rank and different files', t => {
     const moveSquare = [
       {
-        piece: 'R',
+        piece: piecesMap.R,
         origin: {
           x: 0,
           y: 6,
@@ -76,13 +72,10 @@ t.test('translateMoveToSAN', t => {
           x: 1,
           y: 6,
         },
-        flags: {
-          move: true,
-        },
         san: [''],
       },
       {
-        piece: 'R',
+        piece: piecesMap.R,
         origin: {
           x: 7,
           y: 6,
@@ -90,9 +83,6 @@ t.test('translateMoveToSAN', t => {
         target: {
           x: 1,
           y: 6,
-        },
-        flags: {
-          move: true,
         },
         san: [''],
       },
@@ -104,10 +94,10 @@ t.test('translateMoveToSAN', t => {
 
   t.test('Pawn capture', t => {
     const move: Move = {
-      piece: 'P',
+      piece: piecesMap.P,
       origin: { x: 2, y: 6 },
       target: { x: 3, y: 5 },
-      flags: { capture: true },
+      capture: true,
       san: [''],
     };
     const moveSquare = [move];
@@ -136,7 +126,6 @@ t.test('translateSANToMove', t => {
       origin: { x: 4, y: 7 },
       target: { x: 4, y: 1 },
       san: ['Qe7'],
-      flags: { move: true },
     };
 
     const game = start({ FEN, mode: 'standard' });
@@ -153,7 +142,6 @@ t.test('translateSANToMove', t => {
       origin: { x: 4, y: 7 },
       target: { x: 4, y: 1 },
       san: [san],
-      flags: { move: true },
     };
 
     const game = start({ FEN, mode: 'standard' });
@@ -169,7 +157,6 @@ t.test('translateSANToMove', t => {
       origin: { x: 2, y: 6 },
       target: { x: 2, y: 5 },
       san: [san],
-      flags: { move: true },
     };
     t.same(
       translateSANToMove(san, start({ FEN, mode: 'standard' }).movesBoard),
@@ -195,7 +182,6 @@ t.test('translateSANToMove', t => {
       origin: { x: 5, y: 7 },
       target: { x: 3, y: 5 },
       san: [san],
-      flags: { move: true },
     };
     t.same(
       translateSANToMove(san, start({ FEN, mode: 'standard' }).movesBoard),

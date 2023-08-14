@@ -14,12 +14,12 @@ const compareByMove = (a, b) => {
   if (a.target.x < b.target.x) return -1;
   if (a.target.y > b.target.y) return 1;
   if (a.target.y < b.target.y) return -1;
-  if (a.flags.selected && !b.flags.selected) return 1;
-  if (!a.flags.selected && b.flags.selected) return -1;
-  if (a.flags.move && !b.flags.move) return 1;
-  if (!a.flags.move && b.flags.move) return -1;
-  if (a.flags.capture && !b.flags.capture) return 1;
-  if (!a.flags.capture && b.flags.capture) return -1;
+  if (a.selected && !b.selected) return 1;
+  if (!a.selected && b.selected) return -1;
+  if (a.move && !b.move) return 1;
+  if (!a.move && b.move) return -1;
+  if (a.capture && !b.capture) return 1;
+  if (!a.capture && b.capture) return -1;
   return 0;
 };
 
@@ -37,8 +37,8 @@ t.test('Get moves - Black pawn - rank 7', t => {
   const origin = { x: 4, y: 1 };
   const input = generateMoves(origin, state, patterns['p']);
   const expected = [
-    { target: { x: 4, y: 2 }, flags: { move: true }, piece: 'p' },
-    { target: { x: 4, y: 3 }, flags: { move: true }, piece: 'p' },
+    { target: { x: 4, y: 2 }, piece: 'p' },
+    { target: { x: 4, y: 3 }, piece: 'p' },
   ].map(addOrigin(origin));
 
   t.same(input, expected);
@@ -54,7 +54,6 @@ t.test('Get moves - Black pawn - after rank 7', t => {
     [
       {
         target: { x: 4, y: 3 },
-        flags: { move: true },
         origin: { x: 4, y: 2 },
         piece: 'p',
       },
@@ -83,12 +82,12 @@ t.test('Get moves - Black pawn - moves and captures', t => {
       patterns['p']
     ),
     [
-      { target: { x: 4, y: 2 }, flags: { move: true }, piece: 'p' },
-      { target: { x: 4, y: 3 }, flags: { move: true }, piece: 'p' },
+      { target: { x: 4, y: 2 }, piece: 'p' },
+      { target: { x: 4, y: 3 }, piece: 'p' },
       {
         target: { x: 3, y: 2 },
-        flags: { capture: true },
         piece: 'p',
+        capture: true,
       },
     ].map(addOrigin(origin))
   );
@@ -103,11 +102,11 @@ t.test('Get moves - White pawn - moves and captures', t => {
       patterns['P']
     ),
     [
-      { target: { x: 4, y: 5 }, flags: { move: true } },
-      { target: { x: 4, y: 4 }, flags: { move: true } },
+      { target: { x: 4, y: 5 } },
+      { target: { x: 4, y: 4 } },
       {
         target: { x: 3, y: 5 },
-        flags: { capture: true },
+        capture: true,
       },
     ]
       .map(addOrigin(origin))
@@ -123,10 +122,7 @@ t.test('Select pawn on file h', t => {
       start({ mode: 'demo', FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' }),
       patterns['p']
     ),
-    [
-      { target: { x: 7, y: 2 }, flags: { move: true } },
-      { target: { x: 7, y: 3 }, flags: { move: true } },
-    ]
+    [{ target: { x: 7, y: 2 } }, { target: { x: 7, y: 3 } }]
       .map(addOrigin(origin))
       .map(addPiece('p'))
   );
@@ -143,14 +139,14 @@ t.test('Select knight', t => {
   t.same(
     actual,
     [
-      { target: { x: 6, y: 4 }, flags: { move: true } },
-      { target: { x: 5, y: 5 }, flags: { move: true } },
-      { target: { x: 3, y: 5 }, flags: { move: true } },
-      { target: { x: 2, y: 4 }, flags: { move: true } },
-      { target: { x: 2, y: 2 }, flags: { move: true } },
-      { target: { x: 3, y: 1 }, flags: { move: true } },
-      { target: { x: 5, y: 1 }, flags: { move: true } },
-      { target: { x: 6, y: 2 }, flags: { move: true } },
+      { target: { x: 6, y: 4 } },
+      { target: { x: 5, y: 5 } },
+      { target: { x: 3, y: 5 } },
+      { target: { x: 2, y: 4 } },
+      { target: { x: 2, y: 2 } },
+      { target: { x: 3, y: 1 } },
+      { target: { x: 5, y: 1 } },
+      { target: { x: 6, y: 2 } },
     ]
       .sort(compareByMove)
       .map(addOrigin(origin))
@@ -161,17 +157,17 @@ t.test('Select knight', t => {
 t.test('Highlight Bishop moves', t => {
   const origin = { x: 4, y: 3 };
   const expected = [
-    { target: { x: 3, y: 2 }, flags: { move: true } },
-    { target: { x: 2, y: 1 }, flags: { move: true } },
-    { target: { x: 1, y: 0 }, flags: { move: true } },
-    { target: { x: 5, y: 2 }, flags: { move: true } },
-    { target: { x: 6, y: 1 }, flags: { move: true } },
-    { target: { x: 7, y: 0 }, flags: { move: true } },
-    { target: { x: 2, y: 5 }, flags: { move: true } },
-    { target: { x: 1, y: 6 }, flags: { capture: true } },
-    { target: { x: 5, y: 4 }, flags: { move: true } },
-    { target: { x: 3, y: 4 }, flags: { move: true } },
-    { target: { x: 6, y: 5 }, flags: { move: true } },
+    { target: { x: 3, y: 2 } },
+    { target: { x: 2, y: 1 } },
+    { target: { x: 1, y: 0 } },
+    { target: { x: 5, y: 2 } },
+    { target: { x: 6, y: 1 } },
+    { target: { x: 7, y: 0 } },
+    { target: { x: 2, y: 5 } },
+    { target: { x: 1, y: 6 }, capture: true },
+    { target: { x: 5, y: 4 } },
+    { target: { x: 3, y: 4 } },
+    { target: { x: 6, y: 5 } },
   ];
   t.same(
     generateMoves(
@@ -185,18 +181,18 @@ t.test('Highlight Bishop moves', t => {
 });
 t.test('Highlight Rook moves', t => {
   const expected = [
-    { target: { x: 4, y: 4 }, flags: { move: true } },
-    { target: { x: 4, y: 5 }, flags: { move: true } },
-    { target: { x: 4, y: 6 }, flags: { capture: true } },
-    { target: { x: 4, y: 2 }, flags: { move: true } },
-    { target: { x: 4, y: 1 }, flags: { move: true } },
-    { target: { x: 4, y: 0 }, flags: { move: true } },
-    { target: { x: 3, y: 3 }, flags: { move: true } },
-    { target: { x: 2, y: 3 }, flags: { move: true } },
-    { target: { x: 1, y: 3 }, flags: { move: true } },
-    { target: { x: 0, y: 3 }, flags: { move: true } },
-    { target: { x: 5, y: 3 }, flags: { move: true } },
-    { target: { x: 6, y: 3 }, flags: { move: true } },
+    { target: { x: 4, y: 4 } },
+    { target: { x: 4, y: 5 } },
+    { target: { x: 4, y: 6 }, capture: true },
+    { target: { x: 4, y: 2 } },
+    { target: { x: 4, y: 1 } },
+    { target: { x: 4, y: 0 } },
+    { target: { x: 3, y: 3 } },
+    { target: { x: 2, y: 3 } },
+    { target: { x: 1, y: 3 } },
+    { target: { x: 0, y: 3 } },
+    { target: { x: 5, y: 3 } },
+    { target: { x: 6, y: 3 } },
   ];
   const origin = { x: 4, y: 3 };
   t.same(
@@ -212,29 +208,29 @@ t.test('Highlight Rook moves', t => {
 
 t.test('Highlight Queen moves', t => {
   const expected = [
-    { target: { x: 5, y: 3 }, flags: { move: true } },
-    { target: { x: 6, y: 3 }, flags: { move: true } },
-    { target: { x: 3, y: 3 }, flags: { move: true } },
-    { target: { x: 4, y: 4 }, flags: { move: true } },
-    { target: { x: 4, y: 5 }, flags: { move: true } },
-    { target: { x: 4, y: 6 }, flags: { capture: true } },
-    { target: { x: 4, y: 2 }, flags: { move: true } },
-    { target: { x: 4, y: 1 }, flags: { move: true } },
-    { target: { x: 4, y: 0 }, flags: { move: true } },
-    { target: { x: 2, y: 3 }, flags: { move: true } },
-    { target: { x: 1, y: 3 }, flags: { move: true } },
-    { target: { x: 0, y: 3 }, flags: { move: true } },
-    { target: { x: 3, y: 2 }, flags: { move: true } },
-    { target: { x: 2, y: 1 }, flags: { move: true } },
-    { target: { x: 1, y: 0 }, flags: { move: true } },
-    { target: { x: 5, y: 2 }, flags: { move: true } },
-    { target: { x: 6, y: 1 }, flags: { move: true } },
-    { target: { x: 7, y: 0 }, flags: { move: true } },
-    { target: { x: 2, y: 5 }, flags: { move: true } },
-    { target: { x: 1, y: 6 }, flags: { capture: true } },
-    { target: { x: 5, y: 4 }, flags: { move: true } },
-    { target: { x: 3, y: 4 }, flags: { move: true } },
-    { target: { x: 6, y: 5 }, flags: { move: true } },
+    { target: { x: 5, y: 3 } },
+    { target: { x: 6, y: 3 } },
+    { target: { x: 3, y: 3 } },
+    { target: { x: 4, y: 4 } },
+    { target: { x: 4, y: 5 } },
+    { target: { x: 4, y: 6 }, capture: true },
+    { target: { x: 4, y: 2 } },
+    { target: { x: 4, y: 1 } },
+    { target: { x: 4, y: 0 } },
+    { target: { x: 2, y: 3 } },
+    { target: { x: 1, y: 3 } },
+    { target: { x: 0, y: 3 } },
+    { target: { x: 3, y: 2 } },
+    { target: { x: 2, y: 1 } },
+    { target: { x: 1, y: 0 } },
+    { target: { x: 5, y: 2 } },
+    { target: { x: 6, y: 1 } },
+    { target: { x: 7, y: 0 } },
+    { target: { x: 2, y: 5 } },
+    { target: { x: 1, y: 6 }, capture: true },
+    { target: { x: 5, y: 4 } },
+    { target: { x: 3, y: 4 } },
+    { target: { x: 6, y: 5 } },
   ];
   const origin = { x: 4, y: 3 };
   t.same(
@@ -249,14 +245,14 @@ t.test('Highlight Queen moves', t => {
 });
 t.test('Highlight King moves', t => {
   const expected = [
-    { target: { x: 4, y: 2 }, flags: { move: true } },
-    { target: { x: 4, y: 4 }, flags: { move: true } },
-    { target: { x: 5, y: 4 }, flags: { move: true } },
-    { target: { x: 3, y: 4 }, flags: { move: true } },
-    { target: { x: 3, y: 2 }, flags: { move: true } },
-    { target: { x: 5, y: 2 }, flags: { move: true } },
-    { target: { x: 5, y: 3 }, flags: { move: true } },
-    { target: { x: 3, y: 3 }, flags: { move: true } },
+    { target: { x: 4, y: 2 } },
+    { target: { x: 4, y: 4 } },
+    { target: { x: 5, y: 4 } },
+    { target: { x: 3, y: 4 } },
+    { target: { x: 3, y: 2 } },
+    { target: { x: 5, y: 2 } },
+    { target: { x: 5, y: 3 } },
+    { target: { x: 3, y: 3 } },
   ];
   const origin = { x: 4, y: 3 };
   t.same(
@@ -276,37 +272,31 @@ t.test('Highligh moves with king under check', t => {
       piece: 'k',
       origin: { x: 6, y: 0 },
       target: { x: 7, y: 0 },
-      flags: { move: true },
     },
     {
       piece: 'k',
       origin: { x: 6, y: 0 },
       target: { x: 5, y: 0 },
-      flags: { move: true },
     },
     {
       piece: 'k',
       origin: { x: 6, y: 0 },
       target: { x: 6, y: 1 },
-      flags: { move: true },
     },
     {
       piece: 'k',
       origin: { x: 6, y: 0 },
       target: { x: 7, y: 1 },
-      flags: { move: true },
     },
     {
       piece: 'p',
       origin: { x: 3, y: 1 },
       target: { x: 3, y: 3 },
-      flags: { move: true },
     },
     {
       piece: 'p',
       origin: { x: 4, y: 1 },
       target: { x: 4, y: 2 },
-      flags: { move: true },
     },
   ];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
@@ -319,7 +309,7 @@ t.test('Highligh moves with king under check', t => {
 
 t.test('Highlight moves of king under check', t => {
   const FEN = 'rnbqkbnr/ppp2ppp/8/1B1pp3/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 1';
-  // const expected = [{ target: { x: 4, y: 1 }, flags: { move: true } }];
+  // const expected = [{ target: { x: 4, y: 1 },  }];
   const expected = [
     {
       piece: 'n',
@@ -331,9 +321,6 @@ t.test('Highlight moves of king under check', t => {
         x: 3,
         y: 1,
       },
-      flags: {
-        move: true,
-      },
     },
     {
       piece: 'n',
@@ -344,9 +331,6 @@ t.test('Highlight moves of king under check', t => {
       target: {
         x: 2,
         y: 2,
-      },
-      flags: {
-        move: true,
       },
     },
     {
@@ -359,9 +343,6 @@ t.test('Highlight moves of king under check', t => {
         x: 3,
         y: 1,
       },
-      flags: {
-        move: true,
-      },
     },
     {
       piece: 'q',
@@ -372,9 +353,6 @@ t.test('Highlight moves of king under check', t => {
       target: {
         x: 3,
         y: 1,
-      },
-      flags: {
-        move: true,
       },
     },
     {
@@ -387,9 +365,6 @@ t.test('Highlight moves of king under check', t => {
         x: 4,
         y: 1,
       },
-      flags: {
-        move: true,
-      },
     },
     {
       piece: 'p',
@@ -400,9 +375,6 @@ t.test('Highlight moves of king under check', t => {
       target: {
         x: 2,
         y: 2,
-      },
-      flags: {
-        move: true,
       },
     },
   ];
@@ -423,10 +395,10 @@ t.test(
         piece: 'k',
         origin,
         target: { x: 6, y: 0 },
-        flags: { move: true, kingSideCastling: true },
+        kingSideCastling: true,
       },
-      { piece: 'k', origin, target: { x: 5, y: 0 }, flags: { move: true } },
-      { piece: 'k', origin, target: { x: 4, y: 1 }, flags: { move: true } },
+      { piece: 'k', origin, target: { x: 5, y: 0 } },
+      { piece: 'k', origin, target: { x: 4, y: 1 } },
     ];
     const actual = generateLegalMovesForActiveSide({
       ...fromFEN(FEN),
@@ -442,14 +414,14 @@ t.test(
     const FEN = 'r3kb1r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
     const origin = { x: 4, y: 0 };
     const expected = [
-      { piece: 'k', origin, target: { y: 0, x: 3 }, flags: { move: true } },
+      { piece: 'k', origin, target: { y: 0, x: 3 } },
       {
         piece: 'k',
         origin,
         target: { y: 0, x: 2 },
-        flags: { move: true, queenSideCastling: true },
+        queenSideCastling: true,
       },
-      { piece: 'k', origin, target: { y: 1, x: 4 }, flags: { move: true } },
+      { piece: 'k', origin, target: { y: 1, x: 4 } },
     ];
     const actual = generateMoves(
       origin,
@@ -467,19 +439,19 @@ t.test('Highlight kingside and queenside castling for white', t => {
   const FEN = 'r3kb1r/pppp1ppp/3bpn2/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1';
   const origin = { x: 4, y: 7 };
   const expected = [
-    { piece: 'K', origin, target: { y: 7, x: 3 }, flags: { move: true } },
+    { piece: 'K', origin, target: { y: 7, x: 3 } },
     {
       piece: 'K',
       origin,
       target: { y: 7, x: 2 },
-      flags: { move: true, queenSideCastling: true },
+      queenSideCastling: true,
     },
-    { piece: 'K', origin, target: { y: 7, x: 5 }, flags: { move: true } },
+    { piece: 'K', origin, target: { y: 7, x: 5 } },
     {
       piece: 'K',
       origin,
       target: { y: 7, x: 6 },
-      flags: { move: true, kingSideCastling: true },
+      kingSideCastling: true,
     },
   ];
   const actual = generateLegalMovesForActiveSide({
@@ -492,7 +464,7 @@ t.test('Highlight kingside and queenside castling for white', t => {
 t.test('No castling moves if one of the castling cells is under check', t => {
   const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const origin = { x: 4, y: 0 };
-  const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
+  const expected = [{ target: { x: 3, y: 0 } }];
   const actual = generateLegalMovesForActiveSide(
     start({ FEN, mode: 'standard' })
   ).filter(({ piece }) => piece === 'k');
@@ -505,7 +477,7 @@ t.test('No castling moves if one of the castling cells is under check', t => {
 
 t.test('No castling moves if one of the castling cells is occupied', t => {
   const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
-  const expected = [{ target: { x: 3, y: 0 }, flags: { move: true } }];
+  const expected = [{ target: { x: 3, y: 0 } }];
   const origin = { x: 4, y: 0 };
   const actual = generateLegalMovesForActiveSide(
     start({ FEN, mode: 'standard' })
@@ -524,67 +496,57 @@ t.test('Highlight check', t => {
       piece: 'K',
       origin: { x: 4, y: 7 },
       target: { x: 3, y: 7 },
-      flags: { move: true },
     },
     {
       piece: 'K',
       origin: { x: 4, y: 7 },
       target: { x: 4, y: 6 },
-      flags: { move: true },
     },
     {
       piece: 'K',
       origin: { x: 4, y: 7 },
       target: { x: 5, y: 6 },
-      flags: { move: true },
     },
     {
       piece: 'K',
       origin: { x: 4, y: 7 },
       target: { x: 3, y: 6 },
-      flags: { move: true },
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 6, y: 6 },
-      flags: { move: true },
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 7, y: 5 },
-      flags: { move: true },
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 4, y: 6 },
-      flags: { move: true },
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 3, y: 5 },
-      flags: { move: true },
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 2, y: 4 },
-      flags: { move: true },
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 1, y: 3 },
-      flags: { move: true, check: true },
+      check: true,
     },
     {
       piece: 'B',
       origin: { x: 5, y: 7 },
       target: { x: 0, y: 2 },
-      flags: { move: true },
     },
   ];
   const actual = generateLegalMovesForActiveSide(
@@ -600,7 +562,7 @@ t.test('Highlight checkmate', t => {
   const moves = generateLegalMovesForActiveSide({
     ...FENState,
   });
-  const checkMateMoves = moves.filter(({ flags }) => flags.checkmate);
+  const checkMateMoves = moves.filter(move => move.checkmate);
   t.same(checkMateMoves.length, 4);
   t.end();
 });

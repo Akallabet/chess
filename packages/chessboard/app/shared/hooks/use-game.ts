@@ -57,10 +57,10 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         },
         action: (pos, move) => {
           if (move && selected) {
-            if (move.flags.promotion) {
+            if (move.promotion) {
               setPromotionPieces(
                 game.movesBoard[pos.y][pos.x].filter(
-                  m => m.flags.promotion && m.flags.promotion[0]
+                  m => m.promotion && m.promotion[0]
                 )
               );
               return;

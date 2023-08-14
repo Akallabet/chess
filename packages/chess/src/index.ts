@@ -96,6 +96,8 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
       state.halfMoves,
       state.fullMoves
     );
+    if (!inputState.moves) inputState.moves = [];
+    inputState.moves.push(move);
     return deriveState(FENStateWithMove, inputState);
   } catch (e) {
     return state;

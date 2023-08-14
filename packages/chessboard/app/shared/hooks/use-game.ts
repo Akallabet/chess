@@ -29,7 +29,8 @@ export const useGame = (gameId: string): GameOutput | undefined => {
 
   useEffect(() => {
     if (game) {
-      const { FEN, PGN, mode, event, date, site, white, black, result } = game;
+      const { FEN, PGN, mode, event, date, site, white, black, result, moves } =
+        game;
       setItem(`chess-game-${gameId}`, {
         FEN,
         PGN,
@@ -40,6 +41,7 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         white,
         black,
         result,
+        moves,
       });
     }
   }, [game, setItem, gameId]);

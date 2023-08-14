@@ -24,17 +24,28 @@ export default function NewGame() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { FEN, mode, PGN, event, site, date, round, white, black, result } =
-      chess.start({
-        FEN: data.FEN,
-        mode: 'standard',
-        event: 'Local game',
-        site: 'localhost',
-        date: new Date().toISOString(),
-        round: '1',
-        white: 'White',
-        black: 'Black',
-      });
+    const {
+      FEN,
+      mode,
+      PGN,
+      event,
+      site,
+      date,
+      round,
+      white,
+      black,
+      result,
+      moves,
+    } = chess.start({
+      FEN: data.FEN,
+      mode: 'standard',
+      event: 'Local game',
+      site: 'localhost',
+      date: new Date().toISOString(),
+      round: '1',
+      white: 'White',
+      black: 'Black',
+    });
     setItem(`chess-game-${data.id}`, {
       FEN,
       PGN,
@@ -46,6 +57,7 @@ export default function NewGame() {
       white,
       black,
       result,
+      moves,
     });
     navigate(`/games/${data.id}`);
   }, []);

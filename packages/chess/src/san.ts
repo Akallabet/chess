@@ -57,7 +57,7 @@ export function translateMoveToSAN(
   const checkmate = move.checkmate ? '#' : '';
   const promotion = '=';
   const origin = [
-    (!isPawn(move.piece) && move.piece) ||
+    (!isPawn(move.piece) && move.piece.toUpperCase()) ||
       (move.capture && files[move.origin.x]) ||
       '',
   ];

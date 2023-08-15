@@ -78,7 +78,7 @@ t.test('Move', t => {
     const FEN =
       'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
     const state = start({ FEN, mode: 'standard' });
-    const firstMove = move('nc6', state);
+    const firstMove = move('Nc6', state);
     t.same(
       firstMove.FEN,
       'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 50 100'

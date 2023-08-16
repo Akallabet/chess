@@ -2,7 +2,27 @@ import { Move, PGNState } from './types.js';
 
 // specs https://www.chessclub.com/help/PGN-spec
 
-function buildPGNMoves(moves: Move[]) {
+function buildPGNTags({
+  event = '?',
+  site = '?',
+  date = `????.??.??`,
+  round = '?',
+  white = '?',
+  black = '?',
+  result = '*',
+}: PGNState) {
+  return [
+    `[Event "${event}"]`,
+    `[Site "${site}"]`,
+    `[Date "${date}"]`,
+    `[Round "${round}"]`,
+    `[White "${white}"]`,
+    `[Black "${black}"]`,
+    `[Result "${result}"]`,
+  ];
+}
+
+function buildPGNMoveText({ moves = [] }: PGNState) {
   return moves
     .reduce((acc, move) => {
       const lastMove = acc[acc.length - 1];
@@ -14,30 +34,19 @@ function buildPGNMoves(moves: Move[]) {
       return acc;
     }, [] as Move[][])
     .map(([white, black], i) => {
-      const moveNumber = i + 1;
-      return `${moveNumber}. ${white.san} ${black?.san}`;
-    });
+      return [`${i + 1}.`, white.san || '...', black?.san].filter(Boolean);
+    })
+    .map(moveText => moveText.join(' '));
 }
 
-export function buildPGNString({
-  event = '?',
-  site = '?',
-  date = `????.??.??`,
-  round = '?',
-  white = '?',
-  black = '?',
-  result = '*',
-  moves = [],
-}: PGNState) {
-  const headerTags = [
-    `[Event "${event}"]`,
-    `[Site "${site}"]`,
-    `[Date "${date}"]`,
-    `[Round "${round}"]`,
-    `[White "${white}"]`,
-    `[Black "${black}"]`,
-    `[Result "${result}"]`,
-  ];
-  const movesString = buildPGNMoves(moves);
-  return headerTags.concat(movesString).join('\n') + '\n\n';
+function buildResult({ result = '*' }: PGNState) {
+  return result !== '*' ? ` ${result}` : '';
+}
+
+export function buildPGNString(state: PGNState) {
+  return (
+    [...buildPGNTags(state), ...buildPGNMoveText(state)].join('\n') +
+    buildResult(state) +
+    '\n\n'
+  );
 }

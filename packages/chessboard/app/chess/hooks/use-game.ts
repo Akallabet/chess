@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { ChessState, Coordinates, Move } from '@chess/chess';
 import * as chess from '@chess/chess';
-import { useLocalStorage } from './use-local-storage';
+import { useLocalStorage } from '~/shared/hooks/use-local-storage';
 
 export type GameAction = (pos: Coordinates, move: Move | undefined) => void;
 
-interface GameOutput {
+export interface GameOutput {
   game: ChessState;
   selected?: Coordinates;
   highlightedMoves: Array<Move>;

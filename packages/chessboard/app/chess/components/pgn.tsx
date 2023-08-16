@@ -1,18 +1,21 @@
 import type { ChessState, Move } from '@chess/chess';
 
+interface PGNMove extends Move {
+  index: number;
+}
 export function Pgn({ moves = [] }: ChessState) {
   return (
     <div className="flex w-80 flex-col overflow-hidden">
       {moves
-        .reduce((acc, move) => {
+        .reduce((acc, move, index) => {
           const lastMove = acc[acc.length - 1];
           if (Array.isArray(lastMove) && lastMove.length === 1) {
-            acc[acc.length - 1].push(move);
+            acc[acc.length - 1].push({ ...move, index });
           } else {
-            acc.push([move]);
+            acc.push([{ ...move, index }]);
           }
           return acc;
-        }, [] as Move[][])
+        }, [] as PGNMove[][])
         .map((movePair, i) => {
           return (
             <p key={i}>

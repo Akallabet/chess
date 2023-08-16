@@ -1,8 +1,9 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { ChessBoard } from '~/components/chessboard';
-import { useGame } from '~/shared/hooks/use-game';
+import { ChessBoard } from '~/chess/components';
+import { Provider as ChessProvider } from '~/chess/components/provider';
+import { useGame } from '~/chess/hooks/use-game';
 
 export const loader = ({ params }: LoaderArgs) => {
   const { gameId } = params;
@@ -16,15 +17,9 @@ export default function Game() {
   return game ? (
     <div>
       <div className="my-5" />
-      {game && (
-        <ChessBoard
-          game={game.game}
-          highlightedMoves={game.highlightedMoves}
-          promotionMoves={game.promotionMoves}
-          onCellClick={game.action}
-          onPromotion={game.promote}
-        />
-      )}
+      <ChessProvider gameId={gameId}>
+        <ChessBoard />
+      </ChessProvider>
     </div>
   ) : (
     'Loading'

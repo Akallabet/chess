@@ -4,6 +4,7 @@ import { Promotion } from './promotion';
 import { Piece } from './piece';
 import type { GameAction } from '~/shared/hooks/use-game';
 import { Pgn } from './pgn';
+import { MatchController } from './match-controller';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
@@ -25,7 +26,7 @@ export const ChessBoard = ({
   onPromotion,
   onCellClick,
 }: ChessBoardProps) => (
-  <div className="h-auto w-auto">
+  <div className="h-full w-auto">
     {promotionMoves && promotionMoves.length > 0 && (
       <Promotion moves={promotionMoves} onSelect={move => onPromotion(move)} />
     )}
@@ -91,17 +92,7 @@ export const ChessBoard = ({
         </div>
       </div>
       <div className="mx-5">
-        <div>
-          <div className="text-center text-2xl font-bold">Moves</div>
-          {game.isGameOver ? (
-            <div>
-              <p>{game.isCheckmate && 'Checkmate'}</p>
-            </div>
-          ) : null}
-          <div>
-            <Pgn {...game} />
-          </div>
-        </div>
+        <MatchController {...game} />
       </div>
     </div>
   </div>

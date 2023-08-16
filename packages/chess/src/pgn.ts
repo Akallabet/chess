@@ -1,4 +1,4 @@
-import { PGNState } from './types.js';
+import { Move, PGNState } from './types.js';
 
 // specs https://www.chessclub.com/help/PGN-spec
 
@@ -24,6 +24,15 @@ function buildPGNTags({
 
 function buildPGNMoveText({ moves = [] }: PGNState) {
   return moves
+    .reduce((acc, move) => {
+      const lastMove = acc[acc.length - 1];
+      if (Array.isArray(lastMove) && lastMove.length === 1) {
+        acc[acc.length - 1].push(move);
+      } else {
+        acc.push([move]);
+      }
+      return acc;
+    }, [] as Move[][])
     .map(([white, black], i) => {
       return [`${i + 1}.`, white.san || '...', black?.san].filter(Boolean);
     })

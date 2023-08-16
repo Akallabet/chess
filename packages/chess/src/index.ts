@@ -98,12 +98,7 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
       state.halfMoves,
       state.fullMoves
     );
-    const lastMove = state.moves[state.moves.length - 1];
-    if (Array.isArray(lastMove) && lastMove.length === 1) {
-      state.moves[state.moves.length - 1].push(move);
-    } else {
-      state.moves.push([move]);
-    }
+    state.moves.push(move);
     return deriveState(FENStateWithMove, state);
   } catch (e) {
     return state;

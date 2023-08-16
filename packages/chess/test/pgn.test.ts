@@ -37,30 +37,34 @@ t.test('Build PGN string', t => {
         black: 'Black',
         result: '*',
         moves: [
-          {
-            san: ['e4'],
-            target: { x: 4, y: 6 },
-            piece: 'P',
-            origin: { x: 4, y: 7 },
-          },
-          {
-            san: ['e5'],
-            target: { x: 4, y: 4 },
-            piece: 'p',
-            origin: { x: 4, y: 2 },
-          },
-          {
-            san: ['Nf3'],
-            target: { x: 6, y: 5 },
-            piece: 'N',
-            origin: { x: 7, y: 7 },
-          },
-          {
-            san: ['Nc6'],
-            target: { x: 1, y: 5 },
-            piece: 'n',
-            origin: { x: 0, y: 7 },
-          },
+          [
+            {
+              san: ['e4'],
+              target: { x: 4, y: 6 },
+              piece: 'P',
+              origin: { x: 4, y: 7 },
+            },
+            {
+              san: ['e5'],
+              target: { x: 4, y: 4 },
+              piece: 'p',
+              origin: { x: 4, y: 2 },
+            },
+          ],
+          [
+            {
+              san: ['Nf3'],
+              target: { x: 6, y: 5 },
+              piece: 'N',
+              origin: { x: 7, y: 7 },
+            },
+            {
+              san: ['Nc6'],
+              target: { x: 1, y: 5 },
+              piece: 'n',
+              origin: { x: 0, y: 7 },
+            },
+          ],
         ],
       })
     );
@@ -82,92 +86,100 @@ t.test('Build PGN string', t => {
         black: 'Black',
         result: '1-0',
         moves: [
-          {
-            piece: 'P',
-            origin: {
-              y: 6,
-              x: 4,
+          [
+            {
+              piece: 'P',
+              origin: {
+                y: 6,
+                x: 4,
+              },
+              target: {
+                y: 4,
+                x: 4,
+              },
+              san: ['e4'],
             },
-            target: {
-              y: 4,
-              x: 4,
+            {
+              piece: 'p',
+              origin: {
+                y: 1,
+                x: 4,
+              },
+              target: {
+                y: 3,
+                x: 4,
+              },
+              san: ['e5'],
             },
-            san: ['e4'],
-          },
-          {
-            piece: 'p',
-            origin: {
-              y: 1,
-              x: 4,
+          ],
+          [
+            {
+              piece: 'B',
+              origin: {
+                y: 7,
+                x: 5,
+              },
+              target: {
+                y: 4,
+                x: 2,
+              },
+              san: ['Bc4'],
             },
-            target: {
-              y: 3,
-              x: 4,
+            {
+              piece: 'p',
+              origin: {
+                y: 1,
+                x: 1,
+              },
+              target: {
+                y: 2,
+                x: 1,
+              },
+              san: ['b6'],
             },
-            san: ['e5'],
-          },
-          {
-            piece: 'B',
-            origin: {
-              y: 7,
-              x: 5,
+          ],
+          [
+            {
+              piece: 'Q',
+              origin: {
+                y: 7,
+                x: 3,
+              },
+              target: {
+                y: 5,
+                x: 5,
+              },
+              san: ['Qf3'],
             },
-            target: {
-              y: 4,
-              x: 2,
+            {
+              piece: 'p',
+              origin: {
+                y: 1,
+                x: 6,
+              },
+              target: {
+                y: 2,
+                x: 6,
+              },
+              san: ['g6'],
             },
-            san: ['Bc4'],
-          },
-          {
-            piece: 'p',
-            origin: {
-              y: 1,
-              x: 1,
+          ],
+          [
+            {
+              piece: 'Q',
+              origin: {
+                y: 5,
+                x: 5,
+              },
+              target: {
+                y: 1,
+                x: 5,
+              },
+              capture: true,
+              checkmate: true,
+              san: ['Qxf7#'],
             },
-            target: {
-              y: 2,
-              x: 1,
-            },
-            san: ['b6'],
-          },
-          {
-            piece: 'Q',
-            origin: {
-              y: 7,
-              x: 3,
-            },
-            target: {
-              y: 5,
-              x: 5,
-            },
-            san: ['Qf3'],
-          },
-          {
-            piece: 'p',
-            origin: {
-              y: 1,
-              x: 6,
-            },
-            target: {
-              y: 2,
-              x: 6,
-            },
-            san: ['g6'],
-          },
-          {
-            piece: 'Q',
-            origin: {
-              y: 5,
-              x: 5,
-            },
-            target: {
-              y: 1,
-              x: 5,
-            },
-            capture: true,
-            checkmate: true,
-            san: ['Qxf7#'],
-          },
+          ],
         ],
       })
     );

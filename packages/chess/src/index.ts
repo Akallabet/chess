@@ -87,6 +87,7 @@ export function start(initialState: ChessInitialState): ChessState {
 
 export function move(san: string, inputState: ChessInitialState): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
+  if (!state.moves) state.moves = [];
   try {
     const move = translateSANToMove(san, state.movesBoard);
     const FENStateWithMove = updateFENStateWithMove(
@@ -97,8 +98,12 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
       state.halfMoves,
       state.fullMoves
     );
-    if (!state.moves) state.moves = [];
-    state.moves.push(move);
+    const lastMove = state.moves[state.moves.length - 1];
+    if (Array.isArray(lastMove) && lastMove.length === 1) {
+      state.moves[state.moves.length - 1].push(move);
+    } else {
+      state.moves.push([move]);
+    }
     return deriveState(FENStateWithMove, state);
   } catch (e) {
     return state;

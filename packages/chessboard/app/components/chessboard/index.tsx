@@ -3,6 +3,7 @@ import type { Move, ChessState } from '@chess/chess';
 import { Promotion } from './promotion';
 import { Piece } from './piece';
 import type { GameAction } from '~/shared/hooks/use-game';
+import { Pgn } from './pgn';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = (n: number) => !isEven(n);
@@ -97,6 +98,9 @@ export const ChessBoard = ({
               <p>{game.isCheckmate && 'Checkmate'}</p>
             </div>
           ) : null}
+          <div>
+            <Pgn {...game} />
+          </div>
         </div>
       </div>
     </div>

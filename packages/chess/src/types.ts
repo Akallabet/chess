@@ -90,7 +90,7 @@ export interface PGNState {
   white?: string;
   black?: string;
   result?: string;
-  moves?: Move[];
+  moves?: Move[][];
 }
 
 export type GameMode = keyof typeof modes;

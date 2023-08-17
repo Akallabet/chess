@@ -60,6 +60,10 @@ export interface Move extends MoveBase {
   san: string[];
 }
 
+export interface PGNMove extends Move {
+  FEN: string;
+}
+
 export type ChessColor = 'w' | 'b';
 
 export interface CastlingRights {
@@ -90,7 +94,7 @@ export interface PGNState {
   white?: string;
   black?: string;
   result?: string;
-  moves?: Move[];
+  moves?: PGNMove[];
 }
 
 export type GameMode = keyof typeof modes;
@@ -100,6 +104,7 @@ export type Variant = 'standard' | 'chess960';
 export interface ChessInitialState extends PGNState {
   mode: GameMode;
   FEN: string;
+  currentMove?: number;
 }
 
 export interface ChessState extends ChessInitialState, FENState, PGNState {

@@ -1,4 +1,5 @@
 import type { ChessState, Move } from '@chess/chess';
+import { useChess } from '../hooks/use-chess';
 
 interface PGNMove extends Move {
   index: number;

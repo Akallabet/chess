@@ -42,7 +42,11 @@ export function createMovesBoard(
   return movesBoard;
 }
 
-function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
+function deriveState(
+  FENState: FENState,
+  state: ChessInitialState,
+  currentMove: number
+): ChessState {
   const moves = generateLegalMovesForActiveSide(FENState);
 
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
@@ -71,7 +75,8 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     site: state.site,
     white: state.white,
     black: state.black,
-    moves: state.moves,
+    moves: state.moves || [],
+    currentMove,
     isGameOver,
     isCheckmate,
     isCheck: isKingUnderCheck && !isCheckmate,
@@ -82,11 +87,19 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
 }
 
 export function start(initialState: ChessInitialState): ChessState {
-  return deriveState(fromFEN(initialState.FEN), initialState);
+  return deriveState(
+    fromFEN(initialState.FEN),
+    initialState,
+    initialState.currentMove || 0
+  );
 }
 
 export function move(san: string, inputState: ChessInitialState): ChessState {
-  const state = deriveState(fromFEN(inputState.FEN), inputState);
+  const state = deriveState(
+    fromFEN(inputState.FEN),
+    inputState,
+    inputState.currentMove || 0
+  );
   if (!state.moves) state.moves = [];
   try {
     const move = translateSANToMove(san, state.movesBoard);
@@ -98,11 +111,32 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
       state.halfMoves,
       state.fullMoves
     );
-    state.moves.push(move);
-    return deriveState(FENStateWithMove, state);
+    state.moves.push({ ...move, FEN: toFEN(FENStateWithMove) });
+    return deriveState(FENStateWithMove, state, state.moves.length - 1);
   } catch (e) {
     return state;
   }
+}
+
+export function goToMove(
+  index: number,
+  inputState: ChessInitialState
+): ChessState {
+  const state = deriveState(
+    fromFEN(inputState.FEN),
+    inputState,
+    inputState.currentMove || 0
+  );
+  if (!state.moves || !state.moves[index]) return state;
+  const move = state.moves[index];
+  return deriveState(fromFEN(move.FEN), inputState, index);
+}
+
+export function moveBack(inputState: ChessInitialState): ChessState {
+  const currentMove = inputState.currentMove || 0;
+  if (!inputState.moves || !inputState.moves.length)
+    return deriveState(fromFEN(inputState.FEN), inputState, currentMove);
+  return goToMove(currentMove - 1, inputState);
 }
 
 export function moves(coord: Coordinates, state: ChessState): Array<Move> {

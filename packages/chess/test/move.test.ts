@@ -1,5 +1,5 @@
 import t from 'tap';
-import { move, start } from '../src/index.js';
+import { goToMove, move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.test('Move', t => {
@@ -162,6 +162,29 @@ t.test('Move', t => {
     t.same(
       'rnbqkbnr/pppppppp/8/2P5/8/8/PPPPPPPP/2KR1BNR b kq - 1 1',
       kingsideCastlingMove.FEN
+    );
+    t.end();
+  });
+});
+t.test('Go To Move', t => {
+  t.plan(1);
+
+  t.test('Go to first move', t => {
+    const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    const state = move('e4', start({ FEN, mode: 'standard' }));
+    t.same(
+      state.FEN,
+      'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
+    );
+    const state2 = move('e5', state);
+    t.same(
+      state2.FEN,
+      'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2'
+    );
+    const state3 = goToMove(0, state2);
+    t.same(
+      'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+      state3.FEN
     );
     t.end();
   });

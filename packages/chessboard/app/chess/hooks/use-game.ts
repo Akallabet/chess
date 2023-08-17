@@ -11,6 +11,7 @@ export interface GameOutput {
   highlightedMoves: Array<Move>;
   promotionMoves?: Move[];
   promote: (move: Move) => void;
+  moveBack: () => void;
   action: GameAction;
 }
 
@@ -56,6 +57,10 @@ export const useGame = (gameId: string): GameOutput | undefined => {
           setGame(chess.move(move.san[0], game));
           setSelected(undefined);
           setPromotionPieces(undefined);
+        },
+        moveBack: () => {
+          setGame(chess.moveBack(game));
+          setSelected(undefined);
         },
         action: (pos, move) => {
           if (move && selected) {

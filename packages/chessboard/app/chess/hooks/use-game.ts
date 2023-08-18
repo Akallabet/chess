@@ -12,6 +12,7 @@ export interface GameOutput {
   promotionMoves?: Move[];
   promote: (move: Move) => void;
   moveBack: () => void;
+  moveForward: () => void;
   action: GameAction;
 }
 
@@ -74,6 +75,10 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         },
         moveBack: () => {
           setGame(chess.moveBack(game));
+          setSelected(undefined);
+        },
+        moveForward: () => {
+          setGame(chess.moveForward(game));
           setSelected(undefined);
         },
         action: (pos, move) => {

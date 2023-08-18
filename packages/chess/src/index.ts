@@ -133,6 +133,11 @@ export function moveBack(inputState: ChessInitialState): ChessState {
   return goToMove(inputState.currentMove - 1, inputState);
 }
 
+export function moveForward(inputState: ChessInitialState): ChessState {
+  if (!inputState.moves[inputState.currentMove + 1])
+    return deriveState(fromFEN(inputState.FEN), inputState);
+  return goToMove(inputState.currentMove + 1, inputState);
+}
 export function moves(coord: Coordinates, state: ChessState): Array<Move> {
   const moves = [];
   for (const row of state.movesBoard) {

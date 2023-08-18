@@ -3,7 +3,7 @@ import { useChess } from '../hooks/use-chess';
 import { Pgn } from './pgn';
 
 export function MatchController(props: ChessState) {
-  const { moveBack } = useChess();
+  const { moveBack, moveForward } = useChess();
   return (
     <div className="h-full">
       <div className="text-center text-2xl font-bold">Moves</div>
@@ -22,7 +22,10 @@ export function MatchController(props: ChessState) {
         >
           {'<'}
         </button>
-        <button className="bg-blue-500 hover:bg-blue-700 text-black rounded px-4 py-2 font-bold">
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-black rounded px-4 py-2 font-bold"
+          onClick={moveForward}
+        >
           {'>'}
         </button>
       </div>

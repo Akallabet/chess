@@ -104,6 +104,7 @@ export type Variant = 'standard' | 'chess960';
 export interface ChessStartState extends PGNState {
   mode: GameMode;
   FEN: string;
+  initialFEN?: string;
   currentMove?: number;
 }
 export interface ChessInitialState extends PGNState {

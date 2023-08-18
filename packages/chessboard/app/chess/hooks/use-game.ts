@@ -13,6 +13,8 @@ export interface GameOutput {
   promote: (move: Move) => void;
   moveBack: () => void;
   moveForward: () => void;
+  moveToStart: () => void;
+  moveToEnd: () => void;
   action: GameAction;
 }
 
@@ -79,6 +81,14 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         },
         moveForward: () => {
           setGame(chess.moveForward(game));
+          setSelected(undefined);
+        },
+        moveToStart: () => {
+          setGame(chess.moveToStart(game));
+          setSelected(undefined);
+        },
+        moveToEnd: () => {
+          setGame(chess.moveToEnd(game));
           setSelected(undefined);
         },
         action: (pos, move) => {

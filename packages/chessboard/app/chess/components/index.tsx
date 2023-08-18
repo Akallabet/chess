@@ -1,4 +1,3 @@
-import { FENForm } from './fen-form';
 import { Promotion } from './promotion';
 import { Piece } from './piece';
 import { MatchController } from './match-controller';
@@ -83,10 +82,6 @@ export const ChessBoard = () => {
                 })}
               </div>
             ))}
-          </div>
-          <div className="my-5" />
-          <div className="mx-auto max-w-md">
-            <FENForm FEN={game.FEN} />
           </div>
         </div>
         <div className="mx-5">

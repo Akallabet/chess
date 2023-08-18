@@ -101,18 +101,26 @@ export type GameMode = keyof typeof modes;
 
 export type Variant = 'standard' | 'chess960';
 
-export interface ChessInitialState extends PGNState {
+export interface ChessStartState extends PGNState {
   mode: GameMode;
   FEN: string;
   currentMove?: number;
 }
+export interface ChessInitialState extends PGNState {
+  mode: GameMode;
+  FEN: string;
+  initialFEN: string;
+  currentMove: number;
+  moves: PGNMove[];
+}
 
-export interface ChessState extends ChessInitialState, FENState, PGNState {
+export interface ChessState extends ChessInitialState, FENState {
   ranks: Ranks;
   files: Files;
   error?: string;
   movesBoard: Move[][][];
   PGN: string;
+  moves: PGNMove[];
   isGameOver: boolean;
   isCheckmate: boolean;
   isCheck: boolean;

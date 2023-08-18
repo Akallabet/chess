@@ -26,6 +26,7 @@ export default function NewGame() {
   useEffect(() => {
     const {
       FEN,
+      initialFEN,
       mode,
       PGN,
       event,
@@ -36,6 +37,7 @@ export default function NewGame() {
       black,
       result,
       moves,
+      currentMove,
     } = chess.start({
       FEN: data.FEN,
       mode: 'standard',
@@ -48,6 +50,7 @@ export default function NewGame() {
     });
     setItem(`chess-game-${data.id}`, {
       FEN,
+      initialFEN,
       PGN,
       mode,
       event,
@@ -58,6 +61,7 @@ export default function NewGame() {
       black,
       result,
       moves,
+      currentMove,
     });
     navigate(`/games/${data.id}`);
   }, []);

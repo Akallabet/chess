@@ -89,7 +89,7 @@ export function start(initialState: ChessStartState): ChessState {
     ...initialState,
     initialFEN: initialState.FEN,
     moves: initialState.moves || [],
-    currentMove: initialState.currentMove || 0,
+    currentMove: initialState.currentMove || -1,
   });
 }
 

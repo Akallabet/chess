@@ -15,6 +15,7 @@ export interface GameOutput {
   moveForward: () => void;
   moveToStart: () => void;
   moveToEnd: () => void;
+  resign: () => void;
   action: GameAction;
 }
 
@@ -89,6 +90,10 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         },
         moveToEnd: () => {
           setGame(chess.moveToEnd(game));
+          setSelected(undefined);
+        },
+        resign: () => {
+          setGame(chess.resign(game));
           setSelected(undefined);
         },
         action: (pos, move) => {

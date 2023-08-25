@@ -133,10 +133,15 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
 
 export function draw(inputState: ChessInitialState): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
-  state.result = '1/2-1/2';
-  state.isGameOver = true;
-  state.isDraw = true;
-  return state;
+  return deriveState(fromFEN(inputState.FEN), { ...state, result: '1/2-1/2' });
+}
+
+export function resign(inputState: ChessInitialState): ChessState {
+  const state = deriveState(fromFEN(inputState.FEN), inputState);
+  return deriveState(fromFEN(inputState.FEN), {
+    ...state,
+    result: state.activeColor === 'w' ? '0-1' : '1-0',
+  });
 }
 
 export function goToMove(

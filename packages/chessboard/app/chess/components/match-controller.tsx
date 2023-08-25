@@ -9,7 +9,9 @@ export function MatchController(props: ChessState) {
       <div className="text-center text-2xl font-bold">Moves</div>
       {props.isGameOver ? (
         <div>
-          <p>{props.isCheckmate && 'Checkmate'}</p>
+          <p>
+            {(props.isCheckmate && 'Checkmate') || (props.isDraw && 'Draw')}
+          </p>
         </div>
       ) : null}
       <div>

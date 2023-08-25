@@ -18,6 +18,18 @@ function NewGameModal() {
     const fen = formData.get('fen') as string;
     const id = nanoid();
 
+    const input = {
+      PGN: pgn,
+      FEN: fen,
+      mode: 'standard',
+      event: 'Local game',
+      site: 'localhost',
+      date: new Date().toISOString(),
+      round: '1',
+      white: 'White',
+      black: 'Black',
+    };
+
     const {
       FEN,
       initialFEN,
@@ -32,17 +44,7 @@ function NewGameModal() {
       result,
       moves,
       currentMove,
-    } = chess.start({
-      PGN: pgn,
-      FEN: fen,
-      mode: 'standard',
-      event: 'Local game',
-      site: 'localhost',
-      date: new Date().toISOString(),
-      round: '1',
-      white: 'White',
-      black: 'Black',
-    });
+    } = pgn ? chess.startFromPGN(input) : chess.start(input);
     setItem(`chess-game-${id}`, {
       FEN,
       initialFEN,

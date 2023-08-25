@@ -96,12 +96,11 @@ function startFromFEN(state: ChessStartStateFEN): ChessState {
   });
 }
 
-function startFromPGN(state: ChessStartStatePGN): ChessState {
+export function startFromPGN(state: ChessStartStatePGN): ChessState {
   return fromPGNString(state.PGN);
 }
 
 export function start(state: ChessStartState): ChessState {
-  if (state.PGN) return startFromPGN(state as ChessStartStatePGN);
   return startFromFEN(state as ChessStartStateFEN);
 }
 

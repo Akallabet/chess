@@ -1,5 +1,5 @@
 import { startingFEN } from './constants.js';
-import { draw, move, start } from './index.js';
+import { draw, move, moveInternal, start } from './index.js';
 import { ChessState, Move, PGNState, PGNTag } from './types.js';
 
 // specs https://www.chessclub.com/help/PGN-spec
@@ -105,7 +105,7 @@ export function fromPGNString(pgn: string): ChessState {
           return acc;
         }
         if (acc.flag === 'san') {
-          acc.state = move(curr, acc.state);
+          acc.state = moveInternal(curr, acc.state);
           return acc;
         }
         return acc;

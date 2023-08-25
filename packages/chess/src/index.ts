@@ -107,8 +107,10 @@ export function start(state: ChessStartStateFEN): ChessState {
     currentMove: state.currentMove || -1,
   });
 }
-
-export function move(san: string, inputState: ChessInitialState): ChessState {
+export function moveInternal(
+  san: string,
+  inputState: ChessInitialState
+): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
   if (inputState.currentMove !== inputState.moves.length - 1) {
     return state;
@@ -131,13 +133,21 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
   }
 }
 
+export function move(san: string, inputState: ChessInitialState): ChessState {
+  const state = deriveState(fromFEN(inputState.FEN), inputState);
+  if (state.isGameOver) return state;
+  return moveInternal(san, state);
+}
+
 export function draw(inputState: ChessInitialState): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
+  if (state.isGameOver) return state;
   return deriveState(fromFEN(inputState.FEN), { ...state, result: '1/2-1/2' });
 }
 
 export function resign(inputState: ChessInitialState): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
+  if (state.isGameOver) return state;
   return deriveState(fromFEN(inputState.FEN), {
     ...state,
     result: state.activeColor === 'w' ? '0-1' : '1-0',

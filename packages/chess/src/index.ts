@@ -9,6 +9,8 @@ import {
   Square,
   MoveBase,
   ChessStartState,
+  ChessStartStatePGN,
+  ChessStartStateFEN,
 } from './types.js';
 
 import {
@@ -16,7 +18,7 @@ import {
   calcIfKingUnderCheck,
 } from './moves/index.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
-import { buildPGNString } from './pgn.js';
+import { buildPGNString, fromPGNString } from './pgn.js';
 
 export function createMovesBoard(
   board: Square[][],
@@ -71,6 +73,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     event: state.event,
     date: state.date,
     site: state.site,
+    round: state.round,
     white: state.white,
     black: state.black,
     moves: state.moves,
@@ -84,13 +87,22 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
   return newState;
 }
 
-export function start(state: ChessStartState): ChessState {
-  return deriveState(fromFEN(state.FEN), {
+function startFromFEN(state: ChessStartStateFEN): ChessState {
+  return deriveState(fromFEN(state.initialFEN || state.FEN), {
     ...state,
     initialFEN: state.initialFEN || state.FEN,
     moves: state.moves || [],
     currentMove: state.currentMove || -1,
   });
+}
+
+function startFromPGN(state: ChessStartStatePGN): ChessState {
+  return fromPGNString(state.PGN);
+}
+
+export function start(state: ChessStartState): ChessState {
+  if (state.PGN) return startFromPGN(state as ChessStartStatePGN);
+  return startFromFEN(state as ChessStartStateFEN);
 }
 
 export function move(san: string, inputState: ChessInitialState): ChessState {
@@ -108,12 +120,20 @@ export function move(san: string, inputState: ChessInitialState): ChessState {
       state.halfMoves,
       state.fullMoves
     );
-    state.moves.push({ ...move, FEN: toFEN(FENStateWithMove) });
+    state.moves = [...state.moves, { ...move, FEN: toFEN(FENStateWithMove) }];
     state.currentMove = state.moves.length - 1;
     return deriveState(FENStateWithMove, state);
   } catch (e) {
     return state;
   }
+}
+
+export function draw(inputState: ChessInitialState): ChessState {
+  const state = deriveState(fromFEN(inputState.FEN), inputState);
+  state.result = '1/2-1/2';
+  state.isGameOver = true;
+  state.isDraw = true;
+  return state;
 }
 
 export function goToMove(

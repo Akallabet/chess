@@ -10,12 +10,13 @@ import { nanoid } from 'nanoid';
 export const loader = ({ request }: LoaderArgs) => {
   const url = new URL(request.url);
   const FEN = url.searchParams.get('FEN');
+  const PGN = url.searchParams.get('PGN');
   const variant: Variant = url.searchParams.get('variant') as Variant;
   if (!FEN || !variant) {
     return redirect('/play');
   }
   const id = nanoid();
-  return json({ FEN, variant, id });
+  return json({ FEN, PGN, variant, id });
 };
 
 export default function NewGame() {
@@ -39,6 +40,7 @@ export default function NewGame() {
       moves,
       currentMove,
     } = chess.start({
+      PGN: data.PGN,
       FEN: data.FEN,
       mode: 'standard',
       event: 'Local game',

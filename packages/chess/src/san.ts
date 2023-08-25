@@ -12,23 +12,26 @@ function buildSanString({
   moveSquare,
 }: {
   ambiguousIndexes: Array<number>;
-  origin: Array<string>;
+  origin: string;
   destination: Array<string>;
   promotion?: string;
   move: Move;
   moveSquare: Array<Move>;
 }): string {
   if (ambiguousIndexes.length === 0)
-    return [...origin, ...destination, promotion].join('');
+    return [origin, ...destination, promotion].join('');
 
   if (ambiguousIndexes.every(i => move.origin.x !== moveSquare[i].origin.x)) {
-    return [...origin, files[move.origin.x], ...destination, promotion].join(
-      ''
-    );
+    return [
+      isPawn(move.piece) ? '' : move.piece.toUpperCase(),
+      files[move.origin.x],
+      ...destination,
+      promotion,
+    ].join('');
   }
   if (ambiguousIndexes.every(i => move.origin.y !== moveSquare[i].origin.y)) {
     return [
-      ...origin,
+      origin,
       String(ranks[move.origin.y]),
       ...destination,
       promotion,
@@ -56,11 +59,11 @@ export function translateMoveToSAN(
   const check = move.check ? '+' : '';
   const checkmate = move.checkmate ? '#' : '';
   const promotion = '=';
-  const origin = [
+  const origin =
     (!isPawn(move.piece) && move.piece.toUpperCase()) ||
-      (move.capture && files[move.origin.x]) ||
-      '',
-  ];
+    (move.capture && files[move.origin.x]) ||
+    '';
+
   const destination = [capture, file, String(rank), check, checkmate];
 
   const ambiguousIndexes: Array<number> = [];
@@ -68,9 +71,7 @@ export function translateMoveToSAN(
     if (
       i !== moveIndex &&
       moveSquare[i].piece === move.piece &&
-      !moveSquare[i].promotion &&
-      (moveSquare[i].origin.x === move.origin.x ||
-        moveSquare[i].origin.y === move.origin.y)
+      !moveSquare[i].promotion
     ) {
       ambiguousIndexes.push(i);
     }

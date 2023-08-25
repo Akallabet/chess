@@ -86,6 +86,15 @@ export interface FENState {
   fullMoves: number;
 }
 
+export type PGNTag =
+  | 'event'
+  | 'site'
+  | 'date'
+  | 'round'
+  | 'white'
+  | 'black'
+  | 'result';
+
 export interface PGNState {
   event?: string;
   site?: string;
@@ -103,10 +112,19 @@ export type Variant = 'standard' | 'chess960';
 
 export interface ChessStartState extends PGNState {
   mode: GameMode;
-  FEN: string;
+  FEN?: string;
+  PGN?: string;
   initialFEN?: string;
   currentMove?: number;
 }
+
+export interface ChessStartStatePGN extends ChessStartState {
+  PGN: string;
+}
+export interface ChessStartStateFEN extends ChessStartState {
+  FEN: string;
+}
+
 export interface ChessInitialState extends PGNState {
   mode: GameMode;
   FEN: string;

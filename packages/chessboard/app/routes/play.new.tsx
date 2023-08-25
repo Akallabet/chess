@@ -1,17 +1,72 @@
-import { Form, useNavigate } from '@remix-run/react';
+import { useNavigate } from '@remix-run/react';
 import { useState } from 'react';
+import type { BaseSyntheticEvent } from 'react';
+import * as chess from '@chess/chess';
 import Modal from '~/shared/components/modal';
+import { useLocalStorage } from '~/shared/hooks/use-local-storage';
+import { nanoid } from 'nanoid';
 
 function NewGameModal() {
   const navigate = useNavigate();
+  const { setItem } = useLocalStorage();
   const [open] = useState(true);
+
+  function onSubmit(e: BaseSyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const pgn = formData.get('pgn') as string;
+    const fen = formData.get('fen') as string;
+    const id = nanoid();
+
+    const {
+      FEN,
+      initialFEN,
+      mode,
+      PGN,
+      event,
+      site,
+      date,
+      round,
+      white,
+      black,
+      result,
+      moves,
+      currentMove,
+    } = chess.start({
+      PGN: pgn,
+      FEN: fen,
+      mode: 'standard',
+      event: 'Local game',
+      site: 'localhost',
+      date: new Date().toISOString(),
+      round: '1',
+      white: 'White',
+      black: 'Black',
+    });
+    setItem(`chess-game-${id}`, {
+      FEN,
+      initialFEN,
+      PGN,
+      mode,
+      event,
+      site,
+      date,
+      round,
+      white,
+      black,
+      result,
+      moves,
+      currentMove,
+    });
+    navigate(`/games/${id}`);
+  }
 
   return (
     <Modal
       open={open}
       onClose={() => navigate('/play')}
       content={
-        <Form action="/games/new" method="get">
+        <form action="/games/new?index" method="POST" onSubmit={onSubmit}>
           <h3
             className="text-base font-semibold leading-6 text-gray-900"
             id="modal-title"
@@ -22,20 +77,26 @@ function NewGameModal() {
             <div className="w-full">
               <input
                 type="text"
-                name="FEN"
-                id="FEN"
+                name="fen"
+                id="fen"
                 placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
                 defaultValue="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
                 className="w-full"
               />
             </div>
             <div>
-              <label htmlFor="FEN" className="sr-only">
+              <label htmlFor="fen" className="sr-only">
                 FEN
               </label>
               <select name="variant" id="variant">
                 <option value="standard">Standard</option>
               </select>
+              <textarea
+                name="pgn"
+                id="pgn"
+                placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6"
+                className="w-full"
+              />
             </div>
           </div>
           <div className=" px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
@@ -46,7 +107,7 @@ function NewGameModal() {
               Create
             </button>
           </div>
-        </Form>
+        </form>
       }
     />
   );

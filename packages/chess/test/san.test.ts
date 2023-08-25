@@ -4,8 +4,8 @@ import { start } from '../src/index.js';
 import { translateMoveToSAN, translateSANToMove } from '../src/san.js';
 import { Move } from '../src/types.js';
 
-t.test('translateMoveToSAN', t => {
-  t.plan(5);
+t.only('translateMoveToSAN', t => {
+  t.plan(6);
 
   t.test('only one pawn', t => {
     const move: Move = {
@@ -20,26 +20,27 @@ t.test('translateMoveToSAN', t => {
     t.end();
   });
 
-  t.test(' two knights with different files and ranks', t => {
+  t.only('two pawns same rank different file', t => {
     const moveSquare = [
       {
-        piece: piecesMap.N,
-        origin: { x: 2, y: 5 },
-        target: { x: 4, y: 4 },
+        piece: piecesMap.P,
+        origin: { x: 0, y: 2 },
+        target: { x: 1, y: 3 },
+        capture: true,
         san: [''],
       },
       {
-        piece: piecesMap.N,
-        origin: { x: 6, y: 3 },
-        target: { x: 4, y: 4 },
+        piece: piecesMap.P,
+        origin: { x: 2, y: 2 },
+        target: { x: 1, y: 3 },
+        capture: true,
         san: [''],
       },
     ];
     const input = translateMoveToSAN(moveSquare, 0);
-    t.same(input, ['Ne4']);
+    t.same(input, ['axb5']);
     t.end();
   });
-
   t.test(' two rooks with same file and different ranks', t => {
     const moveSquare = [
       {
@@ -89,6 +90,38 @@ t.test('translateMoveToSAN', t => {
     ];
     const input = translateMoveToSAN(moveSquare, 0);
     t.same(input, ['Rab2']);
+    t.end();
+  });
+
+  t.test('two knight with different files and ranks', t => {
+    const moveSquare = [
+      {
+        piece: piecesMap.N,
+        origin: {
+          x: 1,
+          y: 0,
+        },
+        target: {
+          x: 3,
+          y: 1,
+        },
+        san: [''],
+      },
+      {
+        piece: piecesMap.N,
+        origin: {
+          x: 5,
+          y: 2,
+        },
+        target: {
+          x: 3,
+          y: 1,
+        },
+        san: [''],
+      },
+    ];
+    const input = translateMoveToSAN(moveSquare, 0);
+    t.same(input, ['Nbd7']);
     t.end();
   });
 

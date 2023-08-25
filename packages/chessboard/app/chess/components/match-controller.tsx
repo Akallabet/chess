@@ -10,7 +10,10 @@ export function MatchController(props: ChessState) {
       {props.isGameOver ? (
         <div>
           <p>
-            {(props.isCheckmate && 'Checkmate') || (props.isDraw && 'Draw')}
+            {(props.isWhiteWin && 'Checkmate - White wins') ||
+              (props.isBlackWin && 'Checkmate - Black wins')(
+                props.isDraw && 'Draw'
+              )}
           </p>
         </div>
       ) : null}

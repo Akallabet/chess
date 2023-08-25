@@ -140,6 +140,8 @@ export interface ChessState extends ChessInitialState, FENState {
   movesBoard: Move[][][];
   PGN: string;
   moves: PGNMove[];
+  isBlackWin: boolean;
+  isWhiteWin: boolean;
   isGameOver: boolean;
   isCheckmate: boolean;
   isCheck: boolean;

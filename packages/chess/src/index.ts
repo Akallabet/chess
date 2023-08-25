@@ -51,13 +51,19 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
   const isStalemate = moves.length === 0 && !isKingUnderCheck;
   const isDraw =
-    state.mode === 'standard' && (FENState.halfMoves === 50 || isStalemate);
+    state.result === '1/2-1/2' ||
+    (state.mode === 'standard' && (FENState.halfMoves === 50 || isStalemate));
   const isCheckmate = isKingUnderCheck && moves.length === 0;
-  const isGameOver = isDraw || isCheckmate;
+  const isWhiteWin =
+    state.result === '1-0' || (isCheckmate && FENState.activeColor === 'w');
+  const isBlackWin =
+    state.result === '0-1' || (isCheckmate && FENState.activeColor === 'b');
+  const isGameOver = isDraw || isBlackWin || isWhiteWin || isCheckmate;
 
   const result =
     (isDraw && '1/2-1/2') ||
-    (isCheckmate && ((FENState.activeColor === 'w' && '0-1') || '1-0')) ||
+    (isBlackWin && '0-1') ||
+    (isWhiteWin && '1-0') ||
     '*';
 
   const newState = {
@@ -78,6 +84,8 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     black: state.black,
     moves: state.moves,
     currentMove: state.currentMove,
+    isWhiteWin,
+    isBlackWin,
     isGameOver,
     isCheckmate,
     isCheck: isKingUnderCheck && !isCheckmate,
@@ -87,21 +95,17 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
   return newState;
 }
 
-function startFromFEN(state: ChessStartStateFEN): ChessState {
+export function startFromPGN(state: ChessStartStatePGN): ChessState {
+  return fromPGNString(state.PGN);
+}
+
+export function start(state: ChessStartStateFEN): ChessState {
   return deriveState(fromFEN(state.initialFEN || state.FEN), {
     ...state,
     initialFEN: state.initialFEN || state.FEN,
     moves: state.moves || [],
     currentMove: state.currentMove || -1,
   });
-}
-
-export function startFromPGN(state: ChessStartStatePGN): ChessState {
-  return fromPGNString(state.PGN);
-}
-
-export function start(state: ChessStartState): ChessState {
-  return startFromFEN(state as ChessStartStateFEN);
 }
 
 export function move(san: string, inputState: ChessInitialState): ChessState {

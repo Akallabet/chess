@@ -211,7 +211,7 @@ t.test('Build PGN string', t => {
 });
 
 t.only('MoveText generation', t => {
-  t.plan(3);
+  t.plan(5);
 
   t.test('Simple series of moves', t => {
     const moveText = '1. e4 e5 2. Bc4 b6 3. Qf3 g6';
@@ -230,9 +230,22 @@ t.only('MoveText generation', t => {
     t.same('This is a short comment', result[3].comment);
     t.end();
   });
-  t.only('Long comment over 2 lines within {}', t => {
-    const moveText = `1. e4 e5 2. Bc4 b6 {This is a longer comment.
- It is divided in two lines} 3. Qf3 g6`;
+  t.test('Long comment over 2 lines within {}', t => {
+    const moveText = `1. e4 e5 2. Bc4 {This is a longer comment.
+ It is divided in two lines} b6 3. Qf3 g6`;
+    const result = parseMoveText(moveText);
+    t.same(6, result.length);
+    t.same('e4', result[0].san);
+    t.same('b6', result[3].san);
+    t.same(
+      'This is a longer comment. It is divided in two lines',
+      result[2].comment
+    );
+    t.end();
+  });
+  t.test('Split move annotation', t => {
+    const moveText = `1. e4 e5 2. Bc4 2... b6 {This is a longer comment.
+  It is divided in two lines} 3. Qf3 g6`;
     const result = parseMoveText(moveText);
     t.same(6, result.length);
     t.same('e4', result[0].san);
@@ -243,12 +256,24 @@ t.only('MoveText generation', t => {
     );
     t.end();
   });
+  t.only('Ignore move variations', t => {
+    const moveText = `1. e4 e5 2. Bc4 2... b6 {This is a longer comment.
+  It is divided in two lines} 3. Qf3 (3. Qd2 {Move variation}) g6`;
+    const result = parseMoveText(moveText);
+    t.same(6, result.length);
+    t.same('e4', result[0].san);
+    t.same('b6', result[3].san);
+    t.same('Qf3', result[4].san);
+    t.same('', result[4].comment);
+    t.same('g6', result[5].san);
+    t.end();
+  });
 });
 
-t.only('From PGN string', t => {
+t.test('From PGN string', t => {
   t.plan(2);
 
-  t.only('Couple of moves', t => {
+  t.test('Couple of moves', t => {
     const pgn = `[Event "Local game"]
 [Site "localhost"]
 [Date "2023-08-18T20:58:38.737Z"]
@@ -266,7 +291,7 @@ g6 4. Qxf7# 1-0`;
     );
     t.end();
   });
-  t.only(
+  t.test(
     'Fischer, Robert J. vs. Spassky, Boris V. Belgrade, Serbia JUG: F/S Return Match: 1992.11.04',
     t => {
       const pgn = `[Event "F/S Return Match"]

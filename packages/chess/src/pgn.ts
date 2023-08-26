@@ -90,6 +90,18 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
     .flat()
     .reduce(
       (state, curr) => {
+        // console.log(curr, state);
+        if (curr.startsWith('(')) {
+          state.flag = 'variation';
+          return state;
+        }
+        if (curr.endsWith(')')) {
+          state.flag = '';
+          return state;
+        }
+        if (state.flag === 'variation') {
+          return state;
+        }
         if (curr.startsWith('{')) {
           state.flag = 'comment';
           state.moves[state.moves.length - 1].comment.push(
@@ -104,9 +116,6 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
           state.moves[state.moves.length - 1].comment.push(curr);
         } else if (curr.endsWith('.')) {
           state.flag = 'san';
-        } else if (state.flag === 'san') {
-          state.moves.push({ san: '', comment: [] });
-          state.moves[state.moves.length - 1].san = curr;
         } else if (
           curr === '*' ||
           curr === '1-0' ||
@@ -114,6 +123,8 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
           curr === '1/2-1/2'
         ) {
           state.moves.push({ result: curr, comment: [] });
+        } else {
+          state.moves.push({ san: curr, comment: [] });
         }
         return state;
       },

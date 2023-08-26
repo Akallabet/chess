@@ -77,46 +77,77 @@ function forceResult(result: string, state: ChessState): ChessState {
   return state;
 }
 
-export function fromPGNString(pgn: string): ChessState {
-  const [tags, moveText] = pgn.split('\n\n');
+interface PGNLogMove {
+  san?: string;
+  comment?: string;
+  result?: string;
+}
+
+export function parseMoveText(moveText: string): PGNLogMove[] {
   return moveText
     .split('\n')
     .map(row => row.split(' '))
     .flat()
     .reduce(
-      (acc, curr) => {
-        if (curr.endsWith('.')) {
-          acc.flag = 'san';
-          return acc;
-        }
+      (state, curr) => {
         if (curr.startsWith('{')) {
-          acc.flag = 'comment';
-          return acc;
-        }
-        if (
+          state.flag = 'comment';
+          state.moves[state.moves.length - 1].comment.push(
+            curr.replace('{', '')
+          );
+        } else if (curr.endsWith('}')) {
+          state.flag = '';
+          state.moves[state.moves.length - 1].comment.push(
+            curr.replace('}', '')
+          );
+        } else if (state.flag === 'comment') {
+          state.moves[state.moves.length - 1].comment.push(curr);
+        } else if (curr.endsWith('.')) {
+          state.flag = 'san';
+        } else if (state.flag === 'san') {
+          state.moves.push({ san: '', comment: [] });
+          state.moves[state.moves.length - 1].san = curr;
+        } else if (
           curr === '*' ||
           curr === '1-0' ||
           curr === '0-1' ||
           curr === '1/2-1/2'
         ) {
-          if (acc.state.result !== curr) {
-            acc.state = forceResult(curr, acc.state);
-          }
-          return acc;
+          state.moves.push({ result: curr, comment: [] });
         }
-        if (acc.flag === 'san') {
-          acc.state = moveInternal(curr, acc.state);
-          return acc;
-        }
-        return acc;
+        return state;
       },
       {
-        flag: 'start',
-        state: start({
-          FEN: startingFEN,
-          mode: 'standard',
-          ...fromPGNTagString(tags),
-        }),
+        flag: '',
+        side: '',
+        moves: [] as { san?: string; comment: string[]; result?: string }[],
       }
-    ).state;
+    )
+    .moves.map(({ san, comment }) => ({
+      san,
+      comment: comment
+        .map(c => c.trim())
+        .filter(Boolean)
+        .join(' '),
+    }));
+}
+
+export function fromPGNString(pgn: string): ChessState {
+  const [tags, moveText] = pgn.split('\n\n');
+
+  return parseMoveText(moveText).reduce(
+    (state, move) => {
+      if (move.result) {
+        state = forceResult(move.result, state);
+      } else if (move.san) {
+        state = moveInternal(move.san, state);
+      }
+      return state;
+    },
+    start({
+      FEN: startingFEN,
+      mode: 'standard',
+      ...fromPGNTagString(tags),
+    })
+  );
 }

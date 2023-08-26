@@ -147,10 +147,7 @@ function generateLegalMoves(state: FENState): Array<MoveBase> {
     const row = state.board[y];
     for (let x = 0; x < row.length; x++) {
       const square = row[x];
-      if (
-        square &&
-        isActiveColorPiece(state.activeColor, square) // bad bad bad, please remove coercion :(
-      ) {
+      if (square && isActiveColorPiece(state.activeColor, square)) {
         const pieceMoves = generateMoves({ y, x }, state, patterns[square])
           .map(move => {
             if (move.promotion) {

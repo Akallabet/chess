@@ -4,7 +4,7 @@ import { start } from '../src/index.js';
 import { translateMoveToSAN, translateSANToMove } from '../src/san.js';
 import { Move } from '../src/types.js';
 
-t.only('translateMoveToSAN', t => {
+t.test('translateMoveToSAN', t => {
   t.plan(6);
 
   t.test('only one pawn', t => {
@@ -20,7 +20,7 @@ t.only('translateMoveToSAN', t => {
     t.end();
   });
 
-  t.only('two pawns same rank different file', t => {
+  t.test('two pawns same rank different file', t => {
     const moveSquare = [
       {
         piece: piecesMap.P,

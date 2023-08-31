@@ -189,3 +189,10 @@ t.test('Go To Move', t => {
     t.end();
   });
 });
+t.test('Wrong move', t => {
+  const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const state = move('e5', start({ FEN, mode: 'standard' }));
+  t.has(state.error, 'WRONG_MOVE');
+
+  t.end();
+});

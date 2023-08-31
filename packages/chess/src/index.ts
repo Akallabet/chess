@@ -127,7 +127,11 @@ export function moveInternal(
     state.moves = [...state.moves, { ...move, FEN: toFEN(FENStateWithMove) }];
     state.currentMove = state.moves.length - 1;
     return deriveState(FENStateWithMove, state);
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      state.error = e.message;
+      return state;
+    }
     return state;
   }
 }

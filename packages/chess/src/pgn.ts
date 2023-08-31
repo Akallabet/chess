@@ -156,20 +156,23 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
 export function fromPGNString(pgn: string): ChessState {
   const [tags, moveText] = pgn.split('\n\n');
   const moves = parseMoveText(moveText);
+  let state: ChessState = start({
+    FEN: startingFEN,
+    mode: 'standard',
+    ...parsePGNTagString(tags),
+  });
 
-  return moves.reduce(
-    (state, move) => {
-      if (move.result) {
-        state = forceResult(move.result, state);
-      } else if (move.san) {
-        state = moveInternal(move.san, state);
-      }
+  for (const move of moves) {
+    if (move.result) {
+      state = forceResult(move.result, state);
+    } else if (move.san) {
+      state = moveInternal(move.san, state);
+    }
+    if (state.error) {
+      console.error(state.error);
       return state;
-    },
-    start({
-      FEN: startingFEN,
-      mode: 'standard',
-      ...parsePGNTagString(tags),
-    })
-  );
+    }
+  }
+
+  return state;
 }

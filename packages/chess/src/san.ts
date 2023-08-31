@@ -114,6 +114,6 @@ export function translateSANToMove(
   const move = moves.find(move =>
     move.san.find(sanString => sanString === san)
   );
-  if (!move) throw new Error(errorCodes.wrongFormat);
+  if (!move) throw new Error(errorCodes.wrongMove);
   return move;
 }

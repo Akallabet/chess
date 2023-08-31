@@ -294,7 +294,7 @@ t.test('MoveText generation', t => {
 });
 
 t.test('From PGN string', t => {
-  t.plan(3);
+  t.plan(4);
 
   t.test('Couple of moves', t => {
     const pgn = `[Event "Local game"]
@@ -314,6 +314,27 @@ g6 4. Qxf7# 1-0`;
     );
     t.end();
   });
+
+  t.test('With a wrong move', t => {
+    const pgn = `[Event "Local game"]
+[Site "localhost"]
+[Date "2023-08-18T20:58:38.737Z"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "1-0"]
+
+1. e4 e5 2. Bc4 b7 3. Qf3
+g6 4. Qxf7# 1-0`;
+    const state = fromPGNString(pgn);
+    t.same('WRONG_MOVE', state.error);
+    t.same(
+      'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2',
+      state.FEN
+    );
+    t.end();
+  });
+
   t.test(
     'Fischer, Robert J. vs. Spassky, Boris V. Belgrade, Serbia JUG: F/S Return Match: 1992.11.04',
     t => {

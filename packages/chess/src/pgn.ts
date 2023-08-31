@@ -1,5 +1,5 @@
 import { startingFEN } from './constants.js';
-import { draw, move, moveInternal, start } from './index.js';
+import { draw, moveInternal, resign, start } from './index.js';
 import { ChessState, Move, PGNState, PGNTag } from './types.js';
 
 // specs https://www.chessclub.com/help/PGN-spec
@@ -53,11 +53,12 @@ export function buildPGNString(state: PGNState): string {
   );
 }
 
-function fromPGNTagString(tags: string): PGNState {
+function parsePGNTagString(tags: string): PGNState {
   return tags
     .split('\n')
     .map(tag =>
       tag
+        .trim()
         .replace('[', '')
         .replace(']', '')
         .replaceAll('"', '')
@@ -73,6 +74,9 @@ function fromPGNTagString(tags: string): PGNState {
 function forceResult(result: string, state: ChessState): ChessState {
   if (result === '1/2-1/2') {
     return draw(state);
+  }
+  if (result === '0-1') {
+    return resign(state);
   }
   return state;
 }
@@ -90,16 +94,22 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
     .flat()
     .reduce(
       (state, curr) => {
-        // console.log(curr, state);
         if (curr.startsWith('(')) {
           state.flag = 'variation';
+          state.variation += 1;
           return state;
         }
         if (curr.endsWith(')')) {
-          state.flag = '';
+          state.variation -= 1;
+          if (state.variation === 0) {
+            state.flag = '';
+          }
           return state;
         }
         if (state.flag === 'variation') {
+          return state;
+        }
+        if (curr.startsWith('$')) {
           return state;
         }
         if (curr.startsWith('{')) {
@@ -130,12 +140,12 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
       },
       {
         flag: '',
-        side: '',
+        variation: 0,
         moves: [] as { san?: string; comment: string[]; result?: string }[],
       }
     )
-    .moves.map(({ san, comment }) => ({
-      san,
+    .moves.map(({ comment, ...move }) => ({
+      ...move,
       comment: comment
         .map(c => c.trim())
         .filter(Boolean)
@@ -145,8 +155,9 @@ export function parseMoveText(moveText: string): PGNLogMove[] {
 
 export function fromPGNString(pgn: string): ChessState {
   const [tags, moveText] = pgn.split('\n\n');
+  const moves = parseMoveText(moveText);
 
-  return parseMoveText(moveText).reduce(
+  return moves.reduce(
     (state, move) => {
       if (move.result) {
         state = forceResult(move.result, state);
@@ -158,7 +169,7 @@ export function fromPGNString(pgn: string): ChessState {
     start({
       FEN: startingFEN,
       mode: 'standard',
-      ...fromPGNTagString(tags),
+      ...parsePGNTagString(tags),
     })
   );
 }

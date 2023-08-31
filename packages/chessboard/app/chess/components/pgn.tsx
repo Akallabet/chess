@@ -7,7 +7,7 @@ interface PGNMove extends Move {
 }
 export function Pgn() {
   const {
-    game: { moves, currentMove },
+    game: { moves, currentMove, result },
   } = useChess();
   return (
     <div className="flex w-80 flex-col overflow-hidden">
@@ -22,7 +22,7 @@ export function Pgn() {
           }
           return acc;
         }, [] as PGNMove[][])
-        .map((movePair, i) => {
+        .map((movePair, i, pgnMoves) => {
           return (
             <p key={i}>
               <span className="mr-1">{`${i + 1}.`}</span>
@@ -37,6 +37,9 @@ export function Pgn() {
                 >
                   {movePair[1].san}
                 </span>
+              )}
+              {i === pgnMoves.length - 1 && result && (
+                <span className="mr-1">{result}</span>
               )}
             </p>
           );

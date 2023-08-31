@@ -8,7 +8,6 @@ import {
   Move,
   Square,
   MoveBase,
-  ChessStartState,
   ChessStartStatePGN,
   ChessStartStateFEN,
 } from './types.js';

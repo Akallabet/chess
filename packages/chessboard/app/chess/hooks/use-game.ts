@@ -46,6 +46,7 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         black,
         result,
         moves,
+        error,
         currentMove,
       } = game;
       setItem(`chess-game-${gameId}`, {
@@ -59,6 +60,7 @@ export const useGame = (gameId: string): GameOutput | undefined => {
         white,
         black,
         result,
+        error,
         moves,
         currentMove,
       });

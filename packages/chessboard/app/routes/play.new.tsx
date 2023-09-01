@@ -43,6 +43,7 @@ function NewGameModal() {
       black,
       result,
       moves,
+      error,
       currentMove,
     } = pgn ? chess.startFromPGN(input) : chess.start(input);
     setItem(`chess-game-${id}`, {
@@ -57,6 +58,7 @@ function NewGameModal() {
       white,
       black,
       result,
+      error,
       moves,
       currentMove,
     });

@@ -29,9 +29,9 @@ function buildPGNMoveText({ moves = [] }: PGNState): string[] {
     .reduce((acc, move) => {
       const lastMove = acc[acc.length - 1];
       if (Array.isArray(lastMove) && lastMove.length === 1) {
-        acc[acc.length - 1].push(move);
+        acc[acc.length - 1].push(move as Move);
       } else {
-        acc.push([move]);
+        acc.push([move as Move]);
       }
       return acc;
     }, [] as Move[][])
@@ -169,7 +169,6 @@ export function fromPGNString(pgn: string): ChessState {
       state = moveInternal(move.san, state);
     }
     if (state.error) {
-      console.error(state.error);
       return state;
     }
   }

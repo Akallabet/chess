@@ -83,6 +83,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     black: state.black,
     moves: state.moves,
     currentMove: state.currentMove,
+    error: state.error,
     isWhiteWin,
     isBlackWin,
     isGameOver,
@@ -129,6 +130,10 @@ export function moveInternal(
     return deriveState(FENStateWithMove, state);
   } catch (e: unknown) {
     if (e instanceof Error) {
+      state.moves = [
+        ...state.moves,
+        { san: [san], FEN: toFEN(state), error: e.message },
+      ];
       state.error = e.message;
       return state;
     }

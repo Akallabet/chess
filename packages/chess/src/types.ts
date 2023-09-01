@@ -60,8 +60,13 @@ export interface Move extends MoveBase {
   san: string[];
 }
 
-export interface PGNMove extends Move {
+export interface PGNMove {
+  san: string[];
+  piece?: Piece;
+  origin?: Coordinates;
+  target?: Coordinates;
   FEN: string;
+  error?: string;
 }
 
 export type ChessColor = 'w' | 'b';
@@ -131,6 +136,7 @@ export interface ChessInitialState extends PGNState {
   initialFEN: string;
   currentMove: number;
   moves: PGNMove[];
+  error?: string;
 }
 
 export interface ChessState extends ChessInitialState, FENState {

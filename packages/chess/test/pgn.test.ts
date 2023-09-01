@@ -275,7 +275,6 @@ t.test('MoveText generation', t => {
   kingside.}) 9... Qxd5 10. Nxc6 Qxc6 11. Qg4 $1 {with a clear advantage for
   White.})`;
     const result = parseMoveText(moveText);
-    console.log(result);
     t.same(2, result.length);
     t.end();
   });
@@ -327,6 +326,7 @@ g6 4. Qxf7# 1-0`;
 1. e4 e5 2. Bc4 b7 3. Qf3
 g6 4. Qxf7# 1-0`;
     const state = fromPGNString(pgn);
+    t.same('WRONG_MOVE', state.moves[state.moves.length - 1].error);
     t.same('WRONG_MOVE', state.error);
     t.same(
       'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2',
@@ -368,6 +368,7 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2`;
       t.end();
     }
   );
+
   t.test('The game of the century', t => {
     const pgn = `[Event "World Championship 28th"]
   [Site "Reykjavik"]

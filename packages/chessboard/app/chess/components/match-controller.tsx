@@ -4,10 +4,12 @@ import { Pgn } from './pgn';
 
 export function MatchController(props: ChessState) {
   const { moveBack, moveForward, moveToStart, moveToEnd, resign } = useChess();
+  const errorMove = props.moves.find(move => move.error);
+
   return (
     <div className="h-full">
       <div className="text-center text-2xl font-bold">Moves</div>
-      {props.isGameOver ? (
+      {!errorMove && props.isGameOver ? (
         <div>
           <p>
             <span>{props.isDraw && 'Draw'}</span>

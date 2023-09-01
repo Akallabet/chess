@@ -1,7 +1,7 @@
-import type { Move } from '@chess/chess';
+import type { PGNMove as PGNMoveBase } from '@chess/chess';
 import { useChess } from '../hooks/use-chess';
 
-interface PGNMove extends Move {
+interface PGNMove extends PGNMoveBase {
   index: number;
   selected: boolean;
 }
@@ -9,6 +9,9 @@ export function Pgn() {
   const {
     game: { moves, currentMove, result },
   } = useChess();
+
+  const errorMove = moves.find(move => move.error);
+
   return (
     <div className="flex w-80 flex-col overflow-hidden">
       {moves
@@ -38,8 +41,11 @@ export function Pgn() {
                   {movePair[1].san}
                 </span>
               )}
-              {i === pgnMoves.length - 1 && result && (
+              {i === pgnMoves.length - 1 && result && !errorMove && (
                 <span className="mr-1">{result}</span>
+              )}
+              {i === pgnMoves.length - 1 && errorMove && (
+                <span className="mr-1">{errorMove.error}</span>
               )}
             </p>
           );

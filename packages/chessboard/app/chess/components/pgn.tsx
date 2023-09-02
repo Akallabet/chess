@@ -8,12 +8,13 @@ interface PGNMove extends PGNMoveBase {
 export function Pgn() {
   const {
     game: { moves, currentMove, result },
+    goToMove,
   } = useChess();
 
   const errorMove = moves.find(move => move.error);
 
   return (
-    <div className="flex w-80 flex-col overflow-hidden">
+    <div className="max-w-100 flex flex-col overflow-hidden">
       {moves
         .reduce((acc, move, index) => {
           const lastMove = acc[acc.length - 1];
@@ -27,27 +28,29 @@ export function Pgn() {
         }, [] as PGNMove[][])
         .map((movePair, i, pgnMoves) => {
           return (
-            <p key={i}>
-              <span className="mr-1">{`${i + 1}.`}</span>
-              <span
-                className={`mr-1 ${movePair[0].selected ? 'font-bold' : ''}`}
+            <div key={i} className="flex justify-between">
+              <div>{`${i + 1}.`}</div>
+              <button
+                onClick={() => goToMove(movePair[0].index)}
+                className={` ${movePair[0].selected ? 'font-bold' : ''}`}
               >
                 {movePair[0].san}
-              </span>
+              </button>
               {movePair[1] && (
-                <span
-                  className={`mr-1 ${movePair[1].selected ? 'font-bold' : ''}`}
+                <button
+                  onClick={() => goToMove(movePair[1].index)}
+                  className={` ${movePair[1].selected ? 'font-bold' : ''}`}
                 >
                   {movePair[1].san}
-                </span>
+                </button>
               )}
               {i === pgnMoves.length - 1 && result && !errorMove && (
-                <span className="mr-1">{result}</span>
+                <div>{result}</div>
               )}
               {i === pgnMoves.length - 1 && errorMove && (
-                <span className="mr-1">{errorMove.error}</span>
+                <div>{errorMove.error}</div>
               )}
-            </p>
+            </div>
           );
         })}
     </div>

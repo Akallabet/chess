@@ -1,4 +1,4 @@
-import { modes, files, ranks } from './constants.js';
+import { modes, files, ranks, piecesMap } from './constants.js';
 import { fromFEN, toFEN, updateFENStateWithMove } from './fen.js';
 import {
   ChessInitialState,
@@ -10,6 +10,7 @@ import {
   MoveBase,
   ChessStartStatePGN,
   ChessStartStateFEN,
+  Piece,
 } from './types.js';
 
 import {
@@ -18,6 +19,7 @@ import {
 } from './moves/index.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
 import { buildPGNString, fromPGNString } from './pgn.js';
+import { isBlackPiece, isWhitePiece } from './utils.js';
 
 export function createMovesBoard(
   board: Square[][],
@@ -43,15 +45,31 @@ export function createMovesBoard(
 
   return movesBoard;
 }
+function calcInsufficientMaterial(board: Square[][]): boolean {
+  const pieces: Piece[] = board
+    .flat()
+    .filter(square => square !== '')
+    .map(piece => piece as Piece); //Why TypeScript can't infer that piece is Piece?
+
+  const whitePieces = pieces.filter(isWhitePiece);
+  const blackPieces = pieces.filter(isBlackPiece);
+  if (whitePieces.length === 1 && blackPieces.length === 1) return true;
+  if (whitePieces.length === 1 && blackPieces.length === 2) {
+    return Boolean(blackPieces.find(piece => piece === piecesMap.b));
+  }
+  return false;
+}
 
 function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
   const moves = generateLegalMovesForActiveSide(FENState);
 
+  const isInsufficientMaterial = calcInsufficientMaterial(FENState.board);
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
   const isStalemate = moves.length === 0 && !isKingUnderCheck;
   const isDraw =
     state.result === '1/2-1/2' ||
-    (state.mode === 'standard' && (FENState.halfMoves === 50 || isStalemate));
+    (state.mode === 'standard' &&
+      (FENState.halfMoves === 50 || isStalemate || isInsufficientMaterial));
   const isCheckmate = isKingUnderCheck && moves.length === 0;
   const isWhiteWin =
     state.result === '1-0' || (isCheckmate && FENState.activeColor === 'w');
@@ -89,6 +107,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     isGameOver,
     isCheckmate,
     isCheck: isKingUnderCheck && !isCheckmate,
+    isInsufficientMaterial,
     isDraw,
     isStalemate,
   };

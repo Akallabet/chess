@@ -3,7 +3,7 @@ import { goToMove, move, start } from '../src/index.js';
 import { getBoard } from '../test-utils.js';
 
 t.test('Move', t => {
-  t.plan(12);
+  t.plan(9);
   t.test('Move white pawn from e2 to e3', t => {
     const expected = getBoard([
       { coord: { x: 4, y: 5 }, cell: 'P' },
@@ -16,28 +16,6 @@ t.test('Move', t => {
     );
     t.same(state.board, expected);
     t.same(state.FEN, '3k4/8/8/8/8/4P3/8/4K3 b KQkq - 0 1');
-    t.end();
-  });
-
-  t.test('Check mate', t => {
-    const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
-    const init = start({ FEN, mode: 'standard' });
-    const state = move('Qe8#', init);
-    t.same(state.isGameOver, true);
-    t.same(state.isCheckmate, true);
-    t.same(state.isDraw, false);
-    t.same(state.isStalemate, false);
-    t.end();
-  });
-
-  t.test('Draw by Stale mate', t => {
-    const FEN = 'k7/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
-    const state = move('Rb7', start({ FEN, mode: 'standard' }));
-    t.same(state.FEN, 'k7/1R3Q2/8/8/8/8/8/4K3 b - - 1 1');
-    t.same(state.isGameOver, true);
-    t.same(state.isDraw, true);
-    t.same(state.isStalemate, true);
-    t.same(state.isCheckmate, false);
     t.end();
   });
 
@@ -70,22 +48,6 @@ t.test('Move', t => {
       fourthMove.FEN,
       'rnbqkbnr/1ppp1ppp/p7/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3'
     );
-
-    t.end();
-  });
-
-  t.test('Draw by 50 moves rule', t => {
-    const FEN =
-      'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
-    const state = start({ FEN, mode: 'standard' });
-    const firstMove = move('Nc6', state);
-    t.same(
-      firstMove.FEN,
-      'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 50 100'
-    );
-    t.same(firstMove.isGameOver, true);
-    t.same(firstMove.isDraw, true);
-    t.same(state.isCheckmate, false);
 
     t.end();
   });
@@ -166,6 +128,55 @@ t.test('Move', t => {
     t.end();
   });
 });
+t.test('End game', t => {
+  t.plan(4);
+  t.test('Check mate', t => {
+    const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
+    const init = start({ FEN, mode: 'standard' });
+    const state = move('Qe8#', init);
+    t.same(state.isGameOver, true);
+    t.same(state.isCheckmate, true);
+    t.same(state.isDraw, false);
+    t.same(state.isStalemate, false);
+    t.end();
+  });
+
+  t.test('Draw by Stale mate', t => {
+    const FEN = 'k7/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
+    const state = move('Rb7', start({ FEN, mode: 'standard' }));
+    t.same(state.FEN, 'k7/1R3Q2/8/8/8/8/8/4K3 b - - 1 1');
+    t.same(state.isGameOver, true);
+    t.same(state.isDraw, true);
+    t.same(state.isStalemate, true);
+    t.same(state.isCheckmate, false);
+    t.end();
+  });
+  t.test('Draw by 50 moves rule', t => {
+    const FEN =
+      'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
+    const state = start({ FEN, mode: 'standard' });
+    const firstMove = move('Nc6', state);
+    t.same(
+      firstMove.FEN,
+      'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 50 100'
+    );
+    t.same(firstMove.isGameOver, true);
+    t.same(firstMove.isDraw, true);
+    t.same(state.isCheckmate, false);
+
+    t.end();
+  });
+  t.test('Draw by insufficient material - K v K', t => {
+    const FEN = '8/8/3k4/8/8/8/8/4K3 w - - 0 1';
+    const state = start({ FEN, mode: 'standard' });
+    t.same(state.isGameOver, true);
+    t.same(state.isDraw, true);
+    t.same(state.isCheckmate, false);
+    t.same(state.isInsufficientMaterial, true);
+    t.end();
+  });
+});
+
 t.test('Go To Move', t => {
   t.plan(1);
 

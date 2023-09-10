@@ -152,5 +152,6 @@ export interface ChessState extends ChessInitialState, FENState {
   isCheckmate: boolean;
   isCheck: boolean;
   isStalemate: boolean;
+  isInsufficientMaterial: boolean;
   isDraw: boolean;
 }

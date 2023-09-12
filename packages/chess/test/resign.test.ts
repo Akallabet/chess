@@ -1,5 +1,5 @@
 import t from 'tap';
-import { start, resign } from '../src';
+import { start, resign } from '../src/index.js';
 
 t.test('Resign', t => {
   t.plan(1);

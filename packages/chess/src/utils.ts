@@ -4,7 +4,7 @@ import {
   piecesMap,
   whitePiecesArray,
 } from './constants.js';
-import { ChessColor, Piece } from './types.js';
+import { ChessColor, Coordinates, Piece, Square } from './types.js';
 
 const isActiveColorWhite = (color: ChessColor): boolean => color === colours.w;
 const isActiveColorBlack = (color: ChessColor): boolean => color === colours.b;
@@ -41,3 +41,15 @@ export const isRook = (piece: Piece) =>
 export const isPawn = (piece: Piece): boolean => {
   return piece === piecesMap.p || piece === piecesMap.P;
 };
+
+export function getPieceCoord(
+  piece: Piece,
+  board: Square[][]
+): Coordinates | undefined {
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      if (board[y][x] === piece) return { y, x };
+    }
+  }
+  return undefined;
+}

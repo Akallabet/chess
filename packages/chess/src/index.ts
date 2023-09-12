@@ -19,7 +19,7 @@ import {
 } from './moves/index.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
 import { buildPGNString, fromPGNString } from './pgn.js';
-import { isBlackPiece, isWhitePiece } from './utils.js';
+import { getPieceCoord, isBlackPiece, isWhitePiece } from './utils.js';
 
 export function createMovesBoard(
   board: Square[][],
@@ -55,7 +55,27 @@ function calcInsufficientMaterial(board: Square[][]): boolean {
   const blackPieces = pieces.filter(isBlackPiece);
   if (whitePieces.length === 1 && blackPieces.length === 1) return true;
   if (whitePieces.length === 1 && blackPieces.length === 2) {
-    return Boolean(blackPieces.find(piece => piece === piecesMap.b));
+    return Boolean(
+      blackPieces.find(piece => piece === piecesMap.b || piece === piecesMap.n)
+    );
+  }
+  if (blackPieces.length === 1 && whitePieces.length === 2) {
+    return Boolean(
+      whitePieces.find(piece => piece === piecesMap.B || piece === piecesMap.N)
+    );
+  }
+  if (whitePieces.length === 2 && blackPieces.length === 2) {
+    // Two bishops on the same color
+    // https://en.wikipedia.org/wiki/Chess_endgame#Two_bishops
+    // https://www.chessprogramming.org/Two_Bishops_Endgame
+    const whiteBishopCoord = getPieceCoord(piecesMap.B, board);
+    const blackBishopCoord = getPieceCoord(piecesMap.b, board);
+    if (!whiteBishopCoord || !blackBishopCoord) return false;
+    // calculate if white bishop and black bishop are on the same color
+    return (
+      (whiteBishopCoord.x + whiteBishopCoord.y) % 2 === 0 &&
+      (blackBishopCoord.x + blackBishopCoord.y) % 2 === 0
+    );
   }
   return false;
 }
@@ -65,6 +85,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
 
   const isInsufficientMaterial = calcInsufficientMaterial(FENState.board);
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
+
   const isStalemate = moves.length === 0 && !isKingUnderCheck;
   const isDraw =
     state.result === '1/2-1/2' ||

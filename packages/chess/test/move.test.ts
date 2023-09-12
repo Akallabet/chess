@@ -129,7 +129,7 @@ t.test('Move', t => {
   });
 });
 t.test('End game', t => {
-  t.plan(4);
+  t.plan(9);
   t.test('Check mate', t => {
     const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
     const init = start({ FEN, mode: 'standard' });
@@ -151,6 +151,7 @@ t.test('End game', t => {
     t.same(state.isCheckmate, false);
     t.end();
   });
+
   t.test('Draw by 50 moves rule', t => {
     const FEN =
       'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
@@ -166,7 +167,8 @@ t.test('End game', t => {
 
     t.end();
   });
-  t.test('Draw by insufficient material - K v K', t => {
+
+  t.test('Draw by insufficient material - K v k', t => {
     const FEN = '8/8/3k4/8/8/8/8/4K3 w - - 0 1';
     const state = start({ FEN, mode: 'standard' });
     t.same(state.isGameOver, true);
@@ -175,6 +177,59 @@ t.test('End game', t => {
     t.same(state.isInsufficientMaterial, true);
     t.end();
   });
+
+  t.test('Draw by insufficient material - KN v k', t => {
+    const FEN = '8/8/3k4/8/8/8/8/1N2K3 w - - 0 1';
+    const state = start({ FEN, mode: 'standard' });
+    t.same(state.isGameOver, true);
+    t.same(state.isDraw, true);
+    t.same(state.isCheckmate, false);
+    t.same(state.isInsufficientMaterial, true);
+    t.end();
+  });
+
+  t.test('Draw by insufficient material - KB v k', t => {
+    const FEN = '8/8/3k4/8/8/8/8/1B2K3 w - - 0 1';
+    const state = start({ FEN, mode: 'standard' });
+    t.same(state.isGameOver, true);
+    t.same(state.isDraw, true);
+    t.same(state.isCheckmate, false);
+    t.same(state.isInsufficientMaterial, true);
+    t.end();
+  });
+
+  t.test('Draw by insufficient material - K v kn', t => {
+    const FEN = '8/1n6/3k4/8/8/8/8/4K3 w - - 0 1';
+    const state = start({ FEN, mode: 'standard' });
+    t.same(state.isGameOver, true);
+    t.same(state.isDraw, true);
+    t.same(state.isCheckmate, false);
+    t.same(state.isInsufficientMaterial, true);
+    t.end();
+  });
+
+  t.test('Draw by insufficient material - K v kb', t => {
+    const FEN = '8/1b6/3k4/8/8/8/8/4K3 w - - 0 1';
+    const state = start({ FEN, mode: 'standard' });
+    t.same(state.isGameOver, true);
+    t.same(state.isDraw, true);
+    t.same(state.isCheckmate, false);
+    t.same(state.isInsufficientMaterial, true);
+    t.end();
+  });
+
+  t.test(
+    'Draw by insufficient material - KB v kb - bishops on same color',
+    t => {
+      const FEN = '8/1b6/3k4/8/8/8/8/3BK3 w - - 0 1';
+      const state = start({ FEN, mode: 'standard' });
+      t.same(state.isGameOver, true);
+      t.same(state.isDraw, true);
+      t.same(state.isCheckmate, false);
+      t.same(state.isInsufficientMaterial, true);
+      t.end();
+    }
+  );
 });
 
 t.test('Go To Move', t => {

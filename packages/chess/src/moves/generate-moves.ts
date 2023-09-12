@@ -4,6 +4,7 @@ import { Coordinates, FENState, MoveBase, Piece, Square } from '../types.js';
 import {
   areOpponents,
   getOpponentColor,
+  getPieceCoord,
   isActiveColorPiece,
 } from '../utils.js';
 import { isCellUnderCheck } from './is-cell-under-check.js';
@@ -88,18 +89,6 @@ export function generateMoves(
     origin: coord,
     piece,
   });
-}
-
-function getPieceCoord(
-  piece: Piece,
-  board: Square[][]
-): Coordinates | undefined {
-  for (let y = 0; y < board.length; y++) {
-    for (let x = 0; x < board[y].length; x++) {
-      if (board[y][x] === piece) return { y, x };
-    }
-  }
-  return undefined;
 }
 
 function getOwnKingCoord(state: FENState): Coordinates | undefined {

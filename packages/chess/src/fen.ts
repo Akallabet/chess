@@ -41,6 +41,12 @@ function boardFromFEN(piacePlacement: string): Square[][] {
   return piacePlacement.split('/').map(rowFromFEN);
 }
 
+export function getBoardStateFromFEN(FEN: string): string {
+  const parts = FEN.split(' ');
+
+  return `${parts[0]} ${parts[2]} ${parts[3]}`;
+}
+
 export function fromFEN(FEN: string): FENState {
   const [
     piecePlacement,

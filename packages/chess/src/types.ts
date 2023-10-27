@@ -153,5 +153,6 @@ export interface ChessState extends ChessInitialState, FENState {
   isCheck: boolean;
   isStalemate: boolean;
   isInsufficientMaterial: boolean;
+  isThreefoldRepetition: boolean;
   isDraw: boolean;
 }

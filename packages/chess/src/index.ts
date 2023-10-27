@@ -1,5 +1,9 @@
-import { modes, files, ranks, piecesMap } from './constants.js';
-import { fromFEN, toFEN, updateFENStateWithMove } from './fen.js';
+import { modes, files, ranks,  } from './constants.js';
+import {
+  fromFEN,
+  toFEN,
+  updateFENStateWithMove,
+} from './fen.js';
 import {
   ChessInitialState,
   ChessState,
@@ -10,7 +14,6 @@ import {
   MoveBase,
   ChessStartStatePGN,
   ChessStartStateFEN,
-  Piece,
 } from './types.js';
 
 import {
@@ -19,7 +22,7 @@ import {
 } from './moves/index.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
 import { buildPGNString, fromPGNString } from './pgn.js';
-import { getPieceCoord, isBlackPiece, isWhitePiece } from './utils.js';
+import { calcInsufficientMaterial, calcThreefoldRepetition } from './end-game.js';
 
 export function createMovesBoard(
   board: Square[][],
@@ -45,52 +48,22 @@ export function createMovesBoard(
 
   return movesBoard;
 }
-function calcInsufficientMaterial(board: Square[][]): boolean {
-  const pieces: Piece[] = board
-    .flat()
-    .filter(square => square !== '')
-    .map(piece => piece as Piece); //Why TypeScript can't infer that piece is Piece?
-
-  const whitePieces = pieces.filter(isWhitePiece);
-  const blackPieces = pieces.filter(isBlackPiece);
-  if (whitePieces.length === 1 && blackPieces.length === 1) return true;
-  if (whitePieces.length === 1 && blackPieces.length === 2) {
-    return Boolean(
-      blackPieces.find(piece => piece === piecesMap.b || piece === piecesMap.n)
-    );
-  }
-  if (blackPieces.length === 1 && whitePieces.length === 2) {
-    return Boolean(
-      whitePieces.find(piece => piece === piecesMap.B || piece === piecesMap.N)
-    );
-  }
-  if (whitePieces.length === 2 && blackPieces.length === 2) {
-    // Two bishops on the same color
-    // https://en.wikipedia.org/wiki/Chess_endgame#Two_bishops
-    // https://www.chessprogramming.org/Two_Bishops_Endgame
-    const whiteBishopCoord = getPieceCoord(piecesMap.B, board);
-    const blackBishopCoord = getPieceCoord(piecesMap.b, board);
-    if (!whiteBishopCoord || !blackBishopCoord) return false;
-    // calculate if white bishop and black bishop are on the same color
-    return (
-      (whiteBishopCoord.x + whiteBishopCoord.y) % 2 === 0 &&
-      (blackBishopCoord.x + blackBishopCoord.y) % 2 === 0
-    );
-  }
-  return false;
-}
 
 function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
   const moves = generateLegalMovesForActiveSide(FENState);
 
   const isInsufficientMaterial = calcInsufficientMaterial(FENState.board);
+  const isThreefoldRepetition = calcThreefoldRepetition(state);
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
 
   const isStalemate = moves.length === 0 && !isKingUnderCheck;
   const isDraw =
     state.result === '1/2-1/2' ||
     (state.mode === 'standard' &&
-      (FENState.halfMoves === 50 || isStalemate || isInsufficientMaterial));
+      (FENState.halfMoves === 50 ||
+        isStalemate ||
+        isInsufficientMaterial ||
+        isThreefoldRepetition));
   const isCheckmate = isKingUnderCheck && moves.length === 0;
   const isWhiteWin =
     state.result === '1-0' || (isCheckmate && FENState.activeColor === 'w');
@@ -129,6 +102,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     isCheckmate,
     isCheck: isKingUnderCheck && !isCheckmate,
     isInsufficientMaterial,
+    isThreefoldRepetition,
     isDraw,
     isStalemate,
   };
@@ -143,8 +117,8 @@ export function start(state: ChessStartStateFEN): ChessState {
   return deriveState(fromFEN(state.initialFEN || state.FEN), {
     ...state,
     initialFEN: state.initialFEN || state.FEN,
-    moves: state.moves || [],
-    currentMove: state.currentMove || -1,
+    moves: state.moves || [{ FEN: state.initialFEN || state.FEN, san: [''] }],
+    currentMove: state.currentMove || 0,
   });
 }
 export function moveInternal(
@@ -155,30 +129,18 @@ export function moveInternal(
   if (inputState.currentMove !== inputState.moves.length - 1) {
     return state;
   }
-  try {
-    const move = translateSANToMove(san, state.movesBoard);
-    const FENStateWithMove = updateFENStateWithMove(
-      move,
-      state.board,
-      state.activeColor,
-      state.castlingRights,
-      state.halfMoves,
-      state.fullMoves
-    );
-    state.moves = [...state.moves, { ...move, FEN: toFEN(FENStateWithMove) }];
-    state.currentMove = state.moves.length - 1;
-    return deriveState(FENStateWithMove, state);
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      state.moves = [
-        ...state.moves,
-        { san: [san], FEN: toFEN(state), error: e.message },
-      ];
-      state.error = e.message;
-      return state;
-    }
-    return state;
-  }
+  const move = translateSANToMove(san, state.movesBoard);
+  const FENStateWithMove = updateFENStateWithMove(
+    move,
+    state.board,
+    state.activeColor,
+    state.castlingRights,
+    state.halfMoves,
+    state.fullMoves
+  );
+  state.moves = [...state.moves, { ...move, FEN: toFEN(FENStateWithMove) }];
+  state.currentMove = state.moves.length - 1;
+  return deriveState(FENStateWithMove, state);
 }
 
 export function move(san: string, inputState: ChessInitialState): ChessState {

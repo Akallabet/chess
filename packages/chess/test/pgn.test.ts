@@ -325,14 +325,13 @@ g6 4. Qxf7# 1-0`;
 
 1. e4 e5 2. Bc4 b7 3. Qf3
 g6 4. Qxf7# 1-0`;
-    const state = fromPGNString(pgn);
-    t.same('WRONG_MOVE', state.moves[state.moves.length - 1].error);
-    t.same('WRONG_MOVE', state.error);
-    t.same(
-      'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2',
-      state.FEN
-    );
-    t.end();
+    try {
+      fromPGNString(pgn);
+    } catch (e) {
+      t.same('WRONG_MOVE', e.name);
+      t.same('WRONG_MOVE', e.name);
+      t.end();
+    }
   });
 
   t.test(

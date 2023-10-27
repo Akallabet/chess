@@ -114,6 +114,11 @@ export function translateSANToMove(
   const move = moves.find(move =>
     move.san.find(sanString => sanString === san)
   );
-  if (!move) throw new Error(errorCodes.wrongMove);
+  if (!move) {
+    const e = new Error(errorCodes.wrongMove);
+    e.name = errorCodes.wrongMove;
+    e.message = `${san} does not exist in the current position`;
+    throw e;
+  }
   return move;
 }

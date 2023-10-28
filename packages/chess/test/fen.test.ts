@@ -1,4 +1,5 @@
-import t from 'tap';
+import test from 'node:test';
+import { strict as assert } from 'node:assert';
 import {
   fromFEN,
   isFEN,
@@ -8,84 +9,71 @@ import {
 } from '../src/fen.js';
 import { FENState, Square } from '../src/types.js';
 
-t.test('Check FEN format', t => {
-  t.plan(3);
-  t.test('Empty board', t => {
-    t.same(isFEN('8/8/8/8/8/8/8/8 w KQkq - 0 1'), true);
-    t.end();
+test('Check FEN format', async t => {
+  await t.test('Empty board', () => {
+    assert.strictEqual(isFEN('8/8/8/8/8/8/8/8 w KQkq - 0 1'), true);
   });
-  t.test('Too many empty cells', t => {
-    t.same(isFEN('9/8/8/8/8/8/8/8 w KQkq - 0 1'), false);
-    t.end();
+  await t.test('Too many empty cells', () => {
+    assert.strictEqual(isFEN('9/8/8/8/8/8/8/8 w KQkq - 0 1'), false);
   });
-  t.test('Too few empty cells', t => {
-    t.same(isFEN('1/8/8/8/8/8/8/8 w KQkq - 0 1'), false);
-    t.end();
+  await t.test('Too few empty cells', () => {
+    assert.strictEqual(isFEN('1/8/8/8/8/8/8/8 w KQkq - 0 1'), false);
   });
-  t.end();
 });
 
-t.test('No castling rights', t => {
+test('No castling rights', () => {
   const FEN = '8/8/8/8/8/8/8/8 b - - 0 1';
-  t.same(
+  assert.deepEqual(
     {
       b: { kingSide: false, queenSide: false },
       w: { kingSide: false, queenSide: false },
     },
     fromFEN(FEN).castlingRights
   );
-
-  t.end();
 });
 
-t.test('No castling rights for black king', t => {
+test('No castling rights for black king', () => {
   const FEN = '8/8/8/8/8/8/8/8 b KQ - 0 1';
-  t.same(
+  assert.deepEqual(
     {
       b: { kingSide: false, queenSide: false },
       w: { kingSide: true, queenSide: true },
     },
     fromFEN(FEN).castlingRights
   );
-  t.end();
 });
 
-t.test('No kingside castling rights for black king', t => {
+test('No kingside castling rights for black king', () => {
   const FEN = '8/8/8/8/8/8/8/8 b KQq - 0 1';
-  t.same(
+  assert.deepEqual(
     {
       b: { kingSide: false, queenSide: true },
       w: { kingSide: true, queenSide: true },
     },
     fromFEN(FEN).castlingRights
   );
-  t.end();
 });
 
-t.test('No queenside castling rights for black king', t => {
+test('No queenside castling rights for black king', () => {
   const FEN = '8/8/8/8/8/8/8/8 b KQk - 0 1';
-  t.same(
+  assert.deepEqual(
     {
       b: { kingSide: true, queenSide: false },
       w: { kingSide: true, queenSide: true },
     },
     fromFEN(FEN).castlingRights
   );
-
-  t.end();
 });
 
-t.test('No kingside castling rights for white king', t => {
+test('No kingside castling rights for white king', () => {
   const FEN = '8/8/8/8/8/8/8/8 b Qk - 0 1';
-  t.same(
+  assert.deepEqual(
     {
       b: { kingSide: true, queenSide: false },
       w: { kingSide: false, queenSide: true },
     },
     fromFEN(FEN).castlingRights
   );
-
-  t.end();
 });
 
 const emptySquare: Square = '' as Square;
@@ -110,10 +98,10 @@ const emptyBoard = [
   emptyRow,
 ];
 
-t.test('Return object from FEN string', t => {
+test('Return object from FEN string', () => {
   const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
   const FENObj = fromFEN(FEN);
-  t.same(FENObj, {
+  assert.deepEqual(FENObj, {
     board: emptyBoard,
     activeColor: 'w',
     castlingRights: {
@@ -124,23 +112,18 @@ t.test('Return object from FEN string', t => {
     halfMoves: 0,
     fullMoves: 1,
   });
-  t.end();
 });
 
-t.test('Create board rows from piece placement', t => {
-  t.plan(2);
-  t.test('Empty row', t => {
-    t.same(rowFromFEN('8'), emptyRow);
-    t.end();
+test('Create board rows from piece placement', async t => {
+  await test('Empty row', t => {
+    assert.deepEqual(rowFromFEN('8'), emptyRow);
   });
-  t.test('Row with two pawns', t => {
-    t.same(rowFromFEN('2pp4'), ['', '', 'p', 'p', '', '', '', '']);
-    t.end();
+  await test('Row with two pawns', t => {
+    assert.deepEqual(rowFromFEN('2pp4'), ['', '', 'p', 'p', '', '', '', '']);
   });
-  t.end();
 });
 
-t.test('FEN string from object with empty board', t => {
+test('FEN string from object with empty board', () => {
   const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
   const FENObj: FENState = {
     board: emptyBoard,
@@ -153,11 +136,10 @@ t.test('FEN string from object with empty board', t => {
     halfMoves: 0,
     fullMoves: 1,
   };
-  t.same(FEN, toFEN(FENObj));
-  t.end();
+  assert.deepEqual(FEN, toFEN(FENObj));
 });
 
-t.test('FEN string from object with board', t => {
+test('FEN string from object with board', () => {
   const FEN = '3k2r/8/8/7P/8/8/8/8 w KQkq - 0 1';
   const board: Square[][] = [
     [emptySquare, emptySquare, emptySquare, 'k', emptySquare, emptySquare, 'r'],
@@ -189,11 +171,10 @@ t.test('FEN string from object with board', t => {
     halfMoves: 0,
     fullMoves: 1,
   };
-  t.same(FEN, toFEN(FENObj));
-  t.end();
+  assert.deepEqual(FEN, toFEN(FENObj));
 });
 
-t.test('Board with moves', t => {
+test('Board with moves', () => {
   const { board } = fromFEN(
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1'
   );
@@ -205,9 +186,8 @@ t.test('Board with moves', t => {
     },
     board
   );
-  t.same(
+  assert.deepEqual(
     boardMove,
     fromFEN('rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR w - - 0 1').board
   );
-  t.end();
 });

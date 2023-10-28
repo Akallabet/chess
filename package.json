@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "npm test --workspace=@chess/chess",
+    "test": "node --test --loader tsx packages/chess/test/**/*.test.ts",
     "test:watch": "npm run test:watch --workspace=@chess/chess",
     "test:only": "npm run test:only --workspace=@chess/chess",
     "tap": "tap",

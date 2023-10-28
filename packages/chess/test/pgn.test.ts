@@ -1,17 +1,16 @@
-import t from 'tap';
+import test from 'node:test';
+import { strict as assert } from 'node:assert';
 import { buildPGNString, fromPGNString, parseMoveText } from '../src/pgn.js';
 
-t.test('Build PGN string', t => {
-  t.plan(4);
-  t.test('Default tags', t => {
-    t.same(
+test('Build PGN string', async t => {
+  await t.test('Default tags', () => {
+    assert.strictEqual(
       buildPGNString({}),
       '[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n'
     );
-    t.end();
   });
-  t.test('Tags with values', t => {
-    t.same(
+  await t.test('Tags with values', () => {
+    assert.strictEqual(
       '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "*"]\n\n',
       buildPGNString({
         event: 'Test',
@@ -23,10 +22,9 @@ t.test('Build PGN string', t => {
         result: '*',
       })
     );
-    t.end();
   });
-  t.test('Moves', t => {
-    t.same(
+  await t.test('Moves', () => {
+    assert.strictEqual(
       '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "*"]\n1. e4 e5\n2. Nf3 Nc6\n\n',
       buildPGNString({
         event: 'Test',
@@ -92,11 +90,10 @@ t.test('Build PGN string', t => {
         ],
       })
     );
-    t.end();
   });
 
-  t.test('Moves with Checkmate', t => {
-    t.same(
+  await t.test('Moves with Checkmate', () => {
+    assert.strictEqual(
       [
         '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "1-0"]',
         '1. e4 e5\n2. Bc4 b6\n3. Qf3 g6\n4. Qxf7# 1-0\n\n',
@@ -206,96 +203,84 @@ t.test('Build PGN string', t => {
         ],
       })
     );
-    t.end();
   });
 });
 
-t.test('MoveText generation', t => {
-  t.plan(7);
-
-  t.test('Simple series of moves', t => {
+test('MoveText generation', async t => {
+  await t.test('Simple series of moves', () => {
     const moveText = '1. e4 e5 2. Bc4 b6 3. Qf3 g6';
     const result = parseMoveText(moveText);
-    t.same(6, result.length);
-    t.same('e4', result[0].san);
-    t.same('Bc4', result[2].san);
-    t.end();
+    assert.strictEqual(6, result.length);
+    assert.strictEqual('e4', result[0].san);
+    assert.strictEqual('Bc4', result[2].san);
   });
-  t.test('Short inline comment within {}', t => {
+  await t.test('Short inline comment within {}', () => {
     const moveText = '1. e4 e5 2. Bc4 b6 {This is a short comment} 3. Qf3 g6';
     const result = parseMoveText(moveText);
-    t.same(6, result.length);
-    t.same('e4', result[0].san);
-    t.same('b6', result[3].san);
-    t.same('This is a short comment', result[3].comment);
-    t.end();
+    assert.strictEqual(6, result.length);
+    assert.strictEqual('e4', result[0].san);
+    assert.strictEqual('b6', result[3].san);
+    assert.strictEqual('This is a short comment', result[3].comment);
   });
-  t.test('Long comment over 2 lines within {}', t => {
+  await t.test('Long comment over 2 lines within {}', () => {
     const moveText = `1. e4 e5 2. Bc4 {This is a longer comment.
  It is divided in two lines} b6 3. Qf3 g6`;
     const result = parseMoveText(moveText);
-    t.same(6, result.length);
-    t.same('e4', result[0].san);
-    t.same('b6', result[3].san);
-    t.same(
+    assert.strictEqual(6, result.length);
+    assert.strictEqual('e4', result[0].san);
+    assert.strictEqual('b6', result[3].san);
+    assert.strictEqual(
       'This is a longer comment. It is divided in two lines',
       result[2].comment
     );
-    t.end();
   });
-  t.test('Split move annotation', t => {
+  await t.test('Split move annotation', () => {
     const moveText = `1. e4 e5 2. Bc4 2... b6 {This is a longer comment.
   It is divided in two lines} 3. Qf3 g6`;
     const result = parseMoveText(moveText);
-    t.same(6, result.length);
-    t.same('e4', result[0].san);
-    t.same('b6', result[3].san);
-    t.same(
+    assert.strictEqual(6, result.length);
+    assert.strictEqual('e4', result[0].san);
+    assert.strictEqual('b6', result[3].san);
+    assert.strictEqual(
       'This is a longer comment. It is divided in two lines',
       result[3].comment
     );
-    t.end();
   });
-  t.test('Ignore simple move variations', t => {
+  await t.test('Ignore simple move variations', () => {
     const moveText = `1. e4 e5 2. Bc4 2... b6 {This is a longer comment.
   It is divided in two lines} 3. Qf3 (3. Qd2 {Move variation}) g6`;
     const result = parseMoveText(moveText);
-    t.same(6, result.length);
-    t.same('e4', result[0].san);
-    t.same('b6', result[3].san);
-    t.same('Qf3', result[4].san);
-    t.same('', result[4].comment);
-    t.same('g6', result[5].san);
-    t.end();
+    assert.strictEqual(6, result.length);
+    assert.strictEqual('e4', result[0].san);
+    assert.strictEqual('b6', result[3].san);
+    assert.strictEqual('Qf3', result[4].san);
+    assert.strictEqual('', result[4].comment);
+    assert.strictEqual('g6', result[5].san);
   });
-  t.test('Ignore nested move variations', t => {
+  await t.test('Ignore nested move variations', () => {
     const moveText = `8. exd5 exd5 {The best way to recapture. If Black takes with the knight,
   White gets the advantage in many ways.} (8... Nxd5 $6 9. Nxd5 (9. Nxc6 bxc6 10.
   Nxd5 $1 cxd5 11. Bd4 {And the white bishops aim dangerously towards the
   kingside.}) 9... Qxd5 10. Nxc6 Qxc6 11. Qg4 $1 {with a clear advantage for
   White.})`;
     const result = parseMoveText(moveText);
-    t.same(2, result.length);
-    t.end();
+    assert.strictEqual(2, result.length);
   });
-  t.test('Ignore NAGs', t => {
+  await t.test('Ignore NAGs', () => {
     const moveText = `1. e4 e5 2. Bc4 $11 2... b6 {This is a longer comment.
   It is divided in two lines} 3. Qf3 (3. Qd2 {Move variation}) g6`;
     const result = parseMoveText(moveText);
-    t.same(6, result.length);
-    t.same('e4', result[0].san);
-    t.same('b6', result[3].san);
-    t.same('Qf3', result[4].san);
-    t.same('', result[4].comment);
-    t.same('g6', result[5].san);
-    t.end();
+    assert.strictEqual(6, result.length);
+    assert.strictEqual('e4', result[0].san);
+    assert.strictEqual('b6', result[3].san);
+    assert.strictEqual('Qf3', result[4].san);
+    assert.strictEqual('', result[4].comment);
+    assert.strictEqual('g6', result[5].san);
   });
 });
 
-t.test('From PGN string', t => {
-  t.plan(4);
-
-  t.test('Couple of moves', t => {
+test('From PGN string', async t => {
+  await t.test('Couple of moves', () => {
     const pgn = `[Event "Local game"]
 [Site "localhost"]
 [Date "2023-08-18T20:58:38.737Z"]
@@ -307,14 +292,13 @@ t.test('From PGN string', t => {
 1. e4 e5 2. Bc4 b6 3. Qf3
 g6 4. Qxf7# 1-0`;
     const state = fromPGNString(pgn);
-    t.same(
+    assert.strictEqual(
       'rnbqkbnr/p1pp1Q1p/1p4p1/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4',
       state.FEN
     );
-    t.end();
   });
 
-  t.test('With a wrong move', t => {
+  await t.test('With a wrong move', () => {
     const pgn = `[Event "Local game"]
 [Site "localhost"]
 [Date "2023-08-18T20:58:38.737Z"]
@@ -328,15 +312,14 @@ g6 4. Qxf7# 1-0`;
     try {
       fromPGNString(pgn);
     } catch (e) {
-      t.same('WRONG_MOVE', e.name);
-      t.same('WRONG_MOVE', e.name);
-      t.end();
+      assert.strictEqual('WRONG_MOVE', e.name);
+      assert.strictEqual('WRONG_MOVE', e.name);
     }
   });
 
-  t.test(
+  await t.test(
     'Fischer, Robert J. vs. Spassky, Boris V. Belgrade, Serbia JUG: F/S Return Match: 1992.11.04',
-    t => {
+    () => {
       const pgn = `[Event "F/S Return Match"]
 [Site "Belgrade, Serbia JUG"]
 [Date "1992.11.04"]
@@ -354,21 +337,21 @@ hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
 Nf2 42. g4 Bd3 43. Re6 1/2-1/2`;
       const state = fromPGNString(pgn);
-      t.same('8/8/4R1p1/2k3p1/1p4P1/1P1b1P2/3K1n2/8 b - - 2 43', state.FEN);
-      t.has(state, {
-        event: 'F/S Return Match',
-        site: 'Belgrade, Serbia JUG',
-        date: '1992.11.04',
-        round: '29',
-        white: 'Fischer, Robert J.',
-        black: 'Spassky, Boris V.',
-        result: '1/2-1/2',
-      });
-      t.end();
+      assert.strictEqual(
+        '8/8/4R1p1/2k3p1/1p4P1/1P1b1P2/3K1n2/8 b - - 2 43',
+        state.FEN
+      );
+      assert.strictEqual(state.event, 'F/S Return Match');
+      assert.strictEqual(state.site, 'Belgrade, Serbia JUG');
+      assert.strictEqual(state.date, '1992.11.04');
+      assert.strictEqual(state.round, '29');
+      assert.strictEqual(state.white, 'Fischer, Robert J.');
+      assert.strictEqual(state.black, 'Spassky, Boris V.');
+      assert.strictEqual(state.result, '1/2-1/2');
     }
   );
 
-  t.test('The game of the century', t => {
+  await t.test('The game of the century', () => {
     const pgn = `[Event "World Championship 28th"]
   [Site "Reykjavik"]
   [Date "1972.08.31"]
@@ -459,19 +442,16 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2`;
   f2-pawn is lost.}) 0-1`;
 
     const state = fromPGNString(pgn);
-    t.same('8/3B4/5p2/5P1p/P4k2/1P6/r4PK1/8 b - - 1 41', state.FEN);
-    t.has(state, {
-      event: 'World Championship 28th',
-      site: 'Reykjavik',
-      date: '1972.08.31',
-      round: '21',
-      white: 'Boris Spassky',
-      black: 'Bobby Fischer',
-      result: '0-1',
-      isGameOver: true,
-      isCheckmate: false,
-      isWhiteWin: false,
-    });
-    t.end();
+    assert.strictEqual('8/3B4/5p2/5P1p/P4k2/1P6/r4PK1/8 b - - 1 41', state.FEN);
+    assert.strictEqual(state.event, 'World Championship 28th');
+    assert.strictEqual(state.site, 'Reykjavik');
+    assert.strictEqual(state.date, '1972.08.31');
+    assert.strictEqual(state.round, '21');
+    assert.strictEqual(state.white, 'Boris Spassky');
+    assert.strictEqual(state.black, 'Bobby Fischer');
+    assert.strictEqual(state.result, '0-1');
+    assert.strictEqual(state.isGameOver, true);
+    assert.strictEqual(state.isCheckmate, false);
+    assert.strictEqual(state.isWhiteWin, false);
   });
 });

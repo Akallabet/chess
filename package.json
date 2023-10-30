@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "node --test --loader tsx packages/chess/test/**/*.test.ts",
+    "test": "npm test --workspace=@chess/chess",
     "test:watch": "npm run test:watch --workspace=@chess/chess",
     "test:only": "npm run test:only --workspace=@chess/chess",
-    "tap": "tap",
     "build:chess": "npm run build --workspace=@chess/chess",
     "build": "npm run build --workspace=@chess/chessboard",
     "dev": "npm run dev --workspace=@chess/chessboard",
@@ -39,7 +38,6 @@
   "homepage": "https://github.com/Akallabet/chess#readme",
   "devDependencies": {
     "@types/node": "^20.8.9",
-    "@types/tap": "^15.0.8",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "eslint": "^8.30.0",

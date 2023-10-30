@@ -15,9 +15,8 @@
     "dist"
   ],
   "scripts": {
-    "test": "tap --rcfile=test/config/tap.yml",
-    "test:watch": "tap --watch --rcfile=test/config/tap.yml",
-    "test:only": "tap --only --rcfile=test/config/tap.yml",
+    "test": "node --test --loader tsx test/**/*.test.ts",
+    "test:watch": "node --test --watch --loader tsx test/**/*.test.ts",
     "emit:types": "tsc -p . --emitDeclarationOnly",
     "bundle": "swc src -d dist -q",
     "performances": "node ./scripts/performances.js",
@@ -35,7 +34,6 @@
     "eslint-plugin-import": "^2.26.0",
     "prettier": "^2.8.1",
     "prettier-plugin-tailwindcss": "^0.2.1",
-    "tap": "^16.3.2",
     "tsx": "^3.12.6",
     "typescript": "^4.9.4"
   }

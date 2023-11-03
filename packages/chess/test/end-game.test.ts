@@ -92,8 +92,18 @@ test('Draw by insufficient material - KB v kb - bishops on same color', () => {
 });
 
 test('Draw by threefold repetition', () => {
-  const FEN = '1r4k1/p2n3p/5np1/4p3/4P3/5PP1/2R2BB1/Kr4NR w - - 2 33';
-  const moves = ['Ka2', 'R1b4', 'Ka1', 'Rb1+', 'Ka2', 'R1b4', 'Ka1', 'Rb1+'];
+  const FEN = '1r4k1/p2n3p/5np1/4p3/4P3/1r3PP1/2R2BB1/K5NR b - - 1 32';
+  const moves = [
+    'Rb1+',
+    'Ka2',
+    'R1b4',
+    'Ka1',
+    'Rb1+',
+    'Ka2',
+    'R1b4',
+    'Ka1',
+    'Rb1+',
+  ];
   const state = moves.reduce(
     (state, san) => move(san, state),
     start({ FEN, mode: 'standard' })

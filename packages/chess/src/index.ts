@@ -1,9 +1,5 @@
-import { modes, files, ranks,  } from './constants.js';
-import {
-  fromFEN,
-  toFEN,
-  updateFENStateWithMove,
-} from './fen.js';
+import { modes, files, ranks } from './constants.js';
+import { fromFEN, toFEN, updateFENStateWithMove } from './fen.js';
 import {
   ChessInitialState,
   ChessState,
@@ -22,7 +18,10 @@ import {
 } from './moves/index.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
 import { buildPGNString, fromPGNString } from './pgn.js';
-import { calcInsufficientMaterial, calcThreefoldRepetition } from './end-game.js';
+import {
+  calcInsufficientMaterial,
+  calcThreefoldRepetition,
+} from './end-game.js';
 
 export function createMovesBoard(
   board: Square[][],
@@ -117,8 +116,8 @@ export function start(state: ChessStartStateFEN): ChessState {
   return deriveState(fromFEN(state.initialFEN || state.FEN), {
     ...state,
     initialFEN: state.initialFEN || state.FEN,
-    moves: state.moves || [{ FEN: state.initialFEN || state.FEN, san: [''] }],
-    currentMove: state.currentMove || 0,
+    moves: state.moves || [],
+    currentMove: state.currentMove || -1,
   });
 }
 export function moveInternal(

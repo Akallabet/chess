@@ -130,7 +130,7 @@ test('Go to first move', () => {
     state2.FEN,
     'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2'
   );
-  const state3 = goToMove(1, state2);
+  const state3 = goToMove(0, state2);
   assert.strictEqual(
     'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
     state3.FEN

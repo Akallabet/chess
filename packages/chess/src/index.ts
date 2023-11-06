@@ -49,13 +49,13 @@ export function createMovesBoard(
 }
 
 function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
-  const moves = generateLegalMovesForActiveSide(FENState);
+  const legalMoves = generateLegalMovesForActiveSide(FENState);
 
   const isInsufficientMaterial = calcInsufficientMaterial(FENState.board);
   const isThreefoldRepetition = calcThreefoldRepetition(state);
   const isKingUnderCheck = calcIfKingUnderCheck(FENState);
 
-  const isStalemate = moves.length === 0 && !isKingUnderCheck;
+  const isStalemate = legalMoves.length === 0 && !isKingUnderCheck;
   const isDraw =
     state.result === '1/2-1/2' ||
     (state.mode === 'standard' &&
@@ -63,7 +63,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
         isStalemate ||
         isInsufficientMaterial ||
         isThreefoldRepetition));
-  const isCheckmate = isKingUnderCheck && moves.length === 0;
+  const isCheckmate = isKingUnderCheck && legalMoves.length === 0;
   const isWhiteWin =
     state.result === '1-0' || (isCheckmate && FENState.activeColor === 'w');
   const isBlackWin =
@@ -81,7 +81,7 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     mode: state.mode || modes.standard,
     files,
     ranks,
-    movesBoard: createMovesBoard(FENState.board, moves),
+    movesBoard: createMovesBoard(FENState.board, legalMoves),
     FEN: toFEN(FENState),
     PGN: buildPGNString({ ...state, result }),
     initialFEN: state.initialFEN,
@@ -120,14 +120,7 @@ export function start(state: ChessStartStateFEN): ChessState {
     currentMove: state.currentMove || -1,
   });
 }
-export function moveInternal(
-  san: string,
-  inputState: ChessInitialState
-): ChessState {
-  const state = deriveState(fromFEN(inputState.FEN), inputState);
-  if (inputState.currentMove !== inputState.moves.length - 1) {
-    return state;
-  }
+export function moveInternal(san: string, state: ChessState): ChessState {
   const move = translateSANToMove(san, state.movesBoard);
   const FENStateWithMove = updateFENStateWithMove(
     move,
@@ -144,6 +137,9 @@ export function moveInternal(
 
 export function move(san: string, inputState: ChessInitialState): ChessState {
   const state = deriveState(fromFEN(inputState.FEN), inputState);
+  if (inputState.currentMove !== inputState.moves.length - 1) {
+    return state;
+  }
   if (state.isGameOver) return state;
   return moveInternal(san, state);
 }

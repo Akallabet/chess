@@ -15,7 +15,7 @@ import {
 import {
   generateLegalMovesForActiveSide,
   calcIfKingUnderCheck,
-} from './moves/index.js';
+} from './moves-generation.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
 import { buildPGNString, fromPGNString } from './pgn.js';
 import {
@@ -120,6 +120,7 @@ export function start(state: ChessStartStateFEN): ChessState {
     currentMove: state.currentMove || -1,
   });
 }
+
 export function moveInternal(san: string, state: ChessState): ChessState {
   const move = translateSANToMove(san, state.movesBoard);
   const FENStateWithMove = updateFENStateWithMove(

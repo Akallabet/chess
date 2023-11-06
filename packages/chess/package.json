@@ -15,8 +15,8 @@
     "dist"
   ],
   "scripts": {
-    "test": "node --test --loader tsx **/*.test.ts",
-    "test:watch": "node --test --watch --loader tsx **/*.test.ts",
+    "test": "node --test --loader tsx ./test/*.test.ts",
+    "test:watch": "node --test --watch --loader tsx ./test/*.test.ts",
     "emit:types": "tsc -p . --emitDeclarationOnly",
     "bundle": "swc src -d dist -q",
     "performances": "node ./scripts/performances.js",

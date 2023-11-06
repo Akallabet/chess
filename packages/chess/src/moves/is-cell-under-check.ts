@@ -8,12 +8,12 @@ export const canPieceMoveToTarget = (
   target: Coordinates,
   state: FENState
 ): boolean => {
+  const square = state.board[origin.y][origin.x];
+  const pattern = patterns[square] || patterns[square.toLowerCase()];
   const moves = generateMoves(
     origin,
     state,
-    patterns[state.board[origin.y][origin.x]].filter(
-      ({ recursive }) => !recursive
-    )
+    pattern.filter(({ recursive }) => !recursive)
   );
   const targetMove = moves.find(
     move => move.target.x === target.x && move.target.y === target.y

@@ -19,27 +19,20 @@ const lte =
     return n <= step;
   };
 
-const topLeft = ({ x, y }: Coordinates): Coordinates => ({
-  y: y - 1,
-  x: x - 1,
-});
-const topRight = ({ x, y }: Coordinates): Coordinates => ({
-  y: y - 1,
-  x: x + 1,
-});
-const bottomLeft = ({ x, y }: Coordinates): Coordinates => ({
-  y: y + 1,
-  x: x - 1,
-});
-const bottomRight = ({ x, y }: Coordinates): Coordinates => ({
-  y: y + 1,
-  x: x + 1,
-});
+function jumpTo(args: Coordinates) {
+  return function ({ x, y }: Coordinates): Coordinates {
+    return { x: x + args.x, y: y + args.y };
+  };
+}
 
-const top = ({ y, x }: Coordinates): Coordinates => ({ y: y - 1, x });
-const bottom = ({ y, x }: Coordinates): Coordinates => ({ y: y + 1, x });
-const right = ({ y, x }: Coordinates): Coordinates => ({ y, x: x + 1 });
-const left = ({ y, x }: Coordinates): Coordinates => ({ y, x: x - 1 });
+const topLeft = jumpTo({ x: -1, y: -1 });
+const topRight = jumpTo({ x: 1, y: -1 });
+const bottomLeft = jumpTo({ x: -1, y: 1 });
+const bottomRight = jumpTo({ x: 1, y: 1 });
+const top = jumpTo({ x: 0, y: -1 });
+const bottom = jumpTo({ x: 0, y: 1 });
+const right = jumpTo({ x: 1, y: 0 });
+const left = jumpTo({ x: -1, y: 0 });
 
 function stopIfOpponent({ target, origin, state }: PatternState): boolean {
   return (
@@ -67,7 +60,7 @@ export interface Pattern {
   recursive?: boolean;
 }
 
-const basePatterns: Record<string, Array<Pattern>> = {
+export const patterns: Record<string, Array<Pattern>> = {
   p: [
     {
       advance: bottom,
@@ -222,59 +215,35 @@ const basePatterns: Record<string, Array<Pattern>> = {
   ],
   n: [
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x + 2,
-        y: y + 1,
-      }),
+      advance: jumpTo({ x: 2, y: 1 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x + 1,
-        y: y + 2,
-      }),
+      advance: jumpTo({ x: 1, y: 2 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x - 1,
-        y: y + 2,
-      }),
+      advance: jumpTo({ x: -1, y: 2 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x - 2,
-        y: y + 1,
-      }),
+      advance: jumpTo({ x: -2, y: 1 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x - 2,
-        y: y - 1,
-      }),
+      advance: jumpTo({ x: -2, y: -1 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x - 1,
-        y: y - 2,
-      }),
+      advance: jumpTo({ x: -1, y: -2 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x + 1,
-        y: y - 2,
-      }),
+      advance: jumpTo({ x: 1, y: -2 }),
       shallStop: lte(1),
     },
     {
-      advance: ({ x, y }: Coordinates): Coordinates => ({
-        x: x + 2,
-        y: y - 1,
-      }),
+      advance: jumpTo({ x: 2, y: -1 }),
       shallStop: lte(1),
     },
   ],
@@ -419,19 +388,4 @@ const basePatterns: Record<string, Array<Pattern>> = {
     { advance: topLeft, shallStop: lte(1) },
     { advance: bottomLeft, shallStop: lte(1) },
   ],
-};
-
-export const patterns: Record<string, Array<Pattern>> = {
-  p: basePatterns.p,
-  P: basePatterns.P,
-  r: basePatterns.r,
-  R: basePatterns.r,
-  b: basePatterns.b,
-  B: basePatterns.b,
-  n: basePatterns.n,
-  N: basePatterns.n,
-  q: basePatterns.q,
-  Q: basePatterns.q,
-  k: basePatterns.k,
-  K: basePatterns.K,
 };

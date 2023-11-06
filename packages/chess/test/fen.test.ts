@@ -111,6 +111,10 @@ test('Return object from FEN string', () => {
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
+    kings: {
+      b: undefined,
+      w: undefined,
+    },
   });
 });
 
@@ -135,6 +139,10 @@ test('FEN string from object with empty board', () => {
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
+    kings: {
+      b: undefined,
+      w: undefined,
+    },
   };
   assert.deepEqual(FEN, toFEN(FENObj));
 });
@@ -170,6 +178,10 @@ test('FEN string from object with board', () => {
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
+    kings: {
+      b: undefined,
+      w: undefined,
+    },
   };
   assert.deepEqual(FEN, toFEN(FENObj));
 });

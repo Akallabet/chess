@@ -89,6 +89,10 @@ export interface FENState {
   enPassant: Coordinates | false;
   halfMoves: number;
   fullMoves: number;
+  kings: {
+    w?: Coordinates;
+    b?: Coordinates;
+  };
 }
 
 export type PGNTag =

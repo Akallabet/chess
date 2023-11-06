@@ -1,4 +1,4 @@
-import { whitePieces, blackPieces, flags, piecesByColor } from './constants.js';
+import { whitePieces, blackPieces, flags } from './constants.js';
 import { updateFENStateWithMove } from './fen.js';
 import {
   ChessColor,
@@ -9,12 +9,7 @@ import {
   Piece,
   Square,
 } from './types.js';
-import {
-  areOpponents,
-  getOpponentColor,
-  getPieceCoord,
-  isActiveColorPiece,
-} from './utils.js';
+import { areOpponents, getOpponentColor, isActiveColorPiece } from './utils.js';
 
 export function canPieceMoveToTarget(
   origin: Coordinates,
@@ -523,28 +518,17 @@ export function generateMoves(
   });
 }
 
-function getOwnKingCoord(state: FENState): Coordinates | undefined {
-  return getPieceCoord(piecesByColor[state.activeColor].king, state.board);
-}
-function getOpponentKingCoord(state: FENState): Coordinates | undefined {
-  return getPieceCoord(
-    piecesByColor[getOpponentColor(state.activeColor)].king,
-    state.board
-  );
-}
-
 export function calcIfKingUnderCheck(state: FENState): boolean {
-  const kingCoord = getOwnKingCoord(state);
-  if (!kingCoord) return false;
+  if (!state.kings[state.activeColor]) return false;
   return isCellUnderCheck(
     state,
-    kingCoord,
+    state.kings[state.activeColor] as Coordinates, //why Typescript, why?????
     getOpponentColor(state.activeColor)
   );
 }
 
 export function isOpponentKingUnderCheck(state: FENState): boolean {
-  const kingCoord = getOpponentKingCoord(state);
+  const kingCoord = state.kings[getOpponentColor(state.activeColor)];
   if (!kingCoord) return false;
   return isCellUnderCheck(state, kingCoord);
 }
@@ -603,7 +587,7 @@ function calcCheckFlags(
   const check = calcIfKingUnderCheck(moveState);
   if (!check) return {};
 
-  if (!getOwnKingCoord(moveState)) return {};
+  if (!state.kings[moveState.activeColor]) return {};
 
   const checkmate = generateLegalMoves(moveState).length === 0;
   if (checkmate) return { checkmate };

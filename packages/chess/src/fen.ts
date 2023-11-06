@@ -20,7 +20,13 @@ import {
   MoveBase,
   CastlingRights,
 } from './types.js';
-import { isKing, isPawn, isRook, isWhitePiece } from './utils.js';
+import {
+  isKing,
+  isPawn,
+  isRook,
+  isWhitePiece,
+  getPieceCoord,
+} from './utils.js';
 
 export function rowFromFEN(FENRow: string): Square[] {
   const elements = FENRow.split('');
@@ -64,8 +70,9 @@ export function fromFEN(FEN: string): FENState {
     Number(fullMoves) >= 0;
 
   if (isValidFEN) {
+    const board = boardFromFEN(piecePlacement);
     return {
-      board: boardFromFEN(piecePlacement),
+      board,
       activeColor,
       castlingRights:
         castlingRights === '-'
@@ -92,6 +99,10 @@ export function fromFEN(FEN: string): FENState {
           }),
       halfMoves: Number(halfMoves),
       fullMoves: Number(fullMoves),
+      kings: {
+        w: getPieceCoord(whitePieces.king, board),
+        b: getPieceCoord(blackPieces.king, board),
+      },
     };
   }
   throw new Error(errorCodes.invalid_fen);
@@ -240,6 +251,7 @@ export function updateFENStateWithMove(
   halfMoves: number,
   fullMoves: number
 ): FENState {
+  const boardWithMove = updateBoardWithMove(move, board);
   return {
     castlingRights: updateCastlingRights(
       move,
@@ -247,10 +259,14 @@ export function updateFENStateWithMove(
       activeColor,
       castlingRights
     ),
-    board: updateBoardWithMove(move, board),
+    board: boardWithMove,
     activeColor: changeActiveColor(activeColor),
     halfMoves: isPawn(move.piece) || move.capture ? 0 : halfMoves + 1,
     fullMoves: activeColor === colours.b ? fullMoves + 1 : fullMoves,
     enPassant: updateEnPassant(move),
+    kings: {
+      w: getPieceCoord(whitePieces.king, boardWithMove),
+      b: getPieceCoord(blackPieces.king, boardWithMove),
+    },
   };
 }

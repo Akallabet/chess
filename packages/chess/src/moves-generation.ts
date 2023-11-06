@@ -18,7 +18,7 @@ export function canPieceMoveToTarget(
 ): boolean {
   const square = state.board[origin.y][origin.x];
   const pattern = patterns[square] || patterns[square.toLowerCase()];
-  const moves = generateMoves(
+  const moves = generateMovesForPattern(
     origin,
     state,
     pattern.filter(({ recursive }) => !recursive)
@@ -502,7 +502,7 @@ const generateMovesFromPatterns = ({
   return moves;
 };
 
-export function generateMoves(
+export function generateMovesForPattern(
   coord: Coordinates,
   state: FENState,
   piecePatterns: Array<Pattern>
@@ -546,7 +546,7 @@ function isMoveValid(move: MoveBase, state: FENState): boolean {
   );
 }
 
-function generateLegalMoves(state: FENState): Array<MoveBase> {
+function generateMoves(state: FENState): Array<MoveBase> {
   const moves: Array<MoveBase> = [];
   for (let y = 0; y < state.board.length; y++) {
     const row = state.board[y];
@@ -554,7 +554,7 @@ function generateLegalMoves(state: FENState): Array<MoveBase> {
       const square = row[x];
       if (square && isActiveColorPiece(state.activeColor, square)) {
         const pattern = patterns[square] || patterns[square.toLowerCase()];
-        const pieceMoves = generateMoves({ y, x }, state, pattern)
+        const pieceMoves = generateMovesForPattern({ y, x }, state, pattern)
           .map(move => {
             if (move.promotion) {
               return move.promotion.map(promotion => ({
@@ -565,7 +565,7 @@ function generateLegalMoves(state: FENState): Array<MoveBase> {
             return move;
           })
           .flat();
-        moves.push(...pieceMoves.filter(move => isMoveValid(move, state)));
+        moves.push(...pieceMoves);
       }
     }
   }
@@ -589,18 +589,20 @@ function calcCheckFlags(
 
   if (!state.kings[moveState.activeColor]) return {};
 
-  const checkmate = generateLegalMoves(moveState).length === 0;
+  const checkmate =
+    generateMoves(moveState).filter(move => isMoveValid(move, moveState))
+      .length === 0;
   if (checkmate) return { checkmate };
   return { check: true };
 }
 
-export function generateLegalMovesForActiveSide(
-  state: FENState
-): Array<MoveBase> {
-  return generateLegalMoves(state).map(move => {
-    return {
-      ...move,
-      ...calcCheckFlags(move, state),
-    };
-  });
+export function generateLegalMoves(state: FENState): Array<MoveBase> {
+  return generateMoves(state)
+    .filter(move => isMoveValid(move, state))
+    .map(move => {
+      return {
+        ...move,
+        ...calcCheckFlags(move, state),
+      };
+    });
 }

@@ -13,7 +13,7 @@ import {
 } from './types.js';
 
 import {
-  generateLegalMovesForActiveSide,
+  generateLegalMoves,
   calcIfKingUnderCheck,
 } from './moves-generation.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
@@ -49,7 +49,7 @@ export function createMovesBoard(
 }
 
 function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
-  const legalMoves = generateLegalMovesForActiveSide(FENState);
+  const legalMoves = generateLegalMoves(FENState);
 
   const isInsufficientMaterial = calcInsufficientMaterial(FENState.board);
   const isThreefoldRepetition = calcThreefoldRepetition(state);

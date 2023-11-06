@@ -2,8 +2,8 @@ import test from 'node:test';
 import { strict as assert } from 'node:assert';
 import { fromFEN } from '../src/fen.js';
 import {
-  generateMoves,
-  generateLegalMovesForActiveSide,
+  generateMovesForPattern,
+  generateLegalMoves,
   calcIfKingUnderCheck,
   isOpponentKingUnderCheck,
   patterns,
@@ -38,7 +38,7 @@ test('Get moves - Black pawn - rank 7', t => {
     FEN: '8/4p3/8/8/8/8/8/8 b KQkq - 0 1',
   });
   const origin = { x: 4, y: 1 };
-  const input = generateMoves(origin, state, patterns['p']);
+  const input = generateMovesForPattern(origin, state, patterns['p']);
   const expected = [
     { target: { x: 4, y: 2 }, piece: 'p' },
     { target: { x: 4, y: 3 }, piece: 'p' },
@@ -49,7 +49,7 @@ test('Get moves - Black pawn - rank 7', t => {
 
 test('Get moves - Black pawn - after rank 7', t => {
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       { x: 4, y: 2 },
       start({ mode: 'demo', FEN: '8/8/4p3/8/8/8/8/8 b KQkq - 0 1' }),
       patterns['p']
@@ -66,7 +66,7 @@ test('Get moves - Black pawn - after rank 7', t => {
 test('Get moves - Black pawn - other piece in front', t => {
   const origin = { x: 4, y: 1 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/4p3/4p3/8/8/8/8/8 b KQkq - 0 1' }),
       patterns['p']
@@ -77,7 +77,7 @@ test('Get moves - Black pawn - other piece in front', t => {
 test('Get moves - Black pawn - moves and captures', t => {
   const origin = { x: 4, y: 1 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/4p3/3P4/8/8/8/8/8 b KQkq - 0 1' }),
       patterns['p']
@@ -96,7 +96,7 @@ test('Get moves - Black pawn - moves and captures', t => {
 test('Get moves - White pawn - moves and captures', t => {
   const origin = { x: 4, y: 6 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/8/8/8/8/3p4/4P3/8 w KQkq - 0 1' }),
       patterns['P']
@@ -116,7 +116,7 @@ test('Get moves - White pawn - moves and captures', t => {
 test('Select pawn on file h', t => {
   const origin = { x: 7, y: 1 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/7p/8/8/8/8/8/8 b KQkq - 0 1' }),
       patterns['p']
@@ -129,7 +129,7 @@ test('Select pawn on file h', t => {
 
 test('Select knight', t => {
   const origin = { x: 4, y: 3 };
-  const actual = generateMoves(
+  const actual = generateMovesForPattern(
     origin,
     fromFEN('8/8/8/4n3/8/8/8/8 b KQkq - 0 1'),
     patterns['n']
@@ -167,7 +167,7 @@ test('Highlight Bishop moves', t => {
     { target: { x: 6, y: 5 } },
   ];
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4b3/8/8/1P5q/8 b KQkq - 0 2' }),
       patterns['b']
@@ -192,7 +192,7 @@ test('Highlight Rook moves', t => {
   ];
   const origin = { x: 4, y: 3 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4r2q/8/8/4P3/8 b KQkq - 0 1' }),
       patterns['r']
@@ -229,7 +229,7 @@ test('Highlight Queen moves', t => {
   ];
   const origin = { x: 4, y: 3 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4q2q/8/8/1P2P2b/8 b KQkq - 0 1' }),
       patterns['q']
@@ -250,7 +250,7 @@ test('Highlight King moves', t => {
   ];
   const origin = { x: 4, y: 3 };
   assert.deepStrictEqual(
-    generateMoves(
+    generateMovesForPattern(
       origin,
       start({ mode: 'demo', FEN: '8/8/8/4k3/8/8/8/8 b KQkq - 0 1' }),
       patterns['k']
@@ -293,9 +293,7 @@ test('Highligh moves with king under check', t => {
     },
   ];
   const FEN = '6k1/3pp3/8/8/8/8/B7/3K4 b KQkq - 0 1';
-  const actual = generateLegalMovesForActiveSide(
-    start({ FEN, mode: 'standard' })
-  );
+  const actual = generateLegalMoves(start({ FEN, mode: 'standard' }));
   assert.deepStrictEqual(actual, expected);
 });
 
@@ -370,9 +368,7 @@ test('Highlight moves of king under check', t => {
       },
     },
   ];
-  const actual = generateLegalMovesForActiveSide(
-    start({ FEN, mode: 'standard' })
-  );
+  const actual = generateLegalMoves(start({ FEN, mode: 'standard' }));
   assert.deepStrictEqual(actual, expected);
 });
 
@@ -389,7 +385,7 @@ test('Highlight kingside castling when no cells are in check and empty', t => {
     { piece: 'k', origin, target: { x: 5, y: 0 } },
     { piece: 'k', origin, target: { x: 4, y: 1 } },
   ];
-  const actual = generateLegalMovesForActiveSide({
+  const actual = generateLegalMoves({
     ...fromFEN(FEN),
   }).filter(({ piece }) => piece === 'k');
   assert.deepStrictEqual(actual, expected);
@@ -408,7 +404,7 @@ test('Highlight queenside castling when no cells are in check and empty', t => {
     },
     { piece: 'k', origin, target: { y: 1, x: 4 } },
   ];
-  const actual = generateMoves(
+  const actual = generateMovesForPattern(
     origin,
     {
       ...fromFEN(FEN),
@@ -440,7 +436,7 @@ test('Highlight kingside and queenside castling for white', t => {
       kingSideCastling: true,
     },
   ];
-  const actual = generateLegalMovesForActiveSide({
+  const actual = generateLegalMoves({
     ...fromFEN(FEN),
   }).filter(({ piece }) => piece === 'K');
   assert.deepStrictEqual(
@@ -453,9 +449,9 @@ test('No castling moves if one of the castling cells is under check', t => {
   const FEN = 'r3k2r/pp1p1ppp/1b2pn2/8/8/BP2P1Q1/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const origin = { x: 4, y: 0 };
   const expected = [{ target: { x: 3, y: 0 } }];
-  const actual = generateLegalMovesForActiveSide(
-    start({ FEN, mode: 'standard' })
-  ).filter(({ piece }) => piece === 'k');
+  const actual = generateLegalMoves(start({ FEN, mode: 'standard' })).filter(
+    ({ piece }) => piece === 'k'
+  );
   assert.deepStrictEqual(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
@@ -466,9 +462,9 @@ test('No castling moves if one of the castling cells is occupied', t => {
   const FEN = 'rn2k2r/pp1p1ppp/1b2pn2/8/8/BP2PQ2/P1PP1PPP/RN2KBNR b KQkq - 0 1';
   const expected = [{ target: { x: 3, y: 0 } }];
   const origin = { x: 4, y: 0 };
-  const actual = generateLegalMovesForActiveSide(
-    start({ FEN, mode: 'standard' })
-  ).filter(({ piece }) => piece === 'k');
+  const actual = generateLegalMoves(start({ FEN, mode: 'standard' })).filter(
+    ({ piece }) => piece === 'k'
+  );
   assert.deepStrictEqual(
     actual.sort(compareByMove),
     expected.sort(compareByMove).map(addOrigin(origin)).map(addPiece('k'))
@@ -535,16 +531,14 @@ test('Highlight check', t => {
       target: { x: 0, y: 2 },
     },
   ];
-  const actual = generateLegalMovesForActiveSide(
-    start({ FEN, mode: 'standard' })
-  );
+  const actual = generateLegalMoves(start({ FEN, mode: 'standard' }));
   assert.deepStrictEqual(actual, expected);
 });
 
 test('Highlight checkmate', t => {
   const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
   const FENState = fromFEN(FEN);
-  const moves = generateLegalMovesForActiveSide({
+  const moves = generateLegalMoves({
     ...FENState,
   });
   const checkMateMoves = moves.filter(move => move.checkmate);

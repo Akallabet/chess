@@ -1,4 +1,4 @@
-import { whitePieces, blackPieces, flags } from './constants.js';
+import { whitePieces, blackPieces, flags, piecesByColor } from './constants.js';
 import { updateFENStateWithMove } from './fen.js';
 import {
   ChessColor,
@@ -546,8 +546,12 @@ function isMoveValid(move: MoveBase, state: FENState): boolean {
   );
 }
 
-function generateMoves(state: FENState): Array<MoveBase> {
+function generateMoves(state: FENState): {
+  moves: Array<MoveBase>;
+  attackedSquares: Record<string, boolean>;
+} {
   const moves: Array<MoveBase> = [];
+  const attackedSquares: Record<string, boolean> = {};
   for (let y = 0; y < state.board.length; y++) {
     const row = state.board[y];
     for (let x = 0; x < row.length; x++) {
@@ -562,6 +566,7 @@ function generateMoves(state: FENState): Array<MoveBase> {
                 promotion: [promotion],
               }));
             }
+            attackedSquares[`${move.target.x},${move.target.y}`] = true;
             return move;
           })
           .flat();
@@ -569,7 +574,10 @@ function generateMoves(state: FENState): Array<MoveBase> {
       }
     }
   }
-  return moves;
+  return {
+    attackedSquares,
+    moves,
+  };
 }
 
 function calcCheckFlags(
@@ -584,13 +592,20 @@ function calcCheckFlags(
     state.halfMoves,
     state.fullMoves
   );
-  const check = calcIfKingUnderCheck(moveState);
+  const check = generateMoves({
+    ...moveState,
+    activeColor: state.activeColor,
+  }).moves.find(
+    ({ target }) =>
+      moveState.board[target.y][target.x] ===
+      piecesByColor[moveState.activeColor].king
+  );
   if (!check) return {};
 
   if (!state.kings[moveState.activeColor]) return {};
 
   const checkmate =
-    generateMoves(moveState).filter(move => isMoveValid(move, moveState))
+    generateMoves(moveState).moves.filter(move => isMoveValid(move, moveState))
       .length === 0;
   if (checkmate) return { checkmate };
   return { check: true };
@@ -598,7 +613,7 @@ function calcCheckFlags(
 
 export function generateLegalMoves(state: FENState): Array<MoveBase> {
   return generateMoves(state)
-    .filter(move => isMoveValid(move, state))
+    .moves.filter(move => isMoveValid(move, state))
     .map(move => {
       return {
         ...move,

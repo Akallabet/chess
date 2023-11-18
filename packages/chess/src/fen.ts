@@ -103,6 +103,7 @@ export function fromFEN(FEN: string): FENState {
         w: getPieceCoord(whitePieces.king, board),
         b: getPieceCoord(blackPieces.king, board),
       },
+      opponentColor: activeColor === colours.w ? colours.b : colours.w,
     };
   }
   throw new Error(errorCodes.invalid_fen);
@@ -152,9 +153,6 @@ export function isFEN(FEN: string) {
       .every(row => rowFromFEN(row).length === 8)
   );
 }
-
-const changeActiveColor = (activeColor: ChessColor): ChessColor =>
-  activeColor === colours.w ? colours.b : colours.w;
 
 export function updateBoardWithMove(move: MoveBase, board: Square[][]) {
   const boardWithMove = board.map(row => row.map(cell => cell));
@@ -249,7 +247,8 @@ export function updateFENStateWithMove(
   activeColor: ChessColor,
   castlingRights: CastlingRights,
   halfMoves: number,
-  fullMoves: number
+  fullMoves: number,
+  opponentColor: ChessColor
 ): FENState {
   const boardWithMove = updateBoardWithMove(move, board);
   return {
@@ -260,7 +259,7 @@ export function updateFENStateWithMove(
       castlingRights
     ),
     board: boardWithMove,
-    activeColor: changeActiveColor(activeColor),
+    activeColor: opponentColor,
     halfMoves: isPawn(move.piece) || move.capture ? 0 : halfMoves + 1,
     fullMoves: activeColor === colours.b ? fullMoves + 1 : fullMoves,
     enPassant: updateEnPassant(move),
@@ -268,5 +267,6 @@ export function updateFENStateWithMove(
       w: getPieceCoord(whitePieces.king, boardWithMove),
       b: getPieceCoord(blackPieces.king, boardWithMove),
     },
+    opponentColor: activeColor,
   };
 }

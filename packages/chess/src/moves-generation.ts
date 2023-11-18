@@ -9,7 +9,7 @@ import {
   Piece,
   Square,
 } from './types.js';
-import { areOpponents, getOpponentColor, isActiveColorPiece } from './utils.js';
+import { areOpponents, isActiveColorPiece } from './utils.js';
 
 export function canPieceMoveToTarget(
   origin: Coordinates,
@@ -332,7 +332,7 @@ export const patterns: Record<string, Array<Pattern>> = {
         const castlingCells = [origin, ...castlingEmptyCells, target];
         return (
           castlingCells.some(target =>
-            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+            isCellUnderCheck(state, target, state.opponentColor)
           ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
@@ -357,7 +357,7 @@ export const patterns: Record<string, Array<Pattern>> = {
         const castlingCells = [origin, ...castlingEmptyCells, target];
         return (
           castlingCells.some(target =>
-            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+            isCellUnderCheck(state, target, state.opponentColor)
           ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
@@ -391,7 +391,7 @@ export const patterns: Record<string, Array<Pattern>> = {
         const castlingCells = [origin, ...castlingEmptyCells, target];
         return (
           castlingCells.some(target =>
-            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+            isCellUnderCheck(state, target, state.opponentColor)
           ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
@@ -416,7 +416,7 @@ export const patterns: Record<string, Array<Pattern>> = {
         const castlingCells = [origin, ...castlingEmptyCells, target];
         return (
           castlingCells.some(target =>
-            isCellUnderCheck(state, target, getOpponentColor(state.activeColor))
+            isCellUnderCheck(state, target, state.opponentColor)
           ) || castlingEmptyCells.some(coord => state.board[coord.y][coord.x])
         );
       },
@@ -523,27 +523,24 @@ export function calcIfKingUnderCheck(state: FENState): boolean {
   return isCellUnderCheck(
     state,
     state.kings[state.activeColor] as Coordinates, //why Typescript, why?????
-    getOpponentColor(state.activeColor)
+    state.opponentColor
   );
-}
-
-export function isOpponentKingUnderCheck(state: FENState): boolean {
-  const kingCoord = state.kings[getOpponentColor(state.activeColor)];
-  if (!kingCoord) return false;
-  return isCellUnderCheck(state, kingCoord);
 }
 
 function isMoveValid(move: MoveBase, state: FENState): boolean {
-  return !isOpponentKingUnderCheck(
-    updateFENStateWithMove(
-      move,
-      state.board,
-      state.activeColor,
-      state.castlingRights,
-      state.halfMoves,
-      state.fullMoves
-    )
+  const moveState = updateFENStateWithMove(
+    move,
+    state.board,
+    state.activeColor,
+    state.castlingRights,
+    state.halfMoves,
+    state.fullMoves,
+    state.opponentColor
   );
+
+  const kingCoord = moveState.kings[moveState.opponentColor];
+  if (!kingCoord) return false;
+  return !isCellUnderCheck(moveState, kingCoord);
 }
 
 function generateMoves(state: FENState): {
@@ -590,7 +587,8 @@ function calcCheckFlags(
     state.activeColor,
     state.castlingRights,
     state.halfMoves,
-    state.fullMoves
+    state.fullMoves,
+    state.opponentColor
   );
   const check = generateMoves({
     ...moveState,

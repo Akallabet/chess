@@ -129,7 +129,8 @@ export function moveInternal(san: string, state: ChessState): ChessState {
     state.activeColor,
     state.castlingRights,
     state.halfMoves,
-    state.fullMoves
+    state.fullMoves,
+    state.opponentColor
   );
   state.moves = [...state.moves, { ...move, FEN: toFEN(FENStateWithMove) }];
   state.currentMove = state.moves.length - 1;

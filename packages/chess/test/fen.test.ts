@@ -115,6 +115,7 @@ test('Return object from FEN string', () => {
       b: undefined,
       w: undefined,
     },
+    opponentColor: 'b',
   });
 });
 

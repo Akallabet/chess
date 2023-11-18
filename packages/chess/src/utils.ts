@@ -12,8 +12,6 @@ export const isWhitePiece = (piece: Piece): boolean =>
   whitePiecesArray.includes(piece);
 export const isBlackPiece = (piece: Piece): boolean =>
   blackPiecesArray.includes(piece);
-export const getOpponentColor = (color: ChessColor): ChessColor =>
-  color === colours.w ? colours.b : colours.w;
 export const getPieceColor = (piece: Piece) =>
   isWhitePiece(piece) ? colours.w : colours.b;
 export const isOpponentPiece = (color: ChessColor, piece: Piece): boolean =>

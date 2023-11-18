@@ -5,7 +5,6 @@ import {
   generateMovesForPattern,
   generateLegalMoves,
   calcIfKingUnderCheck,
-  isOpponentKingUnderCheck,
   patterns,
   canPieceMoveToTarget,
   isCellUnderCheck,
@@ -548,10 +547,6 @@ test('Highlight checkmate', t => {
 test('Own king is in check', t => {
   const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 b - - 0 1');
   assert.deepStrictEqual(calcIfKingUnderCheck(state), true);
-});
-test('Opponent king is in check', t => {
-  const state = fromFEN('R3k3/8/8/8/8/8/8/4K3 w - - 0 1');
-  assert.deepStrictEqual(isOpponentKingUnderCheck(state), true);
 });
 
 test('e8 Black king not under check by e2 white bishop', () => {

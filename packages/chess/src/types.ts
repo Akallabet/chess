@@ -93,6 +93,7 @@ export interface FENState {
     w?: Coordinates;
     b?: Coordinates;
   };
+  opponentColor: ChessColor;
 }
 
 export type PGNTag =

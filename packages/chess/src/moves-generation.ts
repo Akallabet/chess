@@ -1,4 +1,4 @@
-import { whitePieces, blackPieces, flags, piecesByColor } from './constants.js';
+import { whitePieces, blackPieces, flags } from './constants.js';
 import { updateFENStateWithMove } from './fen.js';
 import {
   ChessColor,
@@ -543,12 +543,8 @@ function isMoveValid(move: MoveBase, state: FENState): boolean {
   return !isCellUnderCheck(moveState, kingCoord);
 }
 
-function generateMoves(state: FENState): {
-  moves: Array<MoveBase>;
-  attackedSquares: Record<string, boolean>;
-} {
+function generateMoves(state: FENState): Array<MoveBase> {
   const moves: Array<MoveBase> = [];
-  const attackedSquares: Record<string, boolean> = {};
   for (let y = 0; y < state.board.length; y++) {
     const row = state.board[y];
     for (let x = 0; x < row.length; x++) {
@@ -563,7 +559,6 @@ function generateMoves(state: FENState): {
                 promotion: [promotion],
               }));
             }
-            attackedSquares[`${move.target.x},${move.target.y}`] = true;
             return move;
           })
           .flat();
@@ -571,10 +566,7 @@ function generateMoves(state: FENState): {
       }
     }
   }
-  return {
-    attackedSquares,
-    moves,
-  };
+  return moves;
 }
 
 function calcCheckFlags(
@@ -590,20 +582,13 @@ function calcCheckFlags(
     state.fullMoves,
     state.opponentColor
   );
-  const check = generateMoves({
-    ...moveState,
-    activeColor: state.activeColor,
-  }).moves.find(
-    ({ target }) =>
-      moveState.board[target.y][target.x] ===
-      piecesByColor[moveState.activeColor].king
-  );
+  const check = calcIfKingUnderCheck(moveState);
   if (!check) return {};
 
   if (!state.kings[moveState.activeColor]) return {};
 
   const checkmate =
-    generateMoves(moveState).moves.filter(move => isMoveValid(move, moveState))
+    generateMoves(moveState).filter(move => isMoveValid(move, moveState))
       .length === 0;
   if (checkmate) return { checkmate };
   return { check: true };
@@ -611,7 +596,7 @@ function calcCheckFlags(
 
 export function generateLegalMoves(state: FENState): Array<MoveBase> {
   return generateMoves(state)
-    .moves.filter(move => isMoveValid(move, state))
+    .filter(move => isMoveValid(move, state))
     .map(move => {
       return {
         ...move,

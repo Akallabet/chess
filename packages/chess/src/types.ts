@@ -82,17 +82,21 @@ export interface CastlingRights {
   };
 }
 
-export interface FENState {
+export interface FENStateBase {
   board: Square[][];
   activeColor: ChessColor;
   castlingRights: CastlingRights;
   enPassant: Coordinates | false;
   halfMoves: number;
   fullMoves: number;
+}
+
+export interface FENState extends FENStateBase {
   kings: {
     w?: Coordinates;
     b?: Coordinates;
   };
+  pieceMap: Record<Piece, Array<Coordinates>>;
   opponentColor: ChessColor;
 }
 

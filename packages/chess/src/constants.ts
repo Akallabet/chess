@@ -2,6 +2,7 @@ import type {
   BlackPiece,
   ChessBoardAddress,
   ChessColor,
+  Coordinates,
   EmptySquare,
   Files,
   Piece,
@@ -28,6 +29,23 @@ export const ranks: Ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
 export const positionsBoard: ChessBoardAddress[][] = getPositions(files, ranks);
 export const positions: ChessBoardAddress[] = positionsBoard.flat();
 export const colours: Record<ChessColor, ChessColor> = { w: 'w', b: 'b' };
+export function getPiecePositions(): Record<Piece, Array<Coordinates>> {
+  return {
+    p: [],
+    n: [],
+    b: [],
+    r: [],
+    q: [],
+    k: [],
+    P: [],
+    N: [],
+    B: [],
+    R: [],
+    Q: [],
+    K: [],
+  };
+}
+
 export const piecesMap: Record<Piece, Piece> = {
   p: 'p',
   n: 'n',

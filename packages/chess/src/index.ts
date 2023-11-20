@@ -15,6 +15,7 @@ import {
 import {
   generateLegalMoves,
   calcIfKingUnderCheck,
+  generateDemoMoves,
 } from './moves-generation.js';
 import { translateMoveToSAN, translateSANToMove } from './san.js';
 import { buildPGNString, fromPGNString } from './pgn.js';
@@ -48,8 +49,13 @@ export function createMovesBoard(
   return movesBoard;
 }
 
+const generateMovesMap = {
+  [modes.standard]: generateLegalMoves,
+  [modes.demo]: generateDemoMoves,
+};
+
 function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
-  const legalMoves = generateLegalMoves(FENState);
+  const legalMoves = generateMovesMap[state.mode](FENState);
 
   const isInsufficientMaterial = calcInsufficientMaterial(FENState.board);
   const isThreefoldRepetition = calcThreefoldRepetition(state);

@@ -7,7 +7,7 @@ import {
   toFEN,
   updateBoardWithMove,
 } from '../src/fen.js';
-import { FENState, Square } from '../src/types.js';
+import { FENState, FENStateBase, Square } from '../src/types.js';
 
 test('Check FEN format', async t => {
   await t.test('Empty board', () => {
@@ -115,6 +115,20 @@ test('Return object from FEN string', () => {
       b: undefined,
       w: undefined,
     },
+    pieceMap: {
+      B: [],
+      K: [],
+      N: [],
+      P: [],
+      Q: [],
+      R: [],
+      b: [],
+      k: [],
+      n: [],
+      p: [],
+      q: [],
+      r: [],
+    },
     opponentColor: 'b',
   });
 });
@@ -130,7 +144,7 @@ test('Create board rows from piece placement', async t => {
 
 test('FEN string from object with empty board', () => {
   const FEN = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
-  const FENObj: FENState = {
+  const FENObj: FENStateBase = {
     board: emptyBoard,
     activeColor: 'w',
     castlingRights: {
@@ -140,10 +154,6 @@ test('FEN string from object with empty board', () => {
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
-    kings: {
-      b: undefined,
-      w: undefined,
-    },
   };
   assert.deepEqual(FEN, toFEN(FENObj));
 });
@@ -169,7 +179,7 @@ test('FEN string from object with board', () => {
     emptyRow,
     emptyRow,
   ];
-  const FENObj: FENState = {
+  const FENObj: FENStateBase = {
     board,
     activeColor: 'w',
     castlingRights: {
@@ -179,10 +189,6 @@ test('FEN string from object with board', () => {
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
-    kings: {
-      b: undefined,
-      w: undefined,
-    },
   };
   assert.deepEqual(FEN, toFEN(FENObj));
 });

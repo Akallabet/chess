@@ -4,7 +4,10 @@ import { matches } from '../test/fixtures/pgn.js';
 
 const data = {
   simple: {
-    start: { FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' },
+    start: {
+      FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+      mode: 'standard',
+    },
     moves: ['e4'],
   },
   gameOfTheCentury: {

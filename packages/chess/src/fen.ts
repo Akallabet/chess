@@ -3,6 +3,7 @@ import {
   colours,
   emptySquare,
   files,
+  getPiecePositions,
   piecesMap,
   positions,
   ranks,
@@ -19,6 +20,8 @@ import {
   ChessColor,
   MoveBase,
   CastlingRights,
+  Coordinates,
+  FENStateBase,
 } from './types.js';
 import {
   isKing,
@@ -51,6 +54,23 @@ export function getBoardStateFromFEN(FEN: string): string {
   const parts = FEN.split(' ');
 
   return `${parts[0]} ${parts[2]} ${parts[3]}`;
+}
+
+function pieceMapFromBoard(
+  board: Square[][]
+): Record<Piece, Array<Coordinates>> {
+  const piecePositions = getPiecePositions();
+
+  board.forEach((row, y) =>
+    row.forEach((cell, x) => {
+      if (!cell) return;
+      if (!piecePositions[cell as Piece]) {
+        piecePositions[cell as Piece] = [];
+      }
+      piecePositions[cell as Piece].push({ y, x });
+    })
+  );
+  return piecePositions;
 }
 
 export function fromFEN(FEN: string): FENState {
@@ -103,6 +123,7 @@ export function fromFEN(FEN: string): FENState {
         w: getPieceCoord(whitePieces.king, board),
         b: getPieceCoord(blackPieces.king, board),
       },
+      pieceMap: pieceMapFromBoard(board),
       opponentColor: activeColor === colours.w ? colours.b : colours.w,
     };
   }
@@ -116,7 +137,7 @@ export const toFEN = ({
   enPassant,
   halfMoves,
   fullMoves,
-}: FENState) => {
+}: FENStateBase) => {
   const piecePlacement = board
     .map(boardRow =>
       boardRow
@@ -267,6 +288,7 @@ export function updateFENStateWithMove(
       w: getPieceCoord(whitePieces.king, boardWithMove),
       b: getPieceCoord(blackPieces.king, boardWithMove),
     },
+    pieceMap: pieceMapFromBoard(boardWithMove),
     opponentColor: activeColor,
   };
 }

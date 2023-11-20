@@ -10,10 +10,11 @@ test('Move white pawn from e2 to e3', () => {
     { coord: { x: 3, y: 0 }, cell: 'k' },
     { coord: { x: 4, y: 7 }, cell: 'K' },
   ]);
-  const state = move(
-    'e3',
-    start({ FEN: '3k4/8/8/8/8/8/4P3/4K3 w KQkq - 0 1', mode: 'standard' })
-  );
+  const startState = start({
+    FEN: '3k4/8/8/8/8/8/4P3/4K3 w KQkq - 0 1',
+    mode: 'standard',
+  });
+  const state = move('e3', startState);
   assert.deepEqual(state.board, expected);
   assert.strictEqual(state.FEN, '3k4/8/8/8/8/4P3/8/4K3 b KQkq - 0 1');
 });

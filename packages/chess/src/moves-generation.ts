@@ -1,4 +1,4 @@
-import { whitePieces, blackPieces, flags } from './constants.js';
+import { whitePieces, blackPieces, flags, piecesByColor } from './constants.js';
 import { updateFENStateWithMove } from './fen.js';
 import {
   ChessColor,
@@ -324,6 +324,11 @@ export const patterns: Record<string, Array<Pattern>> = {
       shallStop: ({ step, state, origin, target }) => {
         if (!state.castlingRights.b.kingSide) return true;
         if (origin.y !== 0 && origin.x !== 3) return true;
+        if (
+          state.board[origin.y][origin.x + 3] !==
+          piecesByColor[state.activeColor].rook
+        )
+          return true;
         if (lte(1)({ step })) return true;
         const castlingEmptyCells = [
           { x: origin.x + 1, y: origin.y },
@@ -348,6 +353,11 @@ export const patterns: Record<string, Array<Pattern>> = {
       shallStop: ({ step, state, origin, target }) => {
         if (!state.castlingRights.b.queenSide) return true;
         if (origin.y !== 0 && origin.x !== 3) return true;
+        if (
+          state.board[origin.y][origin.x - 4] !==
+          piecesByColor[state.activeColor].rook
+        )
+          return true;
         if (lte(1)({ step })) return true;
         const castlingEmptyCells = [
           { x: origin.x - 1, y: origin.y },
@@ -538,7 +548,8 @@ function isMoveValid(move: MoveBase, state: FENState): boolean {
     state.opponentColor
   );
 
-  const kingCoord = moveState.kings[moveState.opponentColor];
+  const kingCoord =
+    moveState.pieceMap[piecesByColor[moveState.opponentColor].king][0];
   if (!kingCoord) return false;
   return !isCellUnderCheck(moveState, kingCoord);
 }
@@ -594,6 +605,14 @@ function calcCheckFlags(
   return { check: true };
 }
 
+export function generateDemoMoves(state: FENState): Array<MoveBase> {
+  return generateMoves(state).map(move => {
+    return {
+      ...move,
+      ...calcCheckFlags(move, state),
+    };
+  });
+}
 export function generateLegalMoves(state: FENState): Array<MoveBase> {
   return generateMoves(state)
     .filter(move => isMoveValid(move, state))

@@ -529,10 +529,10 @@ export function generateMovesForPattern(
 }
 
 export function calcIfKingUnderCheck(state: FENState): boolean {
-  if (!state.kings[state.activeColor]) return false;
+  if (!state.pieceMap[piecesByColor[state.activeColor].king][0]) return false;
   return isCellUnderCheck(
     state,
-    state.kings[state.activeColor] as Coordinates, //why Typescript, why?????
+    state.pieceMap[piecesByColor[state.activeColor].king][0],
     state.opponentColor
   );
 }
@@ -596,7 +596,8 @@ function calcCheckFlags(
   const check = calcIfKingUnderCheck(moveState);
   if (!check) return {};
 
-  if (!state.kings[moveState.activeColor]) return {};
+  if (!state.pieceMap[piecesByColor[moveState.activeColor].king].length)
+    return {};
 
   const checkmate =
     generateMoves(moveState).filter(move => isMoveValid(move, moveState))

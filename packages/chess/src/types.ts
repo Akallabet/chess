@@ -92,10 +92,6 @@ export interface FENStateBase {
 }
 
 export interface FENState extends FENStateBase {
-  kings: {
-    w?: Coordinates;
-    b?: Coordinates;
-  };
   pieceMap: Record<Piece, Array<Coordinates>>;
   opponentColor: ChessColor;
 }

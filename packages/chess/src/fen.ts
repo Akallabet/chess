@@ -119,10 +119,6 @@ export function fromFEN(FEN: string): FENState {
           }),
       halfMoves: Number(halfMoves),
       fullMoves: Number(fullMoves),
-      kings: {
-        w: getPieceCoord(whitePieces.king, board),
-        b: getPieceCoord(blackPieces.king, board),
-      },
       pieceMap: pieceMapFromBoard(board),
       opponentColor: activeColor === colours.w ? colours.b : colours.w,
     };
@@ -284,10 +280,6 @@ export function updateFENStateWithMove(
     halfMoves: isPawn(move.piece) || move.capture ? 0 : halfMoves + 1,
     fullMoves: activeColor === colours.b ? fullMoves + 1 : fullMoves,
     enPassant: updateEnPassant(move),
-    kings: {
-      w: getPieceCoord(whitePieces.king, boardWithMove),
-      b: getPieceCoord(blackPieces.king, boardWithMove),
-    },
     pieceMap: pieceMapFromBoard(boardWithMove),
     opponentColor: activeColor,
   };

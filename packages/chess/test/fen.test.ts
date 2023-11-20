@@ -111,10 +111,6 @@ test('Return object from FEN string', () => {
     enPassant: false,
     halfMoves: 0,
     fullMoves: 1,
-    kings: {
-      b: undefined,
-      w: undefined,
-    },
     pieceMap: {
       B: [],
       K: [],

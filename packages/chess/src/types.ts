@@ -113,6 +113,7 @@ export interface PGNState {
   white?: string;
   black?: string;
   result?: string;
+  initialFEN?: string;
   moves?: PGNMove[];
 }
 
@@ -137,8 +138,8 @@ export interface ChessStartStateFEN extends ChessStartState {
 
 export interface ChessInitialState extends PGNState {
   mode: GameMode;
-  FEN: string;
   initialFEN: string;
+  FEN: string;
   currentMove: number;
   moves: PGNMove[];
   error?: string;

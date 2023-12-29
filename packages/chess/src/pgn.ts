@@ -7,11 +7,12 @@ import { ChessState, Move, PGNState, PGNTag } from './types.js';
 function buildPGNTags({
   event = '?',
   site = '?',
-  date = `????.??.??`,
+  date = '????.??.??',
   round = '?',
   white = '?',
   black = '?',
   result = '*',
+  initialFEN = startingFEN,
 }: PGNState): string[] {
   return [
     `[Event "${event}"]`,
@@ -21,10 +22,11 @@ function buildPGNTags({
     `[White "${white}"]`,
     `[Black "${black}"]`,
     `[Result "${result}"]`,
+    `[FEN "${initialFEN}"]`,
   ];
 }
 
-function buildPGNMoveText({ moves = [] }: PGNState): string[] {
+function buildPGNMoves({ moves = [] }: PGNState): string[] {
   return moves
     .reduce((acc, move) => {
       const lastMove = acc[acc.length - 1];
@@ -46,11 +48,9 @@ function buildResult({ result = '*' }: PGNState): string {
 }
 
 export function buildPGNString(state: PGNState): string {
-  return (
-    [...buildPGNTags(state), ...buildPGNMoveText(state)].join('\n') +
-    buildResult(state) +
-    '\n\n'
-  );
+  return `${buildPGNTags(state)
+    .concat(buildPGNMoves(state))
+    .join('\n')}${buildResult(state)}\n\n`;
 }
 
 function parsePGNTagString(tags: string): PGNState {
@@ -90,8 +90,7 @@ interface PGNLogMove {
 export function parseMoveText(moveText: string): PGNLogMove[] {
   return moveText
     .split('\n')
-    .map(row => row.split(' '))
-    .flat()
+    .flatMap(row => row.split(' '))
     .reduce(
       (state, curr) => {
         if (curr.startsWith('(')) {

@@ -1,4 +1,4 @@
-import { modes, files, ranks } from './constants.js';
+import { modes, files, ranks, startingFEN } from './constants.js';
 import { fromFEN, toFEN, updateFENStateWithMove } from './fen.js';
 import {
   ChessInitialState,
@@ -88,9 +88,9 @@ function deriveState(FENState: FENState, state: ChessInitialState): ChessState {
     files,
     ranks,
     movesBoard: createMovesBoard(FENState.board, legalMoves),
-    FEN: toFEN(FENState),
     PGN: buildPGNString({ ...state, result }),
     initialFEN: state.initialFEN,
+    FEN: toFEN(FENState),
     result,
     event: state.event,
     date: state.date,
@@ -119,9 +119,9 @@ export function startFromPGN(state: ChessStartStatePGN): ChessState {
 }
 
 export function start(state: ChessStartStateFEN): ChessState {
-  return deriveState(fromFEN(state.initialFEN || state.FEN), {
+  return deriveState(fromFEN(state.FEN), {
+    initialFEN: state.FEN,
     ...state,
-    initialFEN: state.initialFEN || state.FEN,
     moves: state.moves || [],
     currentMove: state.currentMove || -1,
   });

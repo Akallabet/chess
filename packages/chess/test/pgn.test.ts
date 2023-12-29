@@ -6,12 +6,12 @@ test('Build PGN string', async t => {
   await t.test('Default tags', () => {
     assert.strictEqual(
       buildPGNString({}),
-      '[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n'
+      '[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n[FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]\n\n'
     );
   });
   await t.test('Tags with values', () => {
     assert.strictEqual(
-      '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "*"]\n\n',
+      '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "*"]\n[FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]\n\n',
       buildPGNString({
         event: 'Test',
         site: 'localhost',
@@ -25,7 +25,7 @@ test('Build PGN string', async t => {
   });
   await t.test('Moves', () => {
     assert.strictEqual(
-      '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "*"]\n1. e4 e5\n2. Nf3 Nc6\n\n',
+      '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "*"]\n[FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]\n1. e4 e5\n2. Nf3 Nc6\n\n',
       buildPGNString({
         event: 'Test',
         site: 'localhost',
@@ -95,7 +95,7 @@ test('Build PGN string', async t => {
   await t.test('Moves with Checkmate', () => {
     assert.strictEqual(
       [
-        '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "1-0"]',
+        '[Event "Test"]\n[Site "localhost"]\n[Date "2020.01.01"]\n[Round "1"]\n[White "White"]\n[Black "Black"]\n[Result "1-0"]\n[FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]',
         '1. e4 e5\n2. Bc4 b6\n3. Qf3 g6\n4. Qxf7# 1-0\n\n',
       ].join('\n'),
       buildPGNString({

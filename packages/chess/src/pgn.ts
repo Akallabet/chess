@@ -165,7 +165,7 @@ export function fromPGNString(pgn: string): ChessState {
         return forceResult(move.result, state);
       }
       if (move.san) {
-        return moveInternal(move.san, state);
+        return moveInternal({ san: move.san, state });
       }
       return state;
     },

@@ -18,8 +18,8 @@ export const data = {
 export const myImplementation = {
   withFEN(args) {
     const begin = performance.now();
-    args.moves.reduce((state, moveData) => {
-      return move(moveData, state);
+    args.moves.reduce((state, san) => {
+      return move({ san, state });
     }, start(args.start));
     const end = performance.now();
     const duration = end - begin;
@@ -42,9 +42,9 @@ export const withChessJs = {
     const begin = performance.now();
     const chess = new Chess(args.start.FEN);
 
-    args.moves.forEach(moveData => {
-      return chess.move(moveData);
-    });
+    for (const moveData of args.moves) {
+      chess.move(moveData);
+    }
 
     const end = performance.now();
     const duration = end - begin;

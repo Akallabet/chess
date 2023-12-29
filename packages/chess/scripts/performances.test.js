@@ -9,6 +9,5 @@ test('Performance - simple', () => {
 
 test('Performance - match of the century', () => {
   const performance = myImplementation.withPGN(data.gameOfTheCentury);
-  console.log(performance);
   assert.ok(performance < 90);
 });

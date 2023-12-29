@@ -6,7 +6,7 @@ import { move, start } from '../src/index.js';
 test('Check mate', () => {
   const FEN = '1k6/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
   const init = start({ FEN, mode: 'standard' });
-  const state = move('Qe8#', init);
+  const state = move({ san: 'Qe8#', state: init });
   assert.strictEqual(state.isGameOver, true);
   assert.strictEqual(state.isCheckmate, true);
   assert.strictEqual(state.isDraw, false);
@@ -15,7 +15,7 @@ test('Check mate', () => {
 
 test('Draw by Stale mate', () => {
   const FEN = 'k7/3R1Q2/8/8/8/8/8/4K3 w - - 0 1';
-  const state = move('Rb7', start({ FEN, mode: 'standard' }));
+  const state = move({ san: 'Rb7', state: start({ FEN, mode: 'standard' }) });
   assert.strictEqual(state.FEN, 'k7/1R3Q2/8/8/8/8/8/4K3 b - - 1 1');
   assert.strictEqual(state.isGameOver, true);
   assert.strictEqual(state.isDraw, true);
@@ -27,7 +27,7 @@ test('Draw by 50 moves rule', () => {
   const FEN =
     'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 49 99';
   const state = start({ FEN, mode: 'standard' });
-  const firstMove = move('Nc6', state);
+  const firstMove = move({ san: 'Nc6', state });
   assert.strictEqual(
     firstMove.FEN,
     'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 50 100'
@@ -105,7 +105,7 @@ test('Draw by threefold repetition', () => {
     'Rb1+',
   ];
   const state = moves.reduce(
-    (state, san) => move(san, state),
+    (state, san) => move({ san, state }),
     start({ FEN, mode: 'standard' })
   );
 

@@ -23,13 +23,7 @@ import {
   Coordinates,
   FENStateBase,
 } from './types.js';
-import {
-  isKing,
-  isPawn,
-  isRook,
-  isWhitePiece,
-  getPieceCoord,
-} from './utils.js';
+import { isKing, isPawn, isRook, isWhitePiece } from './utils.js';
 
 export function rowFromFEN(FENRow: string): Square[] {
   const elements = FENRow.split('');
@@ -61,15 +55,16 @@ function pieceMapFromBoard(
 ): Record<Piece, Array<Coordinates>> {
   const piecePositions = getPiecePositions();
 
-  board.forEach((row, y) =>
-    row.forEach((cell, x) => {
-      if (!cell) return;
+  for (const [y, row] of board.entries()) {
+    for (const [x, cell] of row.entries()) {
+      if (!cell) continue;
       if (!piecePositions[cell as Piece]) {
         piecePositions[cell as Piece] = [];
       }
       piecePositions[cell as Piece].push({ y, x });
-    })
-  );
+    }
+  }
+
   return piecePositions;
 }
 

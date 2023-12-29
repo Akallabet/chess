@@ -13,7 +13,6 @@
     "dev:backup": "npm run dev --workspace=@chess/chessboard-backup",
     "start": "npm start --workspace=@chess/chessboard",
     "performances": "npm run performances --workspace=@chess/chess",
-    "test:performances": "npm run performances && npm t",
     "linting": "eslint .",
     "linting:fix": "npm run linting -- --fix",
     "prettier": "prettier --ignore-path ./.eslintignore ./**/*.{js,json}",

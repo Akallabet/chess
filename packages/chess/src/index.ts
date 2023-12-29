@@ -1,4 +1,4 @@
-import { modes, files, ranks, startingFEN } from './constants.js';
+import { modes, files, ranks } from './constants.js';
 import { fromFEN, toFEN, updateFENStateWithMove } from './fen.js';
 import {
   ChessInitialState,
@@ -128,7 +128,15 @@ export function start(state: ChessStartStateFEN): ChessState {
   });
 }
 
-export function moveInternal(san: string, state: ChessState): ChessState {
+export interface ChessMoveInternalState {
+  san: string;
+  state: ChessState;
+}
+
+export function moveInternal({
+  san,
+  state,
+}: ChessMoveInternalState): ChessState {
   const move = translateSANToMove(san, state.movesBoard);
   const FENStateWithMove = updateFENStateWithMove(
     move,
@@ -139,18 +147,29 @@ export function moveInternal(san: string, state: ChessState): ChessState {
     state.fullMoves,
     state.opponentColor
   );
-  const history = [...state.history, { ...move, FEN: toFEN(FENStateWithMove) }];
-  const currentMove = history.length - 1;
-  return deriveState({ ...state, history, currentMove, ...FENStateWithMove });
+  return deriveState({
+    ...state,
+    history: [...state.history, { ...move, FEN: toFEN(FENStateWithMove) }],
+    currentMove: state.currentMove + 1,
+    ...FENStateWithMove,
+  });
 }
 
-export function move(san: string, inputState: ChessInitialState): ChessState {
+export interface ChessMoveInputState {
+  san: string;
+  state: ChessInitialState;
+}
+
+export function move({
+  san,
+  state: inputState,
+}: ChessMoveInputState): ChessState {
   const state = deriveState({ ...inputState, ...fromFEN(inputState.FEN) });
   if (inputState.currentMove !== inputState.history.length - 1) {
     return state;
   }
   if (state.isGameOver) return state;
-  return moveInternal(san, state);
+  return moveInternal({ san, state });
 }
 
 export function draw(inputState: ChessInitialState): ChessState {
@@ -173,31 +192,36 @@ export function resign(inputState: ChessInitialState): ChessState {
   });
 }
 
-export function goToMove(
-  index: number,
-  inputState: ChessInitialState
-): ChessState {
+export function goToMove({
+  move,
+  state: inputState,
+}: {
+  move: number;
+  state: ChessInitialState;
+}): ChessState {
   const state = deriveState({ ...inputState, ...fromFEN(inputState.FEN) });
-  if (!state.history[index]) return state;
-  state.currentMove = index;
-  const move = state.history[state.currentMove];
-  return deriveState({ ...state, ...fromFEN(move.FEN) });
+  if (!state.history[move]) return state;
+  return deriveState({
+    ...state,
+    currentMove: move,
+    ...fromFEN(state.history[move].FEN),
+  });
 }
 
-export function moveBack(inputState: ChessInitialState): ChessState {
-  if (!inputState.history[inputState.currentMove - 1])
+export function moveBack(state: ChessInitialState): ChessState {
+  if (!state.history[state.currentMove - 1])
     return deriveState({
-      ...inputState,
+      ...state,
       currentMove: -1,
-      ...fromFEN(inputState.initialFEN),
+      ...fromFEN(state.initialFEN),
     });
-  return goToMove(inputState.currentMove - 1, inputState);
+  return goToMove({ move: state.currentMove - 1, state });
 }
 
-export function moveForward(inputState: ChessInitialState): ChessState {
-  if (!inputState.history[inputState.currentMove + 1])
-    return deriveState({ ...inputState, ...fromFEN(inputState.FEN) });
-  return goToMove(inputState.currentMove + 1, inputState);
+export function moveForward(state: ChessInitialState): ChessState {
+  if (!state.history[state.currentMove + 1])
+    return deriveState({ ...state, ...fromFEN(state.FEN) });
+  return goToMove({ move: state.currentMove + 1, state });
 }
 
 export function moveToStart(inputState: ChessInitialState): ChessState {
@@ -208,8 +232,8 @@ export function moveToStart(inputState: ChessInitialState): ChessState {
   });
 }
 
-export function moveToEnd(inputState: ChessInitialState): ChessState {
-  return goToMove(inputState.history.length - 1, inputState);
+export function moveToEnd(state: ChessInitialState): ChessState {
+  return goToMove({ move: state.history.length - 1, state });
 }
 
 export function moves(coord: Coordinates, state: ChessState): Array<Move> {

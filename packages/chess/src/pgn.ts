@@ -26,7 +26,7 @@ function buildPGNTags({
   ];
 }
 
-function buildPGNMoves({ moves = [] }: PGNState): string[] {
+function buildPGNMoves({ history: moves = [] }: PGNState): string[] {
   return moves
     .reduce((acc, move) => {
       const lastMove = acc[acc.length - 1];

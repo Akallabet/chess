@@ -114,7 +114,7 @@ export interface PGNState {
   black?: string;
   result?: string;
   initialFEN?: string;
-  moves?: PGNMove[];
+  history?: PGNMove[];
 }
 
 export type GameMode = keyof typeof modes;
@@ -141,7 +141,7 @@ export interface ChessInitialState extends PGNState {
   initialFEN: string;
   FEN: string;
   currentMove: number;
-  moves: PGNMove[];
+  history: PGNMove[];
   error?: string;
 }
 
@@ -151,7 +151,7 @@ export interface ChessState extends ChessInitialState, FENState {
   error?: string;
   movesBoard: Move[][][];
   PGN: string;
-  moves: PGNMove[];
+  history: PGNMove[];
   isBlackWin: boolean;
   isWhiteWin: boolean;
   isGameOver: boolean;

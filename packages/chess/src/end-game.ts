@@ -1,13 +1,6 @@
-
 import { piecesMap } from './constants.js';
-import {
-  getBoardStateFromFEN,
-} from './fen.js';
-import {
-  ChessInitialState,
-  Square,
-  Piece,
-} from './types.js';
+import { getBoardStateFromFEN } from './fen.js';
+import { ChessInitialState, Square, Piece } from './types.js';
 
 import { getPieceCoord, isBlackPiece, isWhitePiece } from './utils.js';
 
@@ -47,11 +40,11 @@ export function calcInsufficientMaterial(board: Square[][]): boolean {
 }
 
 export function calcThreefoldRepetition(state: ChessInitialState): boolean {
-  if (state.moves.length < 3) return false;
-  const current = state.moves[state.moves.length - 1];
+  if (state.history.length < 3) return false;
+  const current = state.history[state.history.length - 1];
   const currentBoardState = getBoardStateFromFEN(current.FEN);
 
-  const repeatedMoves = state.moves.filter(
+  const repeatedMoves = state.history.filter(
     ({ FEN }) => getBoardStateFromFEN(FEN) === currentBoardState
   );
   return repeatedMoves.length === 3;

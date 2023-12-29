@@ -34,7 +34,7 @@ test('Build PGN string', async t => {
         white: 'White',
         black: 'Black',
         result: '*',
-        moves: [
+        history: [
           {
             piece: 'P',
             origin: {
@@ -106,7 +106,7 @@ test('Build PGN string', async t => {
         white: 'White',
         black: 'Black',
         result: '1-0',
-        moves: [
+        history: [
           {
             piece: 'P',
             origin: {

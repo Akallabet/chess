@@ -139,9 +139,9 @@ export function moveInternal(san: string, state: ChessState): ChessState {
     state.fullMoves,
     state.opponentColor
   );
-  state.history = [...state.history, { ...move, FEN: toFEN(FENStateWithMove) }];
-  state.currentMove = state.history.length - 1;
-  return deriveState({ ...state, ...FENStateWithMove });
+  const history = [...state.history, { ...move, FEN: toFEN(FENStateWithMove) }];
+  const currentMove = history.length - 1;
+  return deriveState({ ...state, history, currentMove, ...FENStateWithMove });
 }
 
 export function move(san: string, inputState: ChessInitialState): ChessState {

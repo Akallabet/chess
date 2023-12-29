@@ -6,6 +6,7 @@
     "test": "npm test --workspace=@chess/chess",
     "test:watch": "npm run test:watch --workspace=@chess/chess",
     "test:only": "npm run test:only --workspace=@chess/chess",
+    "test:performance": "npm run test:performance --workspace=@chess/chess",
     "build:chess": "npm run build --workspace=@chess/chess",
     "build": "npm run build --workspace=@chess/chessboard",
     "dev": "npm run dev --workspace=@chess/chessboard",

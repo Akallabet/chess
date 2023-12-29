@@ -22,22 +22,20 @@ export const myImplementation = {
       return move(moveData, state);
     }, start(args.start));
     const end = performance.now();
-    const duration = end - begin;
-    console.log(`Simple: ${duration}ms`);
-    return duration;
+    console.log(`Simple: ${end - begin}ms`);
+    return end;
   },
   withPGN(args) {
     const begin = performance.now();
     startFromPGN(args.start);
 
     const end = performance.now();
-    const duration = end - begin;
-    console.log(`Match of the century: ${duration}ms`);
-    return duration;
+    console.log(`Match of the century: ${end - begin}ms`);
+    return end;
   },
 };
 
-export const withChessJs = {
+const withChessJs = {
   withFEN(args) {
     const begin = performance.now();
     const chess = new Chess(args.start.FEN);
@@ -47,9 +45,7 @@ export const withChessJs = {
     });
 
     const end = performance.now();
-    const duration = end - begin;
-    console.log(`Simple: ${duration}ms`);
-    return duration;
+    console.log(`Simple: ${end - begin}ms`);
   },
   withPGN(args) {
     const begin = performance.now();
@@ -58,8 +54,14 @@ export const withChessJs = {
     chess.loadPgn(args.start.PGN);
 
     const end = performance.now();
-    const duration = end - begin;
-    console.log(`Match of the century: ${duration}ms`);
-    return duration;
+    console.log(`Match of the century: ${end - begin}ms`);
   },
 };
+
+console.log('My implementation');
+myImplementation.withFEN(data.simple);
+myImplementation.withPGN(data.gameOfTheCentury);
+
+console.log('Chess.js');
+withChessJs.withFEN(data.simple);
+withChessJs.withPGN(data.gameOfTheCentury);

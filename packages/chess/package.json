@@ -18,9 +18,10 @@
     "test": "node --test --loader tsx ./test/*.test.ts",
     "test:only": "node --test-only --loader tsx ./test/start.test.ts",
     "test:watch": "node --test --watch --loader tsx ./test/*.test.ts",
+    "test:performance": "node --test ./scripts/*.test.js",
     "emit:types": "tsc -p . --emitDeclarationOnly",
     "bundle": "swc src -d dist -q",
-    "performances": "node ./scripts/performances.js",
+    "performances": "node ./scripts/performances-run.js",
     "prebuild": "rm -rf dist",
     "build": "npm run bundle",
     "postbuild": "npm run emit:types"
